@@ -1,7 +1,7 @@
 {
   "name": "@wemake-ai/mcp",
   "private": true,
-  "version": "25.0.0",
+  "version": "0.0.1",
   "description": "WeMake Model Context Protocol servers",
   "license": "MIT",
   "author": "WeMake (https://wemake.cx)",
