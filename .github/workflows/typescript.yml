@@ -32,20 +32,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: 22
-          cache: npm
+          bun-version: latest
 
       - name: Install dependencies
         working-directory: src/${{ matrix.package }}
-        run: npm ci
+        run: bun install
 
       - name: Check if tests exist
         id: check-tests
         working-directory: src/${{ matrix.package }}
         run: |
-          if npm run test --silent 2>/dev/null; then
+          if bun run test > /dev/null 2>&1; then
             echo "has-tests=true" >> $GITHUB_OUTPUT
           else
             echo "has-tests=false" >> $GITHUB_OUTPUT
@@ -55,7 +54,7 @@ jobs:
       - name: Run tests
         if: steps.check-tests.outputs.has-tests == 'true'
         working-directory: src/${{ matrix.package }}
-        run: npm test
+        run: bun run test
 
   build:
     needs: [detect-packages, test]
@@ -67,18 +66,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: 22
-          cache: npm
+          bun-version: latest
 
       - name: Install dependencies
         working-directory: src/${{ matrix.package }}
-        run: npm ci
+        run: bun install
 
       - name: Build package
         working-directory: src/${{ matrix.package }}
-        run: npm run build
+        run: bun run build
 
   publish:
     runs-on: ubuntu-latest
@@ -97,18 +95,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: 22
-          cache: npm
-          registry-url: "https://registry.npmjs.org"
+          bun-version: latest
 
       - name: Install dependencies
         working-directory: src/${{ matrix.package }}
-        run: npm ci
+        run: bun install
 
       - name: Publish package
         working-directory: src/${{ matrix.package }}
-        run: npm publish --access public
+        run: bunx --bun npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
