@@ -1,0 +1,39 @@
+{
+  "name": "@wemake-ai/mcp",
+  "private": true,
+  "version": "25.0.0",
+  "description": "WeMake Model Context Protocol servers",
+  "license": "MIT",
+  "author": "WeMake (https://wemake.cx)",
+  "homepage": "https://wemake.cx",
+  "bugs": "https://github.com/wemake-ai/mcp/issues",
+  "type": "module",
+  "workspaces": [
+    "src/*"
+  ],
+  "scripts": {
+    "build": "bun run build --workspaces",
+    "watch": "bun run watch --workspaces",
+    "publish-all": "bun publish --workspaces --access public",
+    "link-all": "bun link --workspaces",
+    "format": "bun prettier && bun lint --fix",
+    "prettier": "bunx prettier --write .",
+    "lint": "bunx eslint . --ext .ts,.tsx"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.31.0",
+    "markdownlint": "^0.38.0",
+    "prettier": "^3.6.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "prettier": {
+    "trailingComma": "none",
+    "printWidth": 80,
+    "proseWrap": "always"
+  }
+}
