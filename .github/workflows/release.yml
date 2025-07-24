@@ -159,22 +159,20 @@ jobs:
         with:
           ref: ${{ needs.create-metadata.outputs.version }}
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: 22
-          cache: npm
-          registry-url: "https://registry.npmjs.org"
+          bun-version: latest
 
       - name: Install dependencies
         working-directory: src/${{ matrix.package }}
-        run: npm ci
+        run: bun install
 
       - name: Check if version exists on npm
         working-directory: src/${{ matrix.package }}
         run: |
           PKG=$(jq -r .name package.json)
           VERSION=$(jq -r .version package.json)
-          if npm view "$PKG" --json | jq -e --arg v "$VERSION" '.versions | index($v) != null'; then
+          if bunx --bun npm view "$PKG" --json | jq -e --arg v "$VERSION" '.versions | index($v) != null'; then
             echo "Version $VERSION already exists on npm"
             exit 1
           fi
@@ -182,12 +180,12 @@ jobs:
 
       - name: Build package
         working-directory: src/${{ matrix.package }}
-        run: npm run build
+        run: bun run build
 
       - name: Publish package
         working-directory: src/${{ matrix.package }}
         run: |
-          npm publish --access public
+          bunx --bun npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
