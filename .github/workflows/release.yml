@@ -172,8 +172,9 @@ jobs:
       - name: Check if version exists on npm
         working-directory: src/${{ matrix.package }}
         run: |
+          PKG=$(jq -r .name package.json)
           VERSION=$(jq -r .version package.json)
-          if npm view --json | jq -e --arg version "$VERSION" '[.[]][0].versions | contains([$version])'; then
+          if npm view "$PKG" --json | jq -e --arg v "$VERSION" '.versions | index($v) != null'; then
             echo "Version $VERSION already exists on npm"
             exit 1
           fi
