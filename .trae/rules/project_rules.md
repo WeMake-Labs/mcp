@@ -1,10 +1,6 @@
----
-description: Use Bun instead of Node.js, npm, pnpm, or vite.
-globs: "*.ts, *.tsx, *.html, *.css, *.js, *.jsx, package.json"
-alwaysApply: false
----
+# Project Rules
 
-# Bun
+## Bun
 
 Default to using Bun instead of Node.js.
 
@@ -15,7 +11,7 @@ Default to using Bun instead of Node.js.
 - Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
 - Bun automatically loads .env, so don't use dotenv.
 
-## APIs
+### APIs
 
 - `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.
 - `bun:sqlite` for SQLite. Don't use `better-sqlite3`.
@@ -25,11 +21,11 @@ Default to using Bun instead of Node.js.
 - Prefer `Bun.file` over `node:fs`'s readFile/writeFile
 - Bun.$`ls` instead of execa.
 
-## Testing
+### Testing
 
 Use `bun test` to run tests.
 
-```ts#index.test.ts
+```ts #index.test.ts
 import { test, expect } from "bun:test";
 
 test("hello world", () => {
@@ -37,14 +33,14 @@ test("hello world", () => {
 });
 ```
 
-## Frontend
+### Frontend
 
 Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully support React, CSS, Tailwind.
 
 Server:
 
-```ts#index.ts
-import index from "./index.html"
+```ts #index.ts
+import index from "./index.html";
 
 Bun.serve({
   routes: {
@@ -65,18 +61,18 @@ Bun.serve({
     },
     close: (ws) => {
       // handle close
-    }
+    },
   },
   development: {
     hmr: true,
     console: true,
-  }
-})
+  },
+});
 ```
 
 HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will transpile & bundle automatically. `<link>` tags can point to stylesheets and Bun's CSS bundler will bundle.
 
-```html#index.html
+```html #index.html
 <html>
   <body>
     <h1>Hello, world!</h1>
@@ -87,11 +83,11 @@ HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will tr
 
 With the following `frontend.tsx`:
 
-```tsx#frontend.tsx
+```tsx #frontend.tsx
 import React from "react";
 
 // import .css files directly and it works
-import './index.css';
+import "./index.css";
 
 import { createRoot } from "react-dom/client";
 
