@@ -19,12 +19,8 @@ is implemented with an MCP SDK:
 
 These servers aim to demonstrate MCP features and the official SDKs.
 
-- **[TODO: Git](src/git)** - Tools to read, search, and manipulate Git
-  repositories
-- **[TODO: Memory](src/memory)** - Knowledge graph-based persistent memory
-  system
-- **[TODO: Sequential Thinking](src/sequentialthinking)** - Dynamic and
-  reflective problem-solving through thought sequences
+- **[Sequential Thinking](src/sequential-thinking)** - Dynamic and reflective
+  problem-solving through thought sequences
 
 ## 🚀 Getting Started
 
