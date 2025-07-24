@@ -16,10 +16,15 @@
     "watch": "bun run watch --workspaces",
     "publish-all": "bun publish --workspaces --access public",
     "link-all": "bun link --workspaces",
-    "format": "prettier --write ."
+    "format": "bun prettier && bun lint --fix",
+    "prettier": "prettier --write .",
+    "lint": "eslint . --ext .ts,.tsx"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.31.0",
     "prettier": "^3.6.2"
   },
   "peerDependencies": {
