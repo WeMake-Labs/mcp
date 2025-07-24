@@ -39,7 +39,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version-file: "src/${{ matrix.package }}/.python-version"
+          python-version: |
+            ${{
+              hashFiles(format('src/{0}/.python-version', matrix.package)) != '' &&
+              formatFile('src/{0}/.python-version', matrix.package) || '3.12'
+            }}
 
       - name: Install dependencies
         working-directory: src/${{ matrix.package }}
