@@ -17,8 +17,8 @@
     "publish-all": "bun publish --workspaces --access public",
     "link-all": "bun link --workspaces",
     "format": "bun prettier && bun lint --fix",
-    "prettier": "prettier --write .",
-    "lint": "eslint . --ext .ts,.tsx"
+    "prettier": "bunx prettier --write .",
+    "lint": "bunx eslint . --ext .ts,.tsx"
   },
   "devDependencies": {
     "@types/bun": "latest",

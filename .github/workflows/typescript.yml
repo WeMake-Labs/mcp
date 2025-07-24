@@ -40,16 +40,15 @@ jobs:
         working-directory: src/${{ matrix.package }}
         run: bun install
 
-      - name: Check if tests exist
+      - name: Check if tests script exists
         id: check-tests
         working-directory: src/${{ matrix.package }}
         run: |
-          if bun run test > /dev/null 2>&1; then
-            echo "has-tests=true" >> $GITHUB_OUTPUT
+          if jq -e '.scripts.test' package.json >/dev/null; then
+            echo "has-tests=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has-tests=false" >> $GITHUB_OUTPUT
+            echo "has-tests=false" >> "$GITHUB_OUTPUT"
           fi
-        continue-on-error: true
 
       - name: Run tests
         if: steps.check-tests.outputs.has-tests == 'true'

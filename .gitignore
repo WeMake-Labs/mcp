@@ -6,6 +6,10 @@ out
 dist
 *.tgz
 
+# Bun runtime artefacts
+bun.lockb
+.bun/
+
 # code coverage
 coverage
 *.lcov
