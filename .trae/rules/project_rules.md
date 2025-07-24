@@ -49,7 +49,7 @@ Default to using Bun instead of Node.js.
 
 Use `bun test` to run tests.
 
-```ts #index.test.ts
+```ts
 import { test, expect } from "bun:test";
 
 test("hello world", () => {
@@ -63,7 +63,7 @@ Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully suppor
 
 Server:
 
-```ts #index.ts
+```ts
 import index from "./index.html";
 
 Bun.serve({
@@ -96,7 +96,7 @@ Bun.serve({
 
 HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will transpile & bundle automatically. `<link>` tags can point to stylesheets and Bun's CSS bundler will bundle.
 
-```html #index.html
+```html
 <html>
   <body>
     <h1>Hello, world!</h1>
@@ -107,7 +107,7 @@ HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will tr
 
 With the following `frontend.tsx`:
 
-```tsx #frontend.tsx
+```tsx
 import React from "react";
 
 // import .css files directly and it works
@@ -131,3 +131,28 @@ bun --hot ./index.ts
 ```
 
 For more information, read the Bun API docs in `node_modules/bun-types/docs/**.md`.
+
+## Vitest
+
+Use Vitest as the primary testing framework for this MCP monorepo.
+
+- Configure Vitest using vitest.config.ts or integrate with vite.config.ts for unified setup. <mcreference link="https://vitest.dev/config/" index="1">1</mcreference>
+- Leverage Vitest's fast execution and parallel testing for velocity in monorepos. <mcreference link="https://dev.to/shannonlal/unit-testing-react-applications-in-a-nx-nrwl-monorepo-with-vitest-322o" index="2">2</mcreference>
+- Write tests with TypeScript support, ensuring strict type checking. <mcreference link="https://colinhacks.com/essays/live-types-typescript-monorepo" index="3">3</mcreference>
+- Add function-level comments in test files explaining test purpose and logic.
+- Optimize for single developer: Use simple test setups, automate runs with scripts.
+- Enable coverage reports and use reporters for quality insights. <mcreference link="https://vitest.dev/guide/" index="5">5</mcreference>
+- Follow best practices for monorepo: Use project configurations for different packages. <mcreference link="https://thijs-koerselman.medium.com/my-quest-for-the-perfect-ts-monorepo-62653d3047eb" index="4">4</mcreference>
+- Example test:
+
+```ts
+// sum.test.ts
+import { expect, test } from "vitest";
+import { sum } from "./sum";
+
+test("adds 1 + 2 to equal 3", () => {
+  expect(sum(1, 2)).toBe(3);
+});
+```
+
+For configuration details, refer to Vitest docs. <mcreference link="https://vitest.dev/config/" index="1">1</mcreference> <mcreference link="https://vitest.dev/guide/" index="5">5</mcreference>
