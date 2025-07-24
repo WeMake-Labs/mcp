@@ -65,7 +65,9 @@ jobs:
 
   update-packages:
     needs: [create-metadata]
-    if: ${{ needs.create-metadata.outputs.npm_packages != '[]' || needs.create-metadata.outputs.pypi_packages != '[]' }}
+    if:
+      ${{ needs.create-metadata.outputs.npm_packages != '[]' ||
+      needs.create-metadata.outputs.pypi_packages != '[]' }}
     runs-on: ubuntu-latest
     environment: release
     outputs:

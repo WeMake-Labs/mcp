@@ -7,18 +7,18 @@ export default [
   {
     files: ["**/*.ts", "**/*.tsx"],
     plugins: {
-      "@typescript-eslint": typescriptEslint,
+      "@typescript-eslint": typescriptEslint
     },
     languageOptions: {
       parser: tsParser,
       parserOptions: {
         project: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
+        tsconfigRootDir: import.meta.dirname
+      }
     },
     rules: {
-      ...typescriptEslint.configs.recommended.rules,
+      ...typescriptEslint.configs.recommended.rules
       // Add or override rules as needed
-    },
-  },
+    }
+  }
 ];

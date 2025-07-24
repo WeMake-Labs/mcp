@@ -25,9 +25,15 @@
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "eslint": "^9.31.0",
+    "markdownlint": "^0.38.0",
     "prettier": "^3.6.2"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "prettier": {
+    "trailingComma": "none",
+    "printWidth": 80,
+    "proseWrap": "always"
   }
 }
