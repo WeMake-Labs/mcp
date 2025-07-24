@@ -1,5 +1,29 @@
 # Project Rules
 
+## Monorepo Best Practices
+
+- Use Bun's workspace features for managing multiple packages in `src/*`.
+- Automate builds and tests across workspaces with `bun run` scripts in the root package.json.
+- Simplify operations by leveraging Bun's built-in tools for dependency management and scripting.
+
+## TypeScript
+
+- Use TypeScript for all code.
+- Follow the project's tsconfig.json settings.
+- Enable strict type checking.
+
+## Development Principles
+
+- Prioritize velocity: Focus on rapid iteration while maintaining code quality through automated tests and linting.
+- Add function-level comments when generating code, explaining purpose and key logic.
+- Optimize for a single full-stack developer: Emphasize simple, maintainable architectures and minimal dependencies.
+
+## Additional Guidelines
+
+- Focus on automation: Use scripts for common tasks like building, testing, and publishing.
+- Ensure operational simplicity: Avoid complex setups; prefer Bun's native capabilities.
+- For MCP servers: Follow Model Context Protocol best practices as per documentation.
+
 ## Bun
 
 Default to using Bun instead of Node.js.
