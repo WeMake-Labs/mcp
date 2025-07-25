@@ -1,6 +1,6 @@
 {
   "name": "@wemake-ai/mcp",
-  "version": "25.2.0",
+  "version": "25.3.0",
   "author": "WeMake (https://wemake.cx)",
   "devDependencies": {
     "@types/bun": "latest",
@@ -14,7 +14,7 @@
     "typescript": "^5"
   },
   "bugs": "https://github.com/WeMake-ai/mcp/issues",
-  "description": "WeMake Model Context Protocol servers",
+  "description": "WeMake Model Context Protocol (MCP) servers",
   "homepage": "https://wemake.cx",
   "license": "MIT",
   "prettier": {
@@ -24,10 +24,14 @@
   },
   "private": true,
   "scripts": {
-    "deep-thinking:build": "bun run --cwd=src/deep-thinking build",
-    "deep-thinking:publish": "bun publish --access=public --cwd=src/deep-thinking",
-    "tasks:build": "bun run --cwd=src/tasks build",
-    "tasks:publish": "bun publish --access=public --cwd=src/tasks",
+    "build-all": "bun run --filter='./src/*' build",
+    "publish-all": "bun run --filter='./src/*' publish-now",
+    "deep-thinking:build": "bun run --cwd='./src/deep-thinking' build",
+    "deep-thinking:publish": "bun run --cwd='./src/deep-thinking' publish-now",
+    "knowledge-graph-memory:build": "bun run --cwd='./src/knowledge-graph-memory' build",
+    "knowledge-graph-memory:publish": "bun run --cwd='./src/knowledge-graph-memory' publish-now",
+    "tasks:build": "bun run --cwd='./src/tasks' build",
+    "tasks:publish": "bun run --cwd='./src/tasks' publish-now",
     "format": "bunx prettier --write . && bun lint --fix",
     "prettier": "bunx prettier --write .",
     "lint": "bunx eslint . --ext .ts,.tsx",
