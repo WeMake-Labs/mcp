@@ -1,21 +1,27 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, mock } from "bun:test";
 import { KnowledgeGraphManager } from "../index.js";
 
-// Import Entity type for proper typing
-type Entity = {
+interface Entity {
   name: string;
   entityType: string;
   observations: string[];
-};
+}
 
-// Mock fs module
-vi.mock("fs", () => ({
+// Mock fs module using Bun's mock
+const mockReadFile = mock(() =>
+  Promise.resolve('{"entities":[],"relations":[]}')
+);
+const mockWriteFile = mock(() => Promise.resolve());
+const mockAccess = mock(() => Promise.resolve());
+const mockExistsSync = mock(() => false);
+
+mock.module("fs", () => ({
   promises: {
-    readFile: vi.fn(() => Promise.resolve('{"entities":[],"relations":[]}')),
-    writeFile: vi.fn(() => Promise.resolve()),
-    access: vi.fn(() => Promise.resolve())
+    readFile: mockReadFile,
+    writeFile: mockWriteFile,
+    access: mockAccess
   },
-  existsSync: vi.fn(() => false)
+  existsSync: mockExistsSync
 }));
 
 describe("Server Integration Tests", () => {

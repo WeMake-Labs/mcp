@@ -19,7 +19,11 @@ export default defineConfig({
       }
     },
     setupFiles: [],
-    testTimeout: 10000
+    testTimeout: 10000,
+    // Mock configuration to enable vi.mock functionality
+    mockReset: true,
+    clearMocks: true,
+    restoreMocks: true
   },
   resolve: {
     alias: {

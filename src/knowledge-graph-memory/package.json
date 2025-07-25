@@ -25,10 +25,8 @@
     "prepare": "bun run build",
     "watch": "bun build --insert-shebang --target=bun --outfile=dist/index.js index.ts --watch",
     "publish-now": "bun publish --access=public",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui"
+    "test": "bun test",
+    "test:watch": "bun test --watch"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.0",

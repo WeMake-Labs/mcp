@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, mock } from "bun:test";
 import { KnowledgeGraphManager } from "../index.js";
 
-// Mock fs module
-const mockReadFile = vi.fn(() => Promise.resolve(""));
-const mockWriteFile = vi.fn(() => Promise.resolve());
+// Mock fs module using Bun's mock
+const mockReadFile = mock(() => Promise.resolve(""));
+const mockWriteFile = mock(() => Promise.resolve());
 
-vi.mock("fs", () => ({
+mock.module("fs", () => ({
   promises: {
     readFile: mockReadFile,
     writeFile: mockWriteFile

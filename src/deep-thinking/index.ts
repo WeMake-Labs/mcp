@@ -63,9 +63,9 @@ export class DeepThinkingServer {
 
   private formatThought(thoughtData: ThoughtData): string {
     const {
+      thought,
       thoughtNumber,
       totalThoughts,
-      thought,
       isRevision,
       revisesThought,
       branchFromThought,
@@ -87,13 +87,25 @@ export class DeepThinkingServer {
     }
 
     const header = `${prefix} ${thoughtNumber}/${totalThoughts}${context}`;
-    const border = "─".repeat(Math.max(header.length, thought.length) + 4);
+
+    // Limit maximum border length to prevent excessive console output
+    const MAX_BORDER_LENGTH = 120;
+    const idealBorderLength = Math.max(header.length, thought.length) + 4;
+    const borderLength = Math.min(idealBorderLength, MAX_BORDER_LENGTH);
+    const border = "─".repeat(borderLength);
+
+    // Truncate thought if it's too long for the border
+    const maxThoughtLength = borderLength - 2;
+    const displayThought =
+      thought.length > maxThoughtLength
+        ? thought.substring(0, maxThoughtLength - 3) + "..."
+        : thought;
 
     return `
 ┌${border}┐
-│ ${header} │
+│ ${header.padEnd(borderLength - 2)} │
 ├${border}┤
-│ ${thought.padEnd(border.length - 2)} │
+│ ${displayThought.padEnd(borderLength - 2)} │
 └${border}┘`;
   }
 
