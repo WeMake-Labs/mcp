@@ -43,18 +43,18 @@ The Sequential Thinking tool is designed for:
 
 ## Configuration
 
-### Usage with Claude Desktop
+### Usage with Trae IDE
 
-Add this to your `claude_desktop_config.json`:
+Add this MCP manually:
 
 #### bunx
 
 ```json
 {
   "mcpServers": {
-    "sequential-thinking": {
+    "Sequential Thinking": {
       "command": "bunx",
-      "args": ["-y", "@wemake-ai/mcp-sequential-thinking"]
+      "args": ["-y", "@wemake-ai/mcp-server-sequential-thinking"]
     }
   }
 }

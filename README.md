@@ -9,7 +9,6 @@ MCP, demonstrating how it can be used to give Large Language Models (LLMs)
 secure, controlled access to tools and data sources. Typically, each MCP server
 is implemented with an MCP SDK:
 
-- [Python MCP SDK](https://github.com/modelcontextprotocol/python-sdk)
 - [Typescript MCP SDK](https://github.com/modelcontextprotocol/typescript-sdk)
 
 > Note: Lists in this README are maintained in alphabetical order to minimize

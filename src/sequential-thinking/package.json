@@ -1,5 +1,5 @@
 {
-  "name": "@wemake-ai/mcp-sequential-thinking",
+  "name": "@wemake-ai/mcp-server-sequential-thinking",
   "version": "1.0.0",
   "description": "MCP server for sequential thinking and problem solving",
   "license": "MIT",
@@ -14,9 +14,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && shx chmod +x dist/*.js",
+    "build": "bun build --target=node --outfile=dist/index.js index.ts && bun tsc && shx chmod +x dist/*.js",
     "prepare": "bun run build",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "publish": "bun publish --access public"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.0",

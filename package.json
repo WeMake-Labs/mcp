@@ -1,6 +1,6 @@
 {
   "name": "@wemake-ai/mcp",
-  "version": "25.1.2",
+  "version": "25.1.3",
   "author": "WeMake (https://wemake.cx)",
   "devDependencies": {
     "@types/bun": "latest",
@@ -24,10 +24,8 @@
   },
   "private": true,
   "scripts": {
-    "build:sequential-thinking": "bun build --target=node --outfile=src/sequential-thinking/dist/index.js src/sequential-thinking/index.ts",
-    "publish:sequential-thinking": "bun publish --cwd=src/sequential-thinking --access public",
-    "publish-all": "bun publish --workspaces --access public",
-    "link-all": "bun link --workspaces",
+    "sequential-thinking:build": "bun run --cwd=src/sequential-thinking build",
+    "sequential-thinking:publish": "bun run --cwd=src/sequential-thinking publish",
     "format": "bun prettier && bun lint --fix",
     "prettier": "bunx prettier --write .",
     "lint": "bunx eslint . --ext .ts,.tsx"

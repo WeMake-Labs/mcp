@@ -163,7 +163,7 @@ class SequentialThinkingServer {
 }
 
 const SEQUENTIAL_THINKING_TOOL: Tool = {
-  name: "sequentialthinking",
+  name: "sequential-thinking",
   description: `A detailed tool for dynamic and reflective problem-solving through thoughts.
 This tool helps analyze problems through a flexible thinking process that can adapt and evolve.
 Each thought can build on, question, or revise previous insights as understanding deepens.
@@ -285,7 +285,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "sequentialthinking") {
+  if (request.params.name === "sequential-thinking") {
     return thinkingServer.processThought(request.params.arguments);
   }
 
