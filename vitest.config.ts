@@ -14,6 +14,7 @@ export default defineConfig({
       "./src/deep-thinking",
       "./src/knowledge-graph-memory",
       "./src/tasks"
-    ]
+    ],
+    watch: false,
   }
 });
