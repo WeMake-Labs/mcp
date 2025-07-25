@@ -135,6 +135,38 @@
         }
       ],
       "completed": true
+    },
+    {
+      "requestId": "req-4",
+      "originalRequest": "Resolve this Code scanning alert in `/Users/admin/Repositories/WeMake/mcp/.github/workflows/typescript.yml#L29-29` : \"Unpinned 3rd party Action 'TypeScript' step `Uses Step` uses 'oven-sh/setup-bun' with ref 'v1', not a pinned commit hash.\" \n \n Description: Using a tag for a 3rd party Action that is not pinned to a commit can lead to executing an untrusted Action through a supply chain attack. \n \n Recommendations: Pinning an action to a full length commit SHA is currently the only way to use a non-immutable action as an immutable release. Pinning to a particular SHA helps mitigate the risk of a bad actor adding a backdoor to the action's repository, as they would need to generate a SHA-1 collision for a valid Git object payload. When selecting a SHA, you should verify it is from the action's repository and not a repository fork. \n \n Examples: \n \n - Incorrect Usage: `- uses: tj-actions/changed-files@v44` \n - Correct Usage: `- uses: tj-actions/changed-files@c65cd883420fd2eb864698a825fc4162dd94482c # v44` \n \n References: \n \n - Using third-party actions: `https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions` \n - oven-sh/setup-bun: `https://github.com/oven-sh/setup-bun`",
+      "splitDetails": "Resolve this Code scanning alert in `/Users/admin/Repositories/WeMake/mcp/.github/workflows/typescript.yml#L29-29` : \"Unpinned 3rd party Action 'TypeScript' step `Uses Step` uses 'oven-sh/setup-bun' with ref 'v1', not a pinned commit hash.\" \n \n Description: Using a tag for a 3rd party Action that is not pinned to a commit can lead to executing an untrusted Action through a supply chain attack. \n \n Recommendations: Pinning an action to a full length commit SHA is currently the only way to use a non-immutable action as an immutable release. Pinning to a particular SHA helps mitigate the risk of a bad actor adding a backdoor to the action's repository, as they would need to generate a SHA-1 collision for a valid Git object payload. When selecting a SHA, you should verify it is from the action's repository and not a repository fork. \n \n Examples: \n \n - Incorrect Usage: `- uses: tj-actions/changed-files@v44` \n - Correct Usage: `- uses: tj-actions/changed-files@c65cd883420fd2eb864698a825fc4162dd94482c # v44` \n \n References: \n \n - Using third-party actions: `https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions` \n - oven-sh/setup-bun: `https://github.com/oven-sh/setup-bun`",
+      "tasks": [
+        {
+          "id": "task-15",
+          "title": "Research commit SHA for v2 tag",
+          "description": "Search for the commit hash associated with the v2 tag in the official oven-sh/setup-bun GitHub repository. Verify it's from the main repository and note the SHA for upgrading from v1 to v2.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Successfully researched the commit SHA for the v2 tag of oven-sh/setup-bun. Using the GitHub API, I found that the v2 tag corresponds to commit SHA: 735343b667d3e6f658f44d0eca948eb6282f2b76. This SHA will be used to pin the action in the workflow file to mitigate the supply chain security risk identified in the code scanning alert."
+        },
+        {
+          "id": "task-16",
+          "title": "Update workflow file to v2",
+          "description": "Edit the file /Users/admin/Repositories/WeMake/mcp/.github/workflows/typescript.yml to replace 'oven-sh/setup-bun@v1' with 'oven-sh/setup-bun@<SHA> # v2', using the SHA from previous task. Ensure the change is accurate and the file remains valid YAML.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Successfully updated the workflow file /Users/admin/Repositories/WeMake/mcp/.github/workflows/typescript.yml to replace all instances of 'oven-sh/setup-bun@v1' with 'oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2'. Updated 4 occurrences across different jobs (test-monorepo, test, build, and publish). The file remains valid YAML and now uses the pinned commit SHA to mitigate the supply chain security risk."
+        },
+        {
+          "id": "task-17",
+          "title": "Verify the update",
+          "description": "View the updated file to confirm the change was applied correctly and there are no syntax errors. Check if the alert would be resolved.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Successfully verified the update to the workflow file. Confirmed that all 4 instances of 'oven-sh/setup-bun@v1' have been correctly replaced with 'oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2' on lines 29, 47, 80, and 109. The file structure remains intact and the YAML syntax appears valid based on visual inspection. The code scanning alert should now be resolved as the action is pinned to a specific commit SHA, mitigating the supply chain security risk."
+        }
+      ],
+      "completed": true
     }
   ]
 }
