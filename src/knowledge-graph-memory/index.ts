@@ -17,8 +17,23 @@ const argv = minimist(process.argv.slice(2));
 let memoryPath = argv["memory-path"];
 
 // If a custom path is provided, ensure it's absolute
-if (memoryPath && !isAbsolute(memoryPath)) {
-  memoryPath = path.resolve(process.cwd(), memoryPath);
+// Before:
+// if (memoryPath && !isAbsolute(memoryPath)) {
+//   memoryPath = path.resolve(process.cwd(), memoryPath);
+// }
+
+// After:
+if (memoryPath) {
+  // Handle tilde expansion
+  if (memoryPath.startsWith("~/")) {
+    memoryPath = path.join(
+      process.env.HOME || process.env.USERPROFILE || "",
+      memoryPath.slice(2)
+    );
+  }
+  if (!isAbsolute(memoryPath)) {
+    memoryPath = path.resolve(process.cwd(), memoryPath);
+  }
 }
 
 // Define the path to the JSONL file
@@ -76,10 +91,24 @@ class KnowledgeGraphManager {
       ...graph.entities.map((e) => JSON.stringify({ type: "entity", ...e })),
       ...graph.relations.map((r) => JSON.stringify({ type: "relation", ...r }))
     ];
-    await fs.writeFile(MEMORY_FILE_PATH, lines.join("\n"));
+    const tempPath = `${MEMORY_FILE_PATH}.tmp`;
+    await fs.writeFile(tempPath, lines.join("\n"));
+    await fs.rename(tempPath, MEMORY_FILE_PATH);
   }
 
   async createEntities(entities: Entity[]): Promise<Entity[]> {
+    // Validate entities
+    for (const entity of entities) {
+      if (!entity.name || typeof entity.name !== "string") {
+        throw new Error("Entity name must be a non-empty string");
+      }
+      if (!entity.entityType || typeof entity.entityType !== "string") {
+        throw new Error("Entity type must be a non-empty string");
+      }
+      if (!Array.isArray(entity.observations)) {
+        throw new Error("Entity observations must be an array");
+      }
+    }
     const graph = await this.loadGraph();
     const newEntities = entities.filter(
       (e) =>
@@ -113,7 +142,12 @@ class KnowledgeGraphManager {
     const results = observations.map((o) => {
       const entity = graph.entities.find((e) => e.name === o.entityName);
       if (!entity) {
-        throw new Error(`Entity with name ${o.entityName} not found`);
+        console.error(`Entity with name ${o.entityName} not found`);
+        return {
+          entityName: o.entityName,
+          addedObservations: [],
+          error: "Entity not found"
+        };
       }
       const newObservations = o.contents.filter(
         (content) => !entity.observations.includes(content)
@@ -230,7 +264,7 @@ const knowledgeGraphManager = new KnowledgeGraphManager();
 const server = new Server(
   {
     name: "knowledge-graph-memory-server",
-    version: "0.0.1"
+    version: "0.0.5"
   },
   {
     capabilities: {
@@ -471,14 +505,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   switch (name) {
     case "create_entities":
+      if (!args.entities || !Array.isArray(args.entities)) {
+        throw new Error("Invalid entities argument");
+      }
       return {
         content: [
           {
             type: "text",
             text: JSON.stringify(
-              await knowledgeGraphManager.createEntities(
-                args.entities as Entity[]
-              ),
+              await knowledgeGraphManager.createEntities(args.entities),
               null,
               2
             )

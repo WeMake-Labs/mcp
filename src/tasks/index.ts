@@ -1234,7 +1234,7 @@ class TasksServer {
 const server = new Server(
   {
     name: "tasks-server",
-    version: "1.0.0"
+    version: "1.0.2"
   },
   {
     capabilities: {

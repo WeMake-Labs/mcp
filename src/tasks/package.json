@@ -1,7 +1,7 @@
 {
   "name": "@wemake-ai/mcpserver-tasks",
-  "version": "1.0.0",
-  "description": "Model Context Protocol server for Tasks",
+  "version": "1.0.2",
+  "description": "Model Context Protocol (MCP) server for Tasks",
   "license": "MIT",
   "author": "WeMake (https://wemake.cx)",
   "homepage": "https://wemake.cx",
@@ -16,10 +16,11 @@
   "scripts": {
     "build": "bun build --insert-shebang --target=bun --outfile=dist/index.js index.ts",
     "prepare": "bun run build",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "publish-now": "bun publish --access=public"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "0.5.0",
+    "@modelcontextprotocol/sdk": "^1.17.0",
     "chalk": "^5.3.0",
     "glob": "^10.3.10",
     "zod": "^3.23.8",

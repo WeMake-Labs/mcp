@@ -193,7 +193,7 @@ You can specify a custom path for the memory file:
         "-y",
         "@wemake-ai/mcpserver-knowledge-graph-memory",
         "--memory-path",
-        "~/project/.wemake-ai/knowledge.jsonl"
+        "/home/alice/project/.wemake-ai/knowledge.jsonl"
       ],
       "autoapprove": [
         "create_entities",

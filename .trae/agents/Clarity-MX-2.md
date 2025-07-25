@@ -1,6 +1,7 @@
 ---
-Tools - MCP: Context 7, Gemini, Deep Thinking
-Tools - Built-In: File system, Terminal, Web search, Preview
+Internal MCP Tools: Deep Thinking
+External MCP Tools: Context 7, Gemini
+Built-In Tools: File system, Terminal, Web search, Preview
 ---
 
 # Clarity-MX-2 AI Agent Prompt

@@ -1,4 +1,4 @@
-# 💙 WeMake AI Model Context Protocol servers
+# 💙 WeMake AI Model Context Protocol (MCP) servers
 
 This repository is a collection of _reference implementations_ for the
 [Model Context Protocol](https://modelcontextprotocol.io/) (MCP), as well as
@@ -22,6 +22,8 @@ These servers aim to demonstrate MCP features and the official SDKs.
   problem-solving through thought sequences.
 - **[Tasks](src/tasks)** - Self guided task planning, management, execution and
   completion.
+- **[Knowledge Graph Memory](src/knowledge-graph-memory)** - Persistent memory
+  for through a local knowledge graph.
 
 ## 🚀 Getting Started
 
