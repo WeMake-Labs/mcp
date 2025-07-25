@@ -1,6 +1,6 @@
 {
   "name": "@wemake-ai/mcp",
-  "version": "25.2.0",
+  "version": "25.3.0",
   "author": "WeMake (https://wemake.cx)",
   "devDependencies": {
     "@types/bun": "latest",
@@ -26,6 +26,8 @@
   "scripts": {
     "deep-thinking:build": "bun run --cwd=src/deep-thinking build",
     "deep-thinking:publish": "bun publish --access=public --cwd=src/deep-thinking",
+    "knowledge-graph-memory:build": "bun run --cwd=src/knowledge-graph-memory build",
+    "knowledge-graph-memory:publish": "bun publish --access=public --cwd=src/knowledge-graph-memory",
     "tasks:build": "bun run --cwd=src/tasks build",
     "tasks:publish": "bun publish --access=public --cwd=src/tasks",
     "format": "bunx prettier --write . && bun lint --fix",
