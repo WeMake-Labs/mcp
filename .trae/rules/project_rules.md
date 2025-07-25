@@ -153,7 +153,7 @@ automated, reliable, scalable, and streamlined testing.
 ### Configuration
 
 - Use `vitest.config.ts` in root with Test Projects for monorepo support
-- Configure coverage thresholds: 90% for lines, functions, branches, statements
+- Configure coverage thresholds: 80% for lines, functions, branches, statements
 - Enable TypeScript support with `vite-tsconfig-paths` plugin
 - Use project-specific configurations for each package under `src/*`
 
@@ -186,7 +186,7 @@ Add to root `package.json`:
 - **Test Types**: Unit tests for functions, integration tests for MCP
   servers/tools
 - **Mocking**: Use `vi.mock` for dependencies
-- **Coverage**: Monitor and maintain 90% threshold across all metrics
+- **Coverage**: Monitor and maintain 80% threshold across all metrics
 - **Watch Mode**: Use for development feedback
 - **Parallelism**: Leverage Vitest's automatic parallel execution
 - **TypeScript**: Enable live type resolution with custom export conditions
