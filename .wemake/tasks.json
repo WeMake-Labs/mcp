@@ -199,6 +199,38 @@
         }
       ],
       "completed": true
+    },
+    {
+      "requestId": "req-6",
+      "originalRequest": "In `/Users/admin/Repositories/WeMake/mcp/src/knowledge-graph-memory/tests/server.test.ts#L1-12` , the test imports and mocks use \"bun:test\" which conflicts with the monorepo's documented use of Vitest. Replace all \"bun:test\" imports with Vitest equivalents and update the mocking syntax to use Vitest's mocking utilities. Ensure the test framework and mocking approach align with Vitest conventions to resolve pipeline failures and maintain consistency. \n \n - In `/Users/admin/Repositories/WeMake/mcp/src/knowledge-graph-memory/tests/server.test.ts#L54-69` , the  test for error handling when passing an empty array to createEntities is incorrect because createEntities does not throw an error for empty arrays. Update the test to assert that calling createEntities with an empty array resolves successfully without throwing, and remove the try-catch block. This will correctly verify that no error occurs for empty input. \n \n - In `/Users/admin/Repositories/WeMake/mcp/src/knowledge-graph-memory/tests/server.test.ts#L71-97` , the current tests only check static object structures instead of testing the actual validation logic in KnowledgeGraphManager. Replace these tests to call the real validation methods from KnowledgeGraphManager on sample inputs and assert their behavior, ensuring the tests cover the business logic validation rather than just object shape.",
+      "splitDetails": "The tasks are ordered to first fix the testing framework compatibility, then correct the specific test logic issues, and finally improve the test coverage quality by testing actual business logic rather than static structures.",
+      "tasks": [
+        {
+          "id": "task-21",
+          "title": "Replace bun:test with Vitest imports and mocking",
+          "description": "Update the test file imports from 'bun:test' to Vitest equivalents (describe, it, expect, beforeEach from 'vitest' and vi from 'vitest' for mocking). Replace mock.module syntax with Vitest's vi.mock syntax to align with the monorepo's documented testing strategy.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Successfully replaced bun:test imports with Vitest equivalents:\n- Changed import from 'bun:test' to 'vitest' for describe, it, expect, beforeEach\n- Replaced 'mock' import with 'vi' from 'vitest'\n- Updated mock.module() syntax to vi.mock()\n- Replaced mock() function calls with vi.fn() for proper Vitest mocking\n- All mocking utilities now align with Vitest conventions as documented in the monorepo testing strategy"
+        },
+        {
+          "id": "task-22",
+          "title": "Fix error handling test for createEntities",
+          "description": "Remove the incorrect try-catch block in the error handling test for createEntities with empty array. Replace with a direct assertion that the method resolves successfully without throwing an error, since createEntities should handle empty arrays gracefully.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Successfully fixed the error handling test for createEntities:\n- Removed the incorrect try-catch block that was testing for an error that doesn't occur\n- Replaced with a direct assertion that calls createEntities([]) and verifies it returns an array\n- Updated test name to be more descriptive: 'should handle empty entity array gracefully'\n- The test now correctly verifies that createEntities handles empty arrays without throwing errors\n- Test logic now aligns with the actual behavior of the createEntities method"
+        },
+        {
+          "id": "task-23",
+          "title": "Replace static validation tests with business logic tests",
+          "description": "Replace the current schema validation tests that only check object properties with tests that actually call KnowledgeGraphManager's validation methods. Test the real validation logic with sample inputs and assert the expected behavior to ensure proper business logic coverage.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Successfully replaced static validation tests with business logic tests:\n- Removed tests that only checked object properties (static structure validation)\n- Added tests that call actual KnowledgeGraphManager.createEntities() method with invalid inputs\n- Tests now verify real validation logic: empty name, empty entityType, and non-array observations\n- Added test for valid entity data to ensure positive case works\n- Tests now throw actual validation errors from the business logic\n- Properly typed the test entities using Entity type and 'as unknown as Entity' for invalid cases\n- Tests now cover the actual validation behavior rather than just object shape checking"
+        }
+      ],
+      "completed": true
     }
   ]
 }

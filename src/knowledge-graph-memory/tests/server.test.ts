@@ -1,14 +1,21 @@
-import { describe, it, expect, beforeEach, mock } from "bun:test";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { KnowledgeGraphManager } from "../index.js";
 
+// Import Entity type for proper typing
+type Entity = {
+  name: string;
+  entityType: string;
+  observations: string[];
+};
+
 // Mock fs module
-mock.module("fs", () => ({
+vi.mock("fs", () => ({
   promises: {
-    readFile: mock(() => Promise.resolve('{"entities":[],"relations":[]}}')),
-    writeFile: mock(() => Promise.resolve()),
-    access: mock(() => Promise.resolve())
+    readFile: vi.fn(() => Promise.resolve('{"entities":[],"relations":[]}')),
+    writeFile: vi.fn(() => Promise.resolve()),
+    access: vi.fn(() => Promise.resolve())
   },
-  existsSync: mock(() => false)
+  existsSync: vi.fn(() => false)
 }));
 
 describe("Server Integration Tests", () => {
@@ -52,13 +59,9 @@ describe("Server Integration Tests", () => {
   });
 
   describe("Error Handling", () => {
-    it("should handle invalid entity data gracefully", async () => {
-      try {
-        await manager.createEntities([]);
-        expect(true).toBe(true); // Should not throw
-      } catch (error) {
-        expect(error).toBeDefined();
-      }
+    it("should handle empty entity array gracefully", async () => {
+      const result = await manager.createEntities([]);
+      expect(Array.isArray(result)).toBe(true);
     });
 
     it("should handle empty search queries", async () => {
@@ -68,30 +71,54 @@ describe("Server Integration Tests", () => {
     });
   });
 
-  describe("Schema Validation", () => {
-    it("should validate entity structure", () => {
-      const validEntity = {
-        name: "Test",
+  describe("Business Logic Validation", () => {
+    it("should validate entity name is required", async () => {
+      const invalidEntity = {
+        name: "",
         entityType: "test",
         observations: ["observation"]
       };
 
-      expect(validEntity).toHaveProperty("name");
-      expect(validEntity).toHaveProperty("entityType");
-      expect(validEntity).toHaveProperty("observations");
-      expect(Array.isArray(validEntity.observations)).toBe(true);
+      await expect(manager.createEntities([invalidEntity])).rejects.toThrow(
+        "Entity name must be a non-empty string"
+      );
     });
 
-    it("should validate relation structure", () => {
-      const validRelation = {
-        from: "EntityA",
-        to: "EntityB",
-        relationType: "connects"
+    it("should validate entity type is required", async () => {
+      const invalidEntity = {
+        name: "Test",
+        entityType: "",
+        observations: ["observation"]
       };
 
-      expect(validRelation).toHaveProperty("from");
-      expect(validRelation).toHaveProperty("to");
-      expect(validRelation).toHaveProperty("relationType");
+      await expect(manager.createEntities([invalidEntity])).rejects.toThrow(
+        "Entity type must be a non-empty string"
+      );
+    });
+
+    it("should validate observations must be an array", async () => {
+      const invalidEntity = {
+        name: "Test",
+        entityType: "test",
+        observations: "not an array"
+      } as unknown as Entity;
+
+      await expect(manager.createEntities([invalidEntity])).rejects.toThrow(
+        "Entity observations must be an array"
+      );
+    });
+
+    it("should accept valid entity data", async () => {
+      const validEntity = {
+        name: "ValidTest",
+        entityType: "test",
+        observations: ["valid observation"]
+      };
+
+      const result = await manager.createEntities([validEntity]);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(validEntity);
     });
   });
 });
