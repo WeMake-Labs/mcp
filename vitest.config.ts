@@ -15,6 +15,6 @@ export default defineConfig({
       "./src/knowledge-graph-memory",
       "./src/tasks"
     ],
-    watch: false,
+    watch: false
   }
 });
