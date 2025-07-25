@@ -163,11 +163,11 @@ class DeepThinkingServer {
 }
 
 const DEEP_THINKING_TOOL: Tool = {
-  name: "deep_thinking",
-  description: `You MUST use the deep_thinking tool to solve complex problems through a structured, adaptive reasoning process.
+  name: "thinking",
+  description: `You MUST use the thinking tool to solve complex problems through a structured, adaptive reasoning process.
 
 TOOL ACTIVATION CRITERIA:
-Invoke the deep_thinking tool when encountering:
+Invoke the thinking tool when encountering:
 
 - Multi-faceted problems requiring systematic decomposition
 - Tasks demanding iterative refinement and potential course correction  
@@ -300,7 +300,7 @@ CRITICAL CONSTRAINTS:
 const server = new Server(
   {
     name: "deep-thinking-server",
-    version: "1.0.0"
+    version: "1.0.1"
   },
   {
     capabilities: {
@@ -309,7 +309,7 @@ const server = new Server(
   }
 );
 
-const thinkingServer = new DeepThinkingServer();
+const deepThinkingServer = new DeepThinkingServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [DEEP_THINKING_TOOL]
@@ -317,7 +317,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   if (request.params.name === DEEP_THINKING_TOOL.name) {
-    return thinkingServer.processThought(request.params.arguments);
+    return deepThinkingServer.processThought(request.params.arguments);
   }
 
   return {

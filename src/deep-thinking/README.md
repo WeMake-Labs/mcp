@@ -56,7 +56,7 @@ Add this MCP via "Add Manually":
       "command": "bunx",
       "args": ["-y", "@wemake-ai/mcpserver-deep-thinking@latest"],
       "env": {
-        "DISABLE_THOUGHT_LOGGING": false
+        "DISABLE_THOUGHT_LOGGING": "false"
       }
     }
   }

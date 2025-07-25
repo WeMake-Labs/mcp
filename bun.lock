@@ -17,7 +17,7 @@
     },
     "src/deep-thinking": {
       "name": "@wemake-ai/mcpserver-deep-thinking",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "bin": {
         "mcpserver-deep-thinking": "dist/index.js",
       },
