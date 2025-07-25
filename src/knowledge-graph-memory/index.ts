@@ -67,11 +67,18 @@ export class KnowledgeGraphManager {
     this.memoryFilePath = memoryFilePath;
   }
   private async loadGraph(): Promise<KnowledgeGraph> {
+    // Load the knowledge graph from file
+    // Handle cases where file doesn't exist, is empty, or contains invalid JSON
+    // by returning an empty graph to prevent parsing errors like 'Unexpected end of JSON input'
     try {
       const data = await fs.readFile(this.memoryFilePath, "utf-8");
+      if (!data.trim()) {
+        // Return empty graph for empty files
+        return { entities: [], relations: [] };
+      }
       const graph = JSON.parse(data) as KnowledgeGraph;
 
-      // Ensure the graph has the expected structure
+      // Ensure the graph has the expected structure, defaulting to empty arrays if invalid
       return {
         entities: Array.isArray(graph.entities) ? graph.entities : [],
         relations: Array.isArray(graph.relations) ? graph.relations : []
@@ -79,9 +86,11 @@ export class KnowledgeGraphManager {
     } catch (error) {
       if (
         error instanceof Error &&
-        "code" in error &&
-        (error as Error & { code: string }).code === "ENOENT"
+        (("code" in error &&
+          (error as Error & { code: string }).code === "ENOENT") ||
+          error.name === "SyntaxError")
       ) {
+        // Return empty graph if file doesn't exist or JSON is invalid
         return { entities: [], relations: [] };
       }
       throw error;
@@ -276,7 +285,7 @@ const knowledgeGraphManager = new KnowledgeGraphManager(MEMORY_FILE_PATH);
 const server = new Server(
   {
     name: "knowledge-graph-memory-server",
-    version: "1.1.0"
+    version: "1.1.1"
   },
   {
     capabilities: {

@@ -35,7 +35,7 @@
     },
     "src/knowledge-graph-memory": {
       "name": "@wemake-ai/mcpserver-knowledge-graph-memory",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "bin": {
         "mcpserver-knowledge-graph-memory": "dist/index.js",
       },
