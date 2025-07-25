@@ -28,7 +28,7 @@
     "deep-thinking:publish": "bun publish --access=public --cwd=src/deep-thinking",
     "tasks:build": "bun run --cwd=src/tasks build",
     "tasks:publish": "bun publish --access=public --cwd=src/tasks",
-    "format": "bun prettier && bun lint --fix",
+    "format": "bunx prettier --write . && bun lint --fix",
     "prettier": "bunx prettier --write .",
     "lint": "bunx eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit"

@@ -878,6 +878,10 @@ class TasksServer {
 
   private async saveTasks() {
     try {
+      // Ensure directory exists
+      const dir = path.dirname(TASK_FILE_PATH);
+      await fs.mkdir(dir, { recursive: true });
+
       await fs.writeFile(
         TASK_FILE_PATH,
         JSON.stringify(this.data, null, 2),
@@ -1230,7 +1234,7 @@ class TasksServer {
 const server = new Server(
   {
     name: "tasks-server",
-    version: "0.0.3"
+    version: "0.0.6"
   },
   {
     capabilities: {

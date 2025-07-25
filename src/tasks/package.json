@@ -1,6 +1,6 @@
 {
   "name": "@wemake-ai/mcpserver-tasks",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Model Context Protocol server for Tasks",
   "license": "MIT",
   "author": "WeMake (https://wemake.cx)",
@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun build --target=bun --outfile=dist/index.js index.ts",
+    "build": "bun build --insert-shebang --target=bun --outfile=dist/index.js index.ts",
     "prepare": "bun run build",
     "watch": "tsc --watch"
   },
