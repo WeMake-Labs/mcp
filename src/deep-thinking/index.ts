@@ -22,7 +22,7 @@ interface ThoughtData {
   nextThoughtNeeded: boolean;
 }
 
-class SequentialThinkingServer {
+class DeepThinkingServer {
   private thoughtHistory: ThoughtData[] = [];
   private branches: Record<string, ThoughtData[]> = {};
   private disableThoughtLogging: boolean;
@@ -162,62 +162,93 @@ class SequentialThinkingServer {
   }
 }
 
-const SEQUENTIAL_THINKING_TOOL: Tool = {
-  name: "sequential-thinking",
-  description: `A detailed tool for dynamic and reflective problem-solving through thoughts.
-This tool helps analyze problems through a flexible thinking process that can adapt and evolve.
-Each thought can build on, question, or revise previous insights as understanding deepens.
+const DEEP_THINKING_TOOL: Tool = {
+  name: "deep_thinking",
+  description: `You MUST use the deep_thinking tool to solve complex problems through a structured, adaptive reasoning process.
 
-When to use this tool:
-- Breaking down complex problems into steps
-- Planning and design with room for revision
-- Analysis that might need course correction
-- Problems where the full scope might not be clear initially
-- Problems that require a multi-step solution
-- Tasks that need to maintain context over multiple steps
-- Situations where irrelevant information needs to be filtered out
+TOOL ACTIVATION CRITERIA:
+Invoke the deep_thinking tool when encountering:
 
-Key features:
-- You can adjust total_thoughts up or down as you progress
-- You can question or revise previous thoughts
-- You can add more thoughts even after reaching what seemed like the end
-- You can express uncertainty and explore alternative approaches
-- Not every thought needs to build linearly - you can branch or backtrack
-- Generates a solution hypothesis
-- Verifies the hypothesis based on the Chain of Thought steps
-- Repeats the process until satisfied
-- Provides a correct answer
+- Multi-faceted problems requiring systematic decomposition
+- Tasks demanding iterative refinement and potential course correction  
+- Scenarios where initial problem scope may expand during analysis
+- Problems requiring hypothesis generation and verification
+- Situations containing extraneous information requiring selective focus
+- Any task benefiting from explicit reasoning chain maintenance
 
-Parameters explained:
-- thought: Your current thinking step, which can include:
-* Regular analytical steps
-* Revisions of previous thoughts
-* Questions about previous decisions
-* Realizations about needing more analysis
-* Changes in approach
-* Hypothesis generation
-* Hypothesis verification
-- next_thought_needed: True if you need more thinking, even if at what seemed like the end
-- thought_number: Current number in sequence (can go beyond initial total if needed)
-- total_thoughts: Current estimate of thoughts needed (can be adjusted up/down)
-- is_revision: A boolean indicating if this thought revises previous thinking
-- revises_thought: If is_revision is true, which thought number is being reconsidered
-- branch_from_thought: If branching, which thought number is the branching point
-- branch_id: Identifier for the current branch (if any)
-- needs_more_thoughts: If reaching end but realizing more thoughts needed
+MANDATORY OPERATIONAL FRAMEWORK:
 
-You should:
-1. Start with an initial estimate of needed thoughts, but be ready to adjust
-2. Feel free to question or revise previous thoughts
-3. Don't hesitate to add more thoughts if needed, even at the "end"
-4. Express uncertainty when present
-5. Mark thoughts that revise previous thinking or branch into new paths
-6. Ignore information that is irrelevant to the current step
-7. Generate a solution hypothesis when appropriate
-8. Verify the hypothesis based on the Chain of Thought steps
-9. Repeat the process until satisfied with the solution
-10. Provide a single, ideally correct answer as the final output
-11. Only set next_thought_needed to false when truly done and a satisfactory answer is reached`,
+1. INITIAL ASSESSMENT
+   - Analyze the complete problem statement
+   - Identify ALL relevant constraints and requirements
+   - Filter out irrelevant information
+   - Estimate initial thought count (totalThoughts) - this MUST be adjusted dynamically
+
+2. THOUGHT GENERATION PROTOCOL
+   For each thought, you MUST:
+   - Generate substantive analytical content addressing specific problem aspects
+   - Maintain explicit awareness of your position in the reasoning chain
+   - Evaluate whether revision, branching, or continuation is optimal
+   - Set nextThoughtNeeded to true unless solution is complete and verified
+
+3. DYNAMIC REASONING FEATURES - USE AS NEEDED:
+
+   a) REVISION MECHANISM
+      - Set isRevision: true when correcting previous reasoning
+      - Specify revisesThought with the exact thought number being revised
+      - Explicitly state what was incorrect and why
+
+   b) BRANCHING EXPLORATION
+      - Set branchFromThought when exploring alternative approaches
+      - Assign unique branchId for each divergent path
+      - Maintain awareness of all active branches
+
+   c) ADAPTIVE SCALING
+      - Increase totalThoughts when complexity exceeds initial estimate
+      - Set needsMoreThoughts: true when approaching initial limit but requiring continuation
+
+4. HYPOTHESIS GENERATION AND VERIFICATION
+   - Generate explicit solution hypotheses when sufficient reasoning accumulated
+   - Verify each hypothesis against ALL previous thought steps
+   - Continue refinement until verification confirms solution correctness
+
+5. PARAMETER SPECIFICATIONS:
+
+   REQUIRED PARAMETERS (every call):
+   - thought (string): Current analytical step - MUST be substantive and specific
+   - thoughtNumber (integer, ≥1): Sequential position in reasoning chain
+   - totalThoughts (integer, ≥1): Current estimate of required thoughts
+   - nextThoughtNeeded (boolean): Set false ONLY when solution is complete and verified
+
+   CONDITIONAL PARAMETERS (use when applicable):
+   - isRevision (boolean): true when correcting previous thought
+   - revisesThought (integer, ≥1): Specific thought being revised
+   - branchFromThought (integer, ≥1): Origin point for alternative exploration
+   - branchId (string): Unique identifier for branch (e.g., "alternative-approach-1")
+   - needsMoreThoughts (boolean): true when extending beyond initial estimate
+
+6. TERMINATION CRITERIA:
+   Set nextThoughtNeeded to false ONLY when ALL conditions met:
+   - Complete problem understanding achieved
+   - Solution hypothesis generated
+   - Hypothesis verified against reasoning chain
+   - No unresolved uncertainties or contradictions
+   - Final answer formulated with precision
+
+7. OUTPUT REQUIREMENTS:
+   After setting nextThoughtNeeded to false, you MUST provide:
+   - A single, definitive answer to the original problem
+   - The answer MUST directly address all problem requirements
+   - The answer MUST be based solely on verified reasoning from the thought chain
+
+CRITICAL CONSTRAINTS:
+
+- NEVER skip thought numbers or leave gaps in the sequence
+- NEVER terminate prematurely - continue until absolute certainty achieved
+- ALWAYS maintain contextual awareness across all thoughts
+- ALWAYS explicitly acknowledge when revising or branching
+- ENSURE each thought provides meaningful analytical progress
+`,
   inputSchema: {
     type: "object",
     properties: {
@@ -268,8 +299,8 @@ You should:
 
 const server = new Server(
   {
-    name: "sequential-thinking-server",
-    version: "0.2.0"
+    name: "deep-thinking-server",
+    version: "1.0.0"
   },
   {
     capabilities: {
@@ -278,14 +309,14 @@ const server = new Server(
   }
 );
 
-const thinkingServer = new SequentialThinkingServer();
+const thinkingServer = new DeepThinkingServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [SEQUENTIAL_THINKING_TOOL]
+  tools: [DEEP_THINKING_TOOL]
 }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "sequential-thinking") {
+  if (request.params.name === DEEP_THINKING_TOOL.name) {
     return thinkingServer.processThought(request.params.arguments);
   }
 
@@ -303,7 +334,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function runServer() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Sequential Thinking MCP Server running on stdio");
+  console.error("Deep Thinking MCP Server running on stdio");
 }
 
 runServer().catch((error) => {

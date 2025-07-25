@@ -18,7 +18,7 @@ is implemented with an MCP SDK:
 
 These servers aim to demonstrate MCP features and the official SDKs.
 
-- **[Sequential Thinking](src/sequential-thinking)** - Dynamic and reflective
+- **[Deep Thinking](src/deep-thinking)** - Dynamic and reflective
   problem-solving through thought sequences
 
 ## 🚀 Getting Started
@@ -27,10 +27,10 @@ These servers aim to demonstrate MCP features and the official SDKs.
 
 Typescript-based servers in this repository can be used directly with `bunx`.
 
-For example, this will start the [Memory](src/memory) server:
+For example, this will start the [Deep Thinking](src/deep-thinking) server:
 
 ```sh
-bunx -y @wemake-ai/memory
+bunx -y @wemake-ai/mcpserver-deep-thinking@latest
 ```
 
 Python-based servers in this repository can be used directly with

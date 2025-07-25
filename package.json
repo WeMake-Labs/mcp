@@ -24,8 +24,8 @@
   },
   "private": true,
   "scripts": {
-    "sequential-thinking:build": "bun run --cwd=src/sequential-thinking build",
-    "sequential-thinking:publish": "bun run --cwd=src/sequential-thinking publish",
+    "deep-thinking:build": "bun run --cwd=src/deep-thinking build",
+    "deep-thinking:publish": "bun run --cwd=src/deep-thinking publish",
     "format": "bun prettier && bun lint --fix",
     "prettier": "bunx prettier --write .",
     "lint": "bunx eslint . --ext .ts,.tsx"

@@ -1,20 +1,20 @@
 {
-  "name": "@wemake-ai/mcp-server-sequential-thinking",
+  "name": "@wemake-ai/mcpserver-deep-thinking",
   "version": "1.0.0",
-  "description": "MCP server for sequential thinking and problem solving",
+  "description": "MCP server for deep thinking and problem solving",
   "license": "MIT",
   "author": "WeMake (https://wemake.cx)",
   "homepage": "https://wemake.cx",
   "bugs": "https://github.com/WeMake-ai/mcp/issues",
   "type": "module",
   "bin": {
-    "mcp-server-sequential-thinking": "dist/index.js"
+    "mcpserver-deep-thinking": "dist/index.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "bun build --target=node --outfile=dist/index.js index.ts && bun tsc && shx chmod +x dist/*.js",
+    "build": "bun tsc && bun build --target=node --outfile=dist/index.js index.ts",
     "prepare": "bun run build",
     "watch": "tsc --watch",
     "publish": "bun publish --access public"
