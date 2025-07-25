@@ -1,12 +1,20 @@
 {
   "name": "@wemake-ai/mcpserver-knowledge-graph-memory",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Model Context Protocol (MCP) server enabling persistent memory for AI Agents through a local knowledge graph",
   "license": "MIT",
   "author": "WeMake (https://wemake.cx)",
   "homepage": "https://wemake.cx",
   "bugs": "https://github.com/WeMake-ai/mcp/issues",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "bun": "./src/index.ts"
+    }
+  },
   "bin": {
     "mcpserver-knowledge-graph-memory": "dist/index.js"
   },

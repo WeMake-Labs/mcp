@@ -22,8 +22,20 @@ jobs:
           PACKAGES=$(find . -name package.json -not -path "*/node_modules/*" -exec dirname {} \; | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]')
           echo "packages=$PACKAGES" >> $GITHUB_OUTPUT
 
+  test-monorepo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install
+      - name: Run tests
+        run: bun test --coverage
+
   test:
-    needs: [detect-packages]
+    needs: [detect-packages, test-monorepo]
     strategy:
       matrix:
         package: ${{ fromJson(needs.detect-packages.outputs.packages) }}

@@ -22,7 +22,7 @@ interface ThoughtData {
   nextThoughtNeeded: boolean;
 }
 
-class DeepThinkingServer {
+export class DeepThinkingServer {
   private thoughtHistory: ThoughtData[] = [];
   private branches: Record<string, ThoughtData[]> = {};
   private disableThoughtLogging: boolean;

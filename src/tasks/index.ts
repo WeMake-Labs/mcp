@@ -839,7 +839,7 @@ POST-DELETION STATE:
   }
 };
 
-class TasksServer {
+export class TasksServer {
   private requestCounter = 0;
   private taskCounter = 0;
   private data: TasksFile = { requests: [] };
@@ -1234,7 +1234,7 @@ class TasksServer {
 const server = new Server(
   {
     name: "tasks-server",
-    version: "1.0.3"
+    version: "1.0.4"
   },
   {
     capabilities: {
