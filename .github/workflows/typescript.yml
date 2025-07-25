@@ -24,6 +24,8 @@ jobs:
 
   test-monorepo:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2
@@ -33,7 +35,6 @@ jobs:
         run: bun install
       - name: Run tests
         run: bun test --coverage
-
   test:
     needs: [detect-packages, test-monorepo]
     strategy:
