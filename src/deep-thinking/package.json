@@ -1,6 +1,6 @@
 {
   "name": "@wemake-ai/mcpserver-deep-thinking",
-  "version": "1.0.1",
+  "version": "0.0.1",
   "description": "MCP server for deep thinking and problem solving",
   "license": "MIT",
   "author": "WeMake (https://wemake.cx)",
@@ -16,8 +16,7 @@
   "scripts": {
     "build": "bun build --target=bun --outfile=dist/index.js index.ts",
     "prepare": "bun run build",
-    "watch": "tsc --watch",
-    "publish": "bun publish --access public"
+    "watch": "tsc --watch"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.0",
