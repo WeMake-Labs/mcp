@@ -1,6 +1,6 @@
 {
   "name": "@wemake-ai/mcpserver-tasks",
-  "version": "0.0.6",
+  "version": "1.0.0",
   "description": "Model Context Protocol server for Tasks",
   "license": "MIT",
   "author": "WeMake (https://wemake.cx)",
