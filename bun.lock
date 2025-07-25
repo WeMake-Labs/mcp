@@ -17,7 +17,7 @@
     },
     "src/sequential-thinking": {
       "name": "@wemake-ai/mcp-sequential-thinking",
-      "version": "25.1.0",
+      "version": "1.0.0",
       "bin": {
         "mcp-server-sequential-thinking": "dist/index.js",
       },
