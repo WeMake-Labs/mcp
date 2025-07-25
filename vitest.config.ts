@@ -12,8 +12,8 @@ export default defineConfig({
     },
     projects: [
       "./src/deep-thinking",
-      "./src/knowledge-graph-memory",
-      "./src/tasks"
+      "./src/knowledge-graph-memory/vitest.config.ts",
+      "./src/tasks/vitest.config.ts"
     ],
     watch: false
   }
