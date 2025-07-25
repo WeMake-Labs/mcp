@@ -1,0 +1,292 @@
+{
+  "entities": [
+    {
+      "name": "MCP Monorepo",
+      "entityType": "Project",
+      "observations": [
+        "Collection of reference implementations for the Model Context Protocol (MCP).",
+        "TypeScript project using Bun for package management.",
+        "Contains subpackages for deep-thinking, knowledge-graph-memory, and tasks."
+      ]
+    },
+    {
+      "name": ".github/",
+      "entityType": "Directory",
+      "observations": [
+        "Directory for GitHub configurations and workflows.",
+        "Contains dependabot.yml for dependency updates and workflows for release and typescript."
+      ]
+    },
+    {
+      "name": ".trae/",
+      "entityType": "Directory",
+      "observations": [
+        "Directory for Trae-specific rules.",
+        "Contains project_rules.md."
+      ]
+    },
+    {
+      "name": ".wemake/",
+      "entityType": "Directory",
+      "observations": [
+        "Directory for WeMake configurations.",
+        "Includes agents like Clarity-MX-2.md, knowledge.json, and tasks.json."
+      ]
+    },
+    {
+      "name": "src/",
+      "entityType": "Directory",
+      "observations": [
+        "Source directory housing subpackages.",
+        "Contains deep-thinking, knowledge-graph-memory, and tasks packages."
+      ]
+    },
+    {
+      "name": "deep-thinking",
+      "entityType": "Package",
+      "observations": [
+        "Package for dynamic and reflective problem-solving through thought sequences.",
+        "Includes index.ts, package.json, tsconfig.json, README.md."
+      ]
+    },
+    {
+      "name": "knowledge-graph-memory",
+      "entityType": "Package",
+      "observations": [
+        "Package for persistent memory via local knowledge graph.",
+        "Includes index.ts, package.json, tsconfig.json, README.md."
+      ]
+    },
+    {
+      "name": "tasks",
+      "entityType": "Package",
+      "observations": [
+        "Package for self-guided task planning, management, execution, and completion.",
+        "Includes index.ts, package.json, tsconfig.json, README.md."
+      ]
+    },
+    {
+      "name": "package.json",
+      "entityType": "File",
+      "observations": [
+        "Root package configuration.",
+        "Defines name, version, scripts like build-all, publish-all, dependencies, and workspaces for src/*."
+      ]
+    },
+    {
+      "name": "tsconfig.json",
+      "entityType": "File",
+      "observations": [
+        "TypeScript compiler configuration.",
+        "Sets options for ESNext, strict mode, and includes src/**/*."
+      ]
+    },
+    {
+      "name": "README.md",
+      "entityType": "File",
+      "observations": [
+        "Project documentation.",
+        "Describes MCP servers, getting started, creating servers, license, and support."
+      ]
+    },
+    {
+      "name": "LICENSE",
+      "entityType": "File",
+      "observations": ["MIT License file for the project."]
+    },
+    {
+      "name": "bun.lock",
+      "entityType": "File",
+      "observations": ["Bun lockfile for dependency management."]
+    },
+    {
+      "name": "eslint.config.mjs",
+      "entityType": "File",
+      "observations": ["ESLint configuration file."]
+    },
+    {
+      "name": ".gitignore",
+      "entityType": "File",
+      "observations": [
+        "Git ignore file for excluding files from version control."
+      ]
+    },
+    {
+      "name": ".markdownlint.jsonc",
+      "entityType": "File",
+      "observations": ["Markdown lint configuration."]
+    },
+    {
+      "name": ".npmrc",
+      "entityType": "File",
+      "observations": ["NPM configuration file."]
+    },
+    {
+      "name": "Clarity-MX-2.md",
+      "entityType": "File",
+      "observations": ["Agent file in .wemake/agents/."]
+    },
+    {
+      "name": "knowledge.json",
+      "entityType": "File",
+      "observations": ["Knowledge configuration in .wemake/."]
+    },
+    {
+      "name": "tasks.json",
+      "entityType": "File",
+      "observations": ["Tasks configuration in .wemake/."]
+    },
+    {
+      "name": "project_rules.md",
+      "entityType": "File",
+      "observations": ["Project rules in .trae/rules/."]
+    },
+    {
+      "name": "release.yml",
+      "entityType": "File",
+      "observations": ["GitHub workflow for releases in .github/workflows/."]
+    },
+    {
+      "name": "typescript.yml",
+      "entityType": "File",
+      "observations": ["GitHub workflow for TypeScript in .github/workflows/."]
+    },
+    {
+      "name": "dependabot.yml",
+      "entityType": "File",
+      "observations": ["Dependabot configuration in .github/."]
+    }
+  ],
+  "relations": [
+    {
+      "from": "MCP Monorepo",
+      "to": ".github/",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": ".trae/",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": ".wemake/",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": "src/",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": "package.json",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": "tsconfig.json",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": "README.md",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": "LICENSE",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": "bun.lock",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": "eslint.config.mjs",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": ".gitignore",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": ".markdownlint.jsonc",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": ".npmrc",
+      "relationType": "contains"
+    },
+    {
+      "from": ".github/",
+      "to": "dependabot.yml",
+      "relationType": "contains"
+    },
+    {
+      "from": ".github/",
+      "to": "release.yml",
+      "relationType": "contains"
+    },
+    {
+      "from": ".github/",
+      "to": "typescript.yml",
+      "relationType": "contains"
+    },
+    {
+      "from": ".trae/",
+      "to": "project_rules.md",
+      "relationType": "contains"
+    },
+    {
+      "from": ".wemake/",
+      "to": "Clarity-MX-2.md",
+      "relationType": "contains"
+    },
+    {
+      "from": ".wemake/",
+      "to": "knowledge.json",
+      "relationType": "contains"
+    },
+    {
+      "from": ".wemake/",
+      "to": "tasks.json",
+      "relationType": "contains"
+    },
+    {
+      "from": "src/",
+      "to": "deep-thinking",
+      "relationType": "contains"
+    },
+    {
+      "from": "src/",
+      "to": "knowledge-graph-memory",
+      "relationType": "contains"
+    },
+    {
+      "from": "src/",
+      "to": "tasks",
+      "relationType": "contains"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": "deep-thinking",
+      "relationType": "implements"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": "knowledge-graph-memory",
+      "relationType": "implements"
+    },
+    {
+      "from": "MCP Monorepo",
+      "to": "tasks",
+      "relationType": "implements"
+    }
+  ]
+}
