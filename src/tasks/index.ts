@@ -12,7 +12,7 @@ import * as path from "node:path";
 import * as os from "node:os";
 import { z } from "zod";
 
-const DEFAULT_PATH = path.join(os.homedir(), ".wemake-ai", "tasks.json");
+const DEFAULT_PATH = path.join(os.homedir(), ".wemake", "tasks.json");
 const TASK_FILE_PATH = process.env.TASKS_FILE_PATH || DEFAULT_PATH;
 
 interface Task {
@@ -1234,7 +1234,7 @@ class TasksServer {
 const server = new Server(
   {
     name: "tasks-server",
-    version: "1.0.2"
+    version: "1.0.3"
   },
   {
     capabilities: {

@@ -18,7 +18,7 @@ Add this MCP via "Add Manually":
       "command": "bunx",
       "args": ["-y", "@wemake-ai/mcpserver-tasks"],
       "env": {
-        "TASKS_FILE_PATH": "~/project/.wemake-ai/tasks.json"
+        "TASKS_FILE_PATH": "~/project/.wemake/tasks.json"
       }
     }
   }
