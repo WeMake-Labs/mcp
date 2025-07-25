@@ -2,7 +2,7 @@
 Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
 External MCP Tools: Context 7, Gemini
 Built-In Tools: File system, Terminal, Web search, Preview
-Version: "v25.2.0"
+Version: 25.2.0
 ---
 
 # Clarity-MX-2 AI Agent Prompt
