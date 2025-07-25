@@ -1,4 +1,4 @@
-# Sequential Thinking MCP Server
+# Deep Thinking MCP Server
 
 An MCP server implementation that provides a tool for dynamic and reflective
 problem-solving through a structured thinking process.
@@ -13,7 +13,7 @@ problem-solving through a structured thinking process.
 
 ## Tool
 
-### sequential_thinking
+### deep-thinking
 
 Facilitates a detailed, step-by-step thinking process for problem-solving and
 analysis.
@@ -32,7 +32,7 @@ analysis.
 
 ## Usage
 
-The Sequential Thinking tool is designed for:
+The Deep Thinking tool is designed for:
 
 - Breaking down complex problems into steps
 - Planning and design with room for revision
@@ -43,25 +43,28 @@ The Sequential Thinking tool is designed for:
 
 ## Configuration
 
-### Usage with Claude Desktop
+### Trae IDE
 
-Add this to your `claude_desktop_config.json`:
+Add this MCP via "Add Manually":
 
 #### bunx
 
 ```json
 {
   "mcpServers": {
-    "sequential-thinking": {
+    "Deep Thinking": {
       "command": "bunx",
-      "args": ["-y", "@wemake-ai/mcp-sequential-thinking"]
+      "args": ["-y", "@wemake-ai/mcpserver-deep-thinking@latest"],
+      "env": {
+        "DISABLE_THOUGHT_LOGGING": "false"
+      }
     }
   }
 }
 ```
 
 To disable logging of thought information set env var: `DISABLE_THOUGHT_LOGGING`
-to `true`. Comment
+to `true`.
 
 ## License
 
