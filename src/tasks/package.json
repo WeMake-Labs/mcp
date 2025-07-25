@@ -16,7 +16,7 @@
   "scripts": {
     "build": "bun build --insert-shebang --target=bun --outfile=dist/index.js index.ts",
     "prepare": "bun run build",
-    "watch": "tsc --watch",
+    "watch": "bun build --insert-shebang --target=bun --outfile=dist/index.js index.ts --watch",
     "publish-now": "bun publish --access=public"
   },
   "dependencies": {
