@@ -36,10 +36,10 @@ if (memoryPath) {
   }
 }
 
-// Define the path to the JSONL file
+// Define the path to the JSON file
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Use the custom path or default to the installation directory
-const MEMORY_FILE_PATH = memoryPath || path.join(__dirname, "knowledge.jsonl");
+const MEMORY_FILE_PATH = memoryPath || path.join(__dirname, "knowledge.json");
 
 // We are storing our memory using entities, relations, and observations in a graph structure
 interface Entity {
@@ -60,20 +60,22 @@ interface KnowledgeGraph {
 }
 
 // The KnowledgeGraphManager class contains all operations to interact with the knowledge graph
-class KnowledgeGraphManager {
+export class KnowledgeGraphManager {
+  private memoryFilePath: string;
+
+  constructor(memoryFilePath: string) {
+    this.memoryFilePath = memoryFilePath;
+  }
   private async loadGraph(): Promise<KnowledgeGraph> {
     try {
-      const data = await fs.readFile(MEMORY_FILE_PATH, "utf-8");
-      const lines = data.split("\n").filter((line) => line.trim() !== "");
-      return lines.reduce(
-        (graph: KnowledgeGraph, line) => {
-          const item = JSON.parse(line);
-          if (item.type === "entity") graph.entities.push(item as Entity);
-          if (item.type === "relation") graph.relations.push(item as Relation);
-          return graph;
-        },
-        { entities: [], relations: [] }
-      );
+      const data = await fs.readFile(this.memoryFilePath, "utf-8");
+      const graph = JSON.parse(data) as KnowledgeGraph;
+
+      // Ensure the graph has the expected structure
+      return {
+        entities: Array.isArray(graph.entities) ? graph.entities : [],
+        relations: Array.isArray(graph.relations) ? graph.relations : []
+      };
     } catch (error) {
       if (
         error instanceof Error &&
@@ -87,13 +89,23 @@ class KnowledgeGraphManager {
   }
 
   private async saveGraph(graph: KnowledgeGraph): Promise<void> {
-    const lines = [
-      ...graph.entities.map((e) => JSON.stringify({ type: "entity", ...e })),
-      ...graph.relations.map((r) => JSON.stringify({ type: "relation", ...r }))
-    ];
-    const tempPath = `${MEMORY_FILE_PATH}.tmp`;
-    await fs.writeFile(tempPath, lines.join("\n"));
-    await fs.rename(tempPath, MEMORY_FILE_PATH);
+    // Create a clean graph object
+    const jsonGraph = {
+      entities: graph.entities.map(({ name, entityType, observations }) => ({
+        name,
+        entityType,
+        observations
+      })),
+      relations: graph.relations.map(({ from, to, relationType }) => ({
+        from,
+        to,
+        relationType
+      }))
+    };
+
+    const tempPath = `${this.memoryFilePath}.tmp`;
+    await fs.writeFile(tempPath, JSON.stringify(jsonGraph, null, 2));
+    await fs.rename(tempPath, this.memoryFilePath);
   }
 
   async createEntities(entities: Entity[]): Promise<Entity[]> {
@@ -258,13 +270,13 @@ class KnowledgeGraphManager {
   }
 }
 
-const knowledgeGraphManager = new KnowledgeGraphManager();
+const knowledgeGraphManager = new KnowledgeGraphManager(MEMORY_FILE_PATH);
 
 // The server instance and tools exposed to AI models
 const server = new Server(
   {
     name: "knowledge-graph-memory-server",
-    version: "1.0.0"
+    version: "1.1.0"
   },
   {
     capabilities: {
