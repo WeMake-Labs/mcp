@@ -1263,7 +1263,9 @@ const listToolsHandler = async () => ({
 });
 server.setRequestHandler(ListToolsRequestSchema, listToolsHandler);
 
-const callToolHandler = async (request) => {
+const callToolHandler = async (request: {
+  params: { name: string; arguments?: Record<string, unknown> };
+}) => {
   try {
     const { name, arguments: args } = request.params;
 

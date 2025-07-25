@@ -38,8 +38,6 @@ if (memoryPath) {
 
 // Define the path to the JSON file
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// Use the custom path or default to the installation directory
-const MEMORY_FILE_PATH = memoryPath || path.join(__dirname, "knowledge.json");
 
 // We are storing our memory using entities, relations, and observations in a graph structure
 interface Entity {
@@ -282,8 +280,6 @@ export class KnowledgeGraphManager {
   }
 }
 
-const knowledgeGraphManager = new KnowledgeGraphManager(MEMORY_FILE_PATH);
-
 // The server instance and tools exposed to AI models
 const server = new Server(
   {
@@ -296,48 +292,105 @@ const server = new Server(
     }
   }
 );
-
 const listToolsHandler = async () => {
   return { tools: toolSchemas };
 };
-const callToolHandler = async (request) => {
+
+// Tool argument interfaces
+interface CreateEntitiesArgs {
+  entities: Entity[];
+}
+
+interface CreateRelationsArgs {
+  relations: Relation[];
+}
+
+interface AddObservationsArgs {
+  observations: { entityName: string; contents: string[] }[];
+}
+
+interface DeleteEntitiesArgs {
+  entityNames: string[];
+}
+
+interface DeleteObservationsArgs {
+  deletions: { entityName: string; observations: string[] }[];
+}
+
+interface DeleteRelationsArgs {
+  relations: Relation[];
+}
+
+interface SearchNodesArgs {
+  query: string;
+}
+
+interface OpenNodesArgs {
+  names: string[];
+}
+
+// Add proper type to request parameter
+const callToolHandler = async (request: {
+  params: { name: string; arguments?: Record<string, unknown> };
+}) => {
   const memoryFilePath =
     process.env.KNOWLEDGE_GRAPH_MEMORY_FILE ||
     path.join(__dirname, "knowledge.json");
   const manager = new KnowledgeGraphManager(memoryFilePath);
   const { name, arguments: args } = request.params;
   if (!args) throw new Error("No arguments provided");
-  let result;
+  let result:
+    | string
+    | Entity[]
+    | Relation[]
+    | KnowledgeGraph
+    | { entityName: string; addedObservations: string[] }[];
   switch (name) {
     case "create_entities":
-      result = await manager.createEntities(args.entities);
+      result = await manager.createEntities(
+        (args as unknown as CreateEntitiesArgs).entities
+      );
       break;
     case "create_relations":
-      result = await manager.createRelations(args.relations);
+      result = await manager.createRelations(
+        (args as unknown as CreateRelationsArgs).relations
+      );
       break;
     case "add_observations":
-      result = await manager.addObservations(args.observations);
+      result = await manager.addObservations(
+        (args as unknown as AddObservationsArgs).observations
+      );
       break;
     case "delete_entities":
-      await manager.deleteEntities(args.entityNames);
+      await manager.deleteEntities(
+        (args as unknown as DeleteEntitiesArgs).entityNames
+      );
       result = "Entities deleted successfully";
       break;
     case "delete_observations":
-      await manager.deleteObservations(args.deletions);
+      await manager.deleteObservations(
+        (args as unknown as DeleteObservationsArgs).deletions
+      );
       result = "Observations deleted successfully";
       break;
     case "delete_relations":
-      await manager.deleteRelations(args.relations);
+      await manager.deleteRelations(
+        (args as unknown as DeleteRelationsArgs).relations
+      );
       result = "Relations deleted successfully";
       break;
     case "read_graph":
       result = await manager.readGraph();
       break;
     case "search_nodes":
-      result = await manager.searchNodes(args.query);
+      result = await manager.searchNodes(
+        (args as unknown as SearchNodesArgs).query
+      );
       break;
     case "open_nodes":
-      result = await manager.openNodes(args.names);
+      result = await manager.openNodes(
+        (args as unknown as OpenNodesArgs).names
+      );
       break;
     default:
       throw new Error(`Unknown tool: ${name}`);
@@ -349,12 +402,24 @@ const callToolHandler = async (request) => {
   };
 };
 
+// Register handlers with the server
+server.setRequestHandler(ListToolsRequestSchema, listToolsHandler);
+server.setRequestHandler(CallToolRequestSchema, callToolHandler);
+
 export const testExports =
   process.env.NODE_ENV === "test" || process.env.VITEST
     ? { listToolsHandler, callToolHandler }
     : undefined;
+
+// Define the main function
+async function main() {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  console.error("Knowledge Graph Memory MCP Server running");
+}
+
 if (process.env.NODE_ENV !== "test" && !process.env.VITEST) {
-  main().catch((error) => {
+  main().catch((error: Error) => {
     console.error("Fatal error in main():", error);
     process.exit(1);
   });
@@ -502,20 +567,6 @@ const toolSchemas = [
     }
   }
 ];
-const createEntities = async (args) =>
-  await knowledgeGraphManager.createEntities(args.entities);
-const createRelations = async (args) =>
-  await knowledgeGraphManager.createRelations(args.relations);
-const addObservations = async (args) =>
-  await knowledgeGraphManager.addObservations(args.observations);
-const deleteEntities = async (args) =>
-  await knowledgeGraphManager.deleteEntities(args.entityNames);
-const deleteObservations = async (args) =>
-  await knowledgeGraphManager.deleteObservations(args.deletions);
-const deleteRelations = async (args) =>
-  await knowledgeGraphManager.deleteRelations(args.relations);
-const readGraph = async () => await knowledgeGraphManager.readGraph();
-const searchNodes = async (args) =>
-  await knowledgeGraphManager.searchNodes(args.query);
-const openNodes = async (args) =>
-  await knowledgeGraphManager.openNodes(args.names);
+
+// Remove all unused const wrapper functions and interfaces below this point
+// End of file
