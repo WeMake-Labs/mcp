@@ -193,7 +193,7 @@ You can specify a custom path for the memory file:
         "-y",
         "@wemake-ai/mcpserver-knowledge-graph-memory",
         "--memory-path",
-        "/home/alice/project/.wemake/knowledge.jsonl"
+        "/home/alice/project/.wemake/knowledge.json"
       ],
       "autoapprove": [
         "create_entities",
@@ -211,8 +211,34 @@ You can specify a custom path for the memory file:
 }
 ```
 
-If no path is specified, it will default to knowledge.jsonl in the server's
+If no path is specified, it will default to knowledge.json in the server's
 installation directory.
+
+## Data Format
+
+The knowledge graph is stored in a single JSON file with the following
+structure:
+
+```json
+{
+  "entities": [
+    {
+      "name": "John_Smith",
+      "entityType": "person",
+      "observations": ["Speaks fluent Spanish"]
+    }
+    // ... more entities
+  ],
+  "relations": [
+    {
+      "from": "John_Smith",
+      "to": "ExampleCorp",
+      "relationType": "works_at"
+    }
+    // ... more relations
+  ]
+}
+```
 
 ## License
 

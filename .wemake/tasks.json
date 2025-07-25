@@ -1,0 +1,52 @@
+{
+  "requests": [
+    {
+      "requestId": "req-1",
+      "originalRequest": "Update `/Users/admin/Repositories/WeMake/mcp/src/knowledge-graph-memory/` to utilize a scalable `knowledge.json` (JSON) instead of currently `knowledge.jsonl` (JSON Lines). `MCP`",
+      "splitDetails": "Decomposing into analysis, design, implementation, documentation, and testing phases for thorough update.",
+      "tasks": [
+        {
+          "id": "task-1",
+          "title": "Analyze current implementation",
+          "description": "Examine the existing code in index.ts and related files to understand how knowledge.jsonl is used, including reading, writing, and any scalability issues.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Analyzed index.ts: knowledge.jsonl stores entities and relations as separate JSON objects per line. Loading reads entire file, parses lines into graph structure. Saving writes all lines to temp file then renames. Scalability concerns: Full memory load for operations may not scale with very large graphs; no indexing for efficient queries; appending is efficient but searches require full load."
+        },
+        {
+          "id": "task-2",
+          "title": "Design JSON structure",
+          "description": "Plan a scalable JSON structure to replace JSONL, ensuring it can handle large amounts of data efficiently.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Planned JSON structure: Single knowledge.json file containing { \"entities\": [ { \"name\": string, \"entityType\": string, \"observations\": string[] } ], \"relations\": [ { \"from\": string, \"to\": string, \"relationType\": string } ] }. For scalability, maintain in-memory maps for quick access (e.g., entity name to object), append-only where possible, but full rewrite on changes. Address large data by suggesting size limits or future migration to database if needed."
+        },
+        {
+          "id": "task-3",
+          "title": "Modify code to use JSON",
+          "description": "Update the code to read from and write to knowledge.json instead of knowledge.jsonl, implementing necessary changes for scalability.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Updated MEMORY_FILE_PATH to 'knowledge.json'. Modified loadGraph to parse the JSON file directly into entities and relations arrays with structure validation. Updated saveGraph to construct a clean JSON object (removing 'type' fields) and write it with indentation. This completes the transition to a scalable JSON format, maintaining in-memory operations while noting persistence requires full rewrites."
+        },
+        {
+          "id": "task-4",
+          "title": "Update configuration and documentation",
+          "description": "Adjust package.json, README.md, and any other files to reflect the change, and document the new format.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Updated README.md: Changed references from knowledge.jsonl to knowledge.json in the custom path example and default path description. Added a new 'Data Format' section documenting the JSON structure with entities and relations arrays. package.json requires no updates as it contains no references to the memory file."
+        },
+        {
+          "id": "task-5",
+          "title": "Test the updated implementation",
+          "description": "Create and run tests to verify the new JSON-based system works correctly and scales appropriately.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Created index.test.ts with unit tests for creating/reading entities, creating relations, adding observations, deleting entities, and scalability with 1000 entities. Fixed bugs in index.ts including exporting the class, adding a constructor for custom file paths, and correcting the rename in saveGraph to use this.memoryFilePath. Ran bun test, and all 5 tests passed successfully, verifying the new JSON-based system functions correctly and handles larger datasets in memory."
+        }
+      ],
+      "completed": true
+    }
+  ]
+}
