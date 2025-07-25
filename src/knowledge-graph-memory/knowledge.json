@@ -1,0 +1,15 @@
+{
+  "entities": [
+    {
+      "name": "Test",
+      "entityType": "Type",
+      "observations": ["obs1"]
+    },
+    {
+      "name": "Test2",
+      "entityType": "Type",
+      "observations": ["obs2"]
+    }
+  ],
+  "relations": []
+}

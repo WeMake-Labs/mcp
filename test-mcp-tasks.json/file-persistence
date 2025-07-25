@@ -1,0 +1,36 @@
+{
+  "requests": [
+    {
+      "requestId": "req-1",
+      "originalRequest": "Persistence test",
+      "splitDetails": "Persistence test",
+      "tasks": [
+        {
+          "id": "task-1",
+          "title": "Persistent Task",
+          "description": "Test persistence",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    },
+    {
+      "requestId": "req-2",
+      "originalRequest": "Persistence test",
+      "splitDetails": "Persistence test",
+      "tasks": [
+        {
+          "id": "task-2",
+          "title": "Persistent Task",
+          "description": "Test persistence",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    }
+  ]
+}

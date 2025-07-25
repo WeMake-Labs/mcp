@@ -1,0 +1,36 @@
+{
+  "requests": [
+    {
+      "requestId": "req-1",
+      "originalRequest": "Request 1",
+      "splitDetails": "Request 1",
+      "tasks": [
+        {
+          "id": "task-1",
+          "title": "Task 1",
+          "description": "First task",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    },
+    {
+      "requestId": "req-2",
+      "originalRequest": "Request 2",
+      "splitDetails": "Request 2",
+      "tasks": [
+        {
+          "id": "task-2",
+          "title": "Task 2",
+          "description": "Second task",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    }
+  ]
+}

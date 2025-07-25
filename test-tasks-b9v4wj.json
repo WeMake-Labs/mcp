@@ -1,0 +1,28 @@
+{
+  "requests": [
+    {
+      "requestId": "req-1",
+      "originalRequest": "Create a simple web app",
+      "splitDetails": "Breaking down web app creation",
+      "tasks": [
+        {
+          "id": "task-1",
+          "title": "Setup project",
+          "description": "Initialize the project structure",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        },
+        {
+          "id": "task-2",
+          "title": "Add dependencies",
+          "description": "Install required packages",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    }
+  ]
+}

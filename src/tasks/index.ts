@@ -843,14 +843,16 @@ export class TasksServer {
   private requestCounter = 0;
   private taskCounter = 0;
   private data: TasksFile = { requests: [] };
+  private filePath: string;
 
-  constructor() {
+  constructor(filePath = TASK_FILE_PATH) {
+    this.filePath = filePath;
     this.loadTasks();
   }
 
   private async loadTasks() {
     try {
-      const data = await fs.readFile(TASK_FILE_PATH, "utf-8");
+      const data = await fs.readFile(this.filePath, "utf-8");
       this.data = JSON.parse(data);
       const allTaskIds: number[] = [];
       const allRequestIds: number[] = [];
@@ -879,11 +881,11 @@ export class TasksServer {
   private async saveTasks() {
     try {
       // Ensure directory exists
-      const dir = path.dirname(TASK_FILE_PATH);
+      const dir = path.dirname(this.filePath);
       await fs.mkdir(dir, { recursive: true });
 
       await fs.writeFile(
-        TASK_FILE_PATH,
+        this.filePath,
         JSON.stringify(this.data, null, 2),
         "utf-8"
       );
@@ -1245,7 +1247,7 @@ const server = new Server(
 
 const tasksServer = new TasksServer();
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
+const listToolsHandler = async () => ({
   tools: [
     PLANNING_TOOL,
     GET_NEXT_TASK_TOOL,
@@ -1258,9 +1260,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     UPDATE_TASK_TOOL,
     DELETE_TASK_TOOL
   ]
-}));
+});
+server.setRequestHandler(ListToolsRequestSchema, listToolsHandler);
 
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
+const callToolHandler = async (request) => {
   try {
     const { name, arguments: args } = request.params;
 
@@ -1407,7 +1410,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       isError: true
     };
   }
-});
+};
+server.setRequestHandler(CallToolRequestSchema, callToolHandler);
 
 async function runServer() {
   const transport = new StdioServerTransport();
@@ -1415,7 +1419,10 @@ async function runServer() {
   console.error(`Tasks MCP Server running. Saving tasks at: ${TASK_FILE_PATH}`);
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error running server:", error);
-  process.exit(1);
-});
+if (process.env.NODE_ENV !== 'test') {
+  runServer().catch((error) => {
+    console.error("Fatal error running server:", error);
+    process.exit(1);
+  });
+}
+export { listToolsHandler, callToolHandler, server, tasksServer, runServer };

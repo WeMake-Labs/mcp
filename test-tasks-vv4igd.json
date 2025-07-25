@@ -1,0 +1,20 @@
+{
+  "requests": [
+    {
+      "requestId": "req-1",
+      "originalRequest": "Test request",
+      "splitDetails": "Test request",
+      "tasks": [
+        {
+          "id": "task-2",
+          "title": "Task 2",
+          "description": "Second task",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    }
+  ]
+}

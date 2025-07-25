@@ -1,0 +1,28 @@
+{
+  "requests": [
+    {
+      "requestId": "req-1",
+      "originalRequest": "Task management test",
+      "splitDetails": "Task management test",
+      "tasks": [
+        {
+          "id": "task-2",
+          "title": "Task to Delete",
+          "description": "This will be deleted",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        },
+        {
+          "id": "task-3",
+          "title": "Added Task",
+          "description": "This was added later",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    }
+  ]
+}

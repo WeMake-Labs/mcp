@@ -1,0 +1,68 @@
+{
+  "requests": [
+    {
+      "requestId": "req-1",
+      "originalRequest": "First request",
+      "splitDetails": "First request",
+      "tasks": [
+        {
+          "id": "task-1",
+          "title": "Task 1",
+          "description": "First task",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    },
+    {
+      "requestId": "req-2",
+      "originalRequest": "Second request",
+      "splitDetails": "Second request",
+      "tasks": [
+        {
+          "id": "task-2",
+          "title": "Task 2",
+          "description": "Second task",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    },
+    {
+      "requestId": "req-3",
+      "originalRequest": "First request",
+      "splitDetails": "First request",
+      "tasks": [
+        {
+          "id": "task-3",
+          "title": "Task 1",
+          "description": "First task",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    },
+    {
+      "requestId": "req-4",
+      "originalRequest": "Second request",
+      "splitDetails": "Second request",
+      "tasks": [
+        {
+          "id": "task-4",
+          "title": "Task 2",
+          "description": "Second task",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
+    }
+  ]
+}
