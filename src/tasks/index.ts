@@ -1419,7 +1419,7 @@ async function runServer() {
   console.error(`Tasks MCP Server running. Saving tasks at: ${TASK_FILE_PATH}`);
 }
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== "test") {
   runServer().catch((error) => {
     console.error("Fatal error running server:", error);
     process.exit(1);
