@@ -15,15 +15,15 @@
     }
   },
   "bin": {
-    "mcpserver-deep-thinking": "dist/index.js"
+    "mcpserver-deep-thinking": "dist/bin.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "bun build --insert-shebang --target=bun --outfile=dist/index.js index.ts",
+    "build": "bun build --insert-shebang --target=bun --outfile=dist/bin.js bin.ts && bun build --target=bun --outfile=dist/index.js index.ts",
     "prepare": "bun run build",
-    "watch": "bun build --insert-shebang --target=bun --outfile=dist/index.js index.ts --watch",
+    "watch": "bun build --insert-shebang --target=bun --outfile=dist/bin.js bin.ts --watch",
     "publish-now": "bun publish --access=public"
   },
   "dependencies": {

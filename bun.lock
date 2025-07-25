@@ -22,7 +22,7 @@
       "name": "@wemake-ai/mcpserver-deep-thinking",
       "version": "1.0.2",
       "bin": {
-        "mcpserver-deep-thinking": "dist/index.js",
+        "mcpserver-deep-thinking": "dist/bin.js",
       },
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.17.0",
