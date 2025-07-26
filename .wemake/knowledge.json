@@ -155,6 +155,40 @@
       "name": "dependabot.yml",
       "entityType": "File",
       "observations": ["Dependabot configuration in .github/."]
+    },
+    {
+      "name": "Vitest Monorepo Best Practices",
+      "entityType": "Testing Strategy",
+      "observations": [
+        "Vitest supports monorepo setups via Test Projects, allowing multiple configurations in one process for different environments or packages. <mcreference link=\"https://vitest.dev/guide/projects\" index=\"2\">2</mcreference>",
+        "Integrate with Bun by using 'bun run test' to avoid Bun's native runner. <mcreference link=\"https://vitest.dev/guide/\" index=\"1\">1</mcreference>",
+        "Use custom export conditions for live TypeScript resolution in monorepos to ensure static-runtime agreement. <mcreference link=\"https://colinhacks.com/essays/live-types-typescript-monorepo\" index=\"3\">3</mcreference>",
+        "In Turborepo, configure tasks for caching and watch mode; merge coverage reports manually if not using Projects. <mcreference link=\"https://turborepo.com/docs/guides/tools/vitest\" index=\"4\">4</mcreference>",
+        "For NX monorepos, install @nrwl/vite and configure with vite-tsconfig-paths for path resolution. <mcreference link=\"https://dev.to/shannonlal/unit-testing-react-applications-in-a-nx-nrwl-monorepo-with-vitest-322o\" index=\"5\">5</mcreference>",
+        "Scalability achieved through parallel test execution and unified configuration with Vite. <mcreference link=\"https://vitest.dev/guide/\" index=\"1\">1</mcreference> <mcreference link=\"https://vitest.dev/guide/projects\" index=\"2\">2</mcreference>"
+      ]
+    },
+    {
+      "name": "MCP Monorepo Structure",
+      "entityType": "Codebase Analysis",
+      "observations": [
+        "Monorepo root at /Users/admin/Repositories/WeMake/mcp, managed with Bun, using workspaces ['src/*'].",
+        "Packages: src/deep-thinking, src/knowledge-graph-memory, src/tasks – each with index.ts, package.json, tsconfig.json.",
+        "Dev dependencies include ESLint, Prettier, TypeScript; scripts for build, publish, lint, format, type check – no test scripts or testing libraries.",
+        ".github/workflows for CI (release.yml, typescript.yml); potential integration points for Vitest: add dev dep, vitest.config.ts in root, test scripts per package or unified, leveraging Test Projects for scalability."
+      ]
+    },
+    {
+      "name": "Vitest Strategy for MCP",
+      "entityType": "Testing Blueprint",
+      "observations": [
+        "Use root vitest.config.ts with Test Projects for each package (deep-thinking, knowledge-graph-memory, tasks) to enable scalable, parallel testing across the monorepo.",
+        "Integrate with Bun: Add 'vitest' as dev dep, use 'bun run test' scripts; configure for TypeScript with custom export conditions for live resolution.",
+        "Automation: Add test scripts to package.json, leverage .github/workflows for CI runs on push/pull requests.",
+        "Reliability: Implement coverage thresholds, watch mode for dev, manual coverage merging if needed.",
+        "Scalability: Unified Vite config, parallel execution; rationale: Matches MCP's small package count, ensures fast feedback loops.",
+        "Implementation steps: 1. Install vitest and deps. 2. Create vitest.config.ts with projects array. 3. Add test dirs/files per package. 4. Update CI yaml for test runs. 5. Best practices: Unit/integration tests, mocking, consistent naming."
+      ]
     }
   ],
   "relations": [
