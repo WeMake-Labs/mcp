@@ -284,7 +284,7 @@ export class KnowledgeGraphManager {
 const server = new Server(
   {
     name: "knowledge-graph-memory-server",
-    version: "1.1.2"
+    version: "1.1.3"
   },
   {
     capabilities: {
@@ -335,7 +335,7 @@ const callToolHandler = async (request: {
 }) => {
   const memoryFilePath =
     process.env.KNOWLEDGE_GRAPH_MEMORY_FILE ||
-    path.join(__dirname, "knowledge.json");
+    path.join(__dirname, "knowledge-graph.json");
   const manager = new KnowledgeGraphManager(memoryFilePath);
   const { name, arguments: args } = request.params;
   if (!args) throw new Error("No arguments provided");
