@@ -167,6 +167,30 @@
         }
       ],
       "completed": false
+    },
+    {
+      "requestId": "req-3",
+      "originalRequest": "Add a final AI agent for AI Agent orchestration, work collaboration, and agent communication, focusing on agent architecture management. As a Senior Level DevOps Engineer, AI Agent Engineer, and AI Orchestration Architect, you will be responsible for optimizing internal AI agent collaboration within a single monorepo.",
+      "splitDetails": "Add a final AI agent for AI Agent orchestration, work collaboration, and agent communication, focusing on agent architecture management. As a Senior Level DevOps Engineer, AI Agent Engineer, and AI Orchestration Architect, you will be responsible for optimizing internal AI agent collaboration within a single monorepo.",
+      "tasks": [
+        {
+          "id": "task-20",
+          "title": "Design Orchestration Prompt",
+          "description": "Create the prompt file for the orchestration agent using the existing template, integrating MCP tools, collaboration mechanisms, and self-approval criteria. Tailor to agent management, communication, and monorepo optimization. Success: File created in /Users/admin/Repositories/WeMake/mcp/.wemake/agents/Orchestration.md, under 10k characters.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Created Orchestration.md in /Users/admin/Repositories/WeMake/mcp/.wemake/agents using the template. Integrated MCP tools, collaboration mechanisms, self-approval criteria, and tailored for agent orchestration, communication, and monorepo optimization as a Senior DevOps and AI Orchestration Architect. File is under 10k characters (approximately 2500 characters)."
+        },
+        {
+          "id": "task-21",
+          "title": "Verify Orchestration Prompt",
+          "description": "Check the new prompt for tool integration, collaboration features, and character limit. Success: Prompt meets all criteria.",
+          "done": true,
+          "approved": true,
+          "completedDetails": "Verified Orchestration.md: Integrates all MCP and built-in tools with specific uses, details collaboration mechanisms including Knowledge Graph sharing and monorepo optimization, and is under 10k characters (approximately 2800 characters). All success criteria met."
+        }
+      ],
+      "completed": true
     }
   ]
 }
