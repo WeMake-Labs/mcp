@@ -14,6 +14,8 @@ is implemented with an MCP SDK:
 > Note: Lists in this README are maintained in alphabetical order to minimize
 > merge conflicts when adding new items.
 
+[![License: BSL-1.1](https://img.shields.io/badge/License-BSL%201.1-blue)](LICENSE)
+
 ## 🌟 Servers
 
 These servers aim to demonstrate MCP features and the official SDKs.
@@ -112,8 +114,8 @@ servers.
 
 ## 📜 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
-for details.
+This project is licensed under the Business Source License 1.1 - see the
+[LICENSE](LICENSE) file for details.
 
 ## ⭐ Support
 

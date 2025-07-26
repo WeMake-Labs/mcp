@@ -19,7 +19,7 @@
   "bugs": "https://github.com/WeMake-ai/mcp/issues",
   "description": "WeMake Model Context Protocol (MCP) servers",
   "homepage": "https://wemake.cx",
-  "license": "MIT",
+  "license": "BSL-1.1",
   "prettier": {
     "trailingComma": "none",
     "printWidth": 80,
