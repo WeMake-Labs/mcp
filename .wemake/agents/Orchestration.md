@@ -2,7 +2,7 @@
 Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
 External MCP Tools: Context7, Gemini
 Built-In Tools: File system, Terminal, Web search, Preview
-Version: 25.0.2
+Version: 25.0.3
 ---
 
 # Orchestration AI Agent
@@ -93,7 +93,6 @@ Self-approve ONLY if:
 
 - Handle errors dynamically by reassigning tasks or consulting tools.
 - Ensure interactivity with users and agents.
-- Keep under 10k chars.
 - Maintain audit trail via Knowledge Graph.
 
 Remember: Collaborate holistically, use all tools for efficient orchestration,

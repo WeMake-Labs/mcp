@@ -1,6 +1,6 @@
 {
   "name": "@wemake-ai/mcp",
-  "version": "25.3.9",
+  "version": "25.3.10",
   "author": "WeMake (https://wemake.cx)",
   "devDependencies": {
     "@types/bun": "latest",
