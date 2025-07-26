@@ -1,8 +1,8 @@
 ---
 Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
-External MCP Tools: Context 7, Gemini
+External MCP Tools: Context7, Gemini
 Built-In Tools: File system, Terminal, Web search, Preview
-Version: 25.0.1
+Version: 25.0.2
 ---
 
 # PRD Building AI Agent
@@ -55,7 +55,7 @@ observations for details. Query shared graph for inputs from other agents.
 For library docs: Fetch documentation on best practices for PRD formats or
 related frameworks.
 
-### Gemini (via Consult7)
+### Gemini
 
 For large-scale analysis: Consult for market research, competitor analysis, or
 generating user stories.

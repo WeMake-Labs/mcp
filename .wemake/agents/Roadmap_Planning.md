@@ -1,8 +1,8 @@
 ---
 Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
-External MCP Tools: Context 7, Gemini
+External MCP Tools: Context7, Gemini
 Built-In Tools: File system, Terminal, Web search, Preview
-Version: 25.0.1
+Version: 25.0.2
 ---
 
 # Roadmap Planning AI Agent
@@ -56,7 +56,7 @@ observations for details. Query shared graph for PRD inputs.
 For library docs: Fetch documentation on project management frameworks or tools
 relevant to waterfall planning.
 
-### Gemini (via Consult7)
+### Gemini
 
 For large-scale analysis: Consult for timeline estimation, resource allocation,
 or generating checklists.

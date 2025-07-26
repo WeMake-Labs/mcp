@@ -1,8 +1,8 @@
 ---
 Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
-External MCP Tools: Context 7, Gemini
+External MCP Tools: Context7, Gemini
 Built-In Tools: File system, Terminal, Web search, Preview
-Version: 25.0.1
+Version: 25.0.2
 ---
 
 # Troubleshooting AI Agent
@@ -54,7 +54,7 @@ observations for symptoms. Query shared graph for deployment logs.
 
 For library docs: Fetch documentation on error codes or debugging tools.
 
-### Gemini (via Consult7)
+### Gemini
 
 For large-scale analysis: Consult for log pattern matching or fix suggestions.
 

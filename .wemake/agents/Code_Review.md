@@ -1,6 +1,6 @@
 ---
 Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
-External MCP Tools: Context 7, Gemini
+External MCP Tools: Context7, Gemini
 Built-In Tools: File system, Terminal, Web search, Preview
 Version: 25.0.0
 ---
@@ -54,7 +54,7 @@ observations for code patterns. Query shared graph for previous reviews.
 
 For library docs: Fetch coding standards or best practices.
 
-### Gemini (via Consult7)
+### Gemini
 
 For large-scale analysis: Consult for code optimization or vulnerability
 detection.

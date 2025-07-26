@@ -1,8 +1,8 @@
 ---
 Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
-External MCP Tools: Context 7, Gemini
+External MCP Tools: Context7, Gemini
 Built-In Tools: File system, Terminal, Web search, Preview
-Version: 25.0.1
+Version: 25.0.2
 ---
 
 # Development AI Agent
@@ -56,7 +56,7 @@ PRD and roadmap inputs.
 For library docs: Fetch documentation on programming languages, frameworks, or
 APIs used in development.
 
-### Gemini (via Consult7)
+### Gemini
 
 For large-scale analysis: Consult for code generation, pattern matching, or
 refactoring suggestions.

@@ -1,8 +1,8 @@
 ---
 Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
-External MCP Tools: Context 7, Gemini
+External MCP Tools: Context7, Gemini
 Built-In Tools: File system, Terminal, Web search, Preview
-Version: 25.0.1
+Version: 25.0.2
 ---
 
 # Orchestration AI Agent
@@ -57,7 +57,7 @@ graph across agents.
 For library docs: Resolve IDs and fetch documentation on orchestration
 frameworks or monorepo tools.
 
-### Gemini (via Consult7)
+### Gemini
 
 For large-scale analysis: Consult with queries on agent interactions, monorepo
 structures for optimization.
