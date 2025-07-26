@@ -37,7 +37,8 @@
 Default to using Bun instead of Node.js.
 
 - Use `bun <file>` instead of `node <file>` or `ts-node <file>`
-- Use `bun test` instead of `jest` or `vitest`
+- Use `bun test` for simple scripts; use Vitest for comprehensive monorepo
+  testing with coverage requirements
 - Use `bun build <file.html|file.ts|file.css>` instead of `webpack` or `esbuild`
 - Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
 - Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or
@@ -145,38 +146,77 @@ bun --hot ./index.ts
 For more information, read the Bun API docs in
 `node_modules/bun-types/docs/**.md`.
 
-## Vitest
+## Testing Strategy
 
-Use Vitest as the primary testing framework for this MCP monorepo.
+Use Vitest as the primary testing framework for this MCP monorepo with
+automated, reliable, scalable, and streamlined testing.
 
-- Configure Vitest using vitest.config.ts or integrate with vite.config.ts for
-  unified setup.
-  <mcreference link="https://vitest.dev/config/" index="1">1</mcreference>
-- Leverage Vitest's fast execution and parallel testing for velocity in
-  monorepos.
-  <mcreference link="https://dev.to/shannonlal/unit-testing-react-applications-in-a-nx-nrwl-monorepo-with-vitest-322o" index="2">2</mcreference>
-- Write tests with TypeScript support, ensuring strict type checking.
-  <mcreference link="https://colinhacks.com/essays/live-types-typescript-monorepo" index="3">3</mcreference>
-- Add function-level comments in test files explaining test purpose and logic.
-- Optimize for single developer: Use simple test setups, automate runs with
-  scripts.
-- Enable coverage reports and use reporters for quality insights.
-  <mcreference link="https://vitest.dev/guide/" index="5">5</mcreference>
-- Follow best practices for monorepo: Use project configurations for different
-  packages.
-  <mcreference link="https://thijs-koerselman.medium.com/my-quest-for-the-perfect-ts-monorepo-62653d3047eb" index="4">4</mcreference>
-- Example test:
+### Configuration
+
+- Use `vitest.config.ts` in root with Test Projects for monorepo support
+- Configure coverage thresholds: 80% for lines, functions, branches, statements
+- Enable TypeScript support with `vite-tsconfig-paths` plugin
+- Use project-specific configurations for each package under `src/*`
+
+### Directory Structure
+
+- Root: `vitest.config.ts`, test scripts in `package.json`
+- Packages: Add `tests/` folders in each `src/*` package with `*.test.ts` files
+- Naming convention: `functionName.test.ts`
+
+### Scripts
+
+Add to root `package.json`:
+
+```json
+"scripts": {
+  "test": "bun run vitest",
+  "test:watch": "bun run vitest --watch",
+  "test:coverage": "bun run vitest --coverage"
+}
+```
+
+### CI Integration
+
+- Run tests on push/pull requests via GitHub Actions
+- Use `bun test --coverage` in CI pipeline
+- Ensure coverage thresholds are met for quality gates
+
+### Best Practices
+
+- **Test Types**: Unit tests for functions, integration tests for MCP
+  servers/tools
+- **Mocking**: Use `vi.mock` for dependencies
+- **Coverage**: Monitor and maintain 80% threshold across all metrics
+- **Watch Mode**: Use for development feedback
+- **Parallelism**: Leverage Vitest's automatic parallel execution
+- **TypeScript**: Enable live type resolution with custom export conditions
+
+### Example Test
 
 ```ts
-// sum.test.ts
 import { expect, test } from "vitest";
-import { sum } from "./sum";
+import { someFunction } from "../index";
 
-test("adds 1 + 2 to equal 3", () => {
-  expect(sum(1, 2)).toBe(3);
+test("someFunction works", () => {
+  expect(someFunction()).toBe(true);
 });
 ```
 
-For configuration details, refer to Vitest docs.
-<mcreference link="https://vitest.dev/config/" index="1">1</mcreference>
-<mcreference link="https://vitest.dev/guide/" index="5">5</mcreference>
+### Monorepo TypeScript Resolution
+
+Add to each package's `package.json`:
+
+```json
+"exports": {
+  ".": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.js",
+    "bun": "./src/index.ts"
+  }
+}
+```
+
+This strategy ensures efficient testing that scales with the monorepo while
+maintaining quality through automation and coverage requirements.

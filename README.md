@@ -1,4 +1,4 @@
-# 💙 WeMake AI Model Context Protocol servers
+# 💙 WeMake AI Model Context Protocol (MCP) servers
 
 This repository is a collection of _reference implementations_ for the
 [Model Context Protocol](https://modelcontextprotocol.io/) (MCP), as well as
@@ -9,7 +9,6 @@ MCP, demonstrating how it can be used to give Large Language Models (LLMs)
 secure, controlled access to tools and data sources. Typically, each MCP server
 is implemented with an MCP SDK:
 
-- [Python MCP SDK](https://github.com/modelcontextprotocol/python-sdk)
 - [Typescript MCP SDK](https://github.com/modelcontextprotocol/typescript-sdk)
 
 > Note: Lists in this README are maintained in alphabetical order to minimize
@@ -19,12 +18,12 @@ is implemented with an MCP SDK:
 
 These servers aim to demonstrate MCP features and the official SDKs.
 
-- **[TODO: Git](src/git)** - Tools to read, search, and manipulate Git
-  repositories
-- **[TODO: Memory](src/memory)** - Knowledge graph-based persistent memory
-  system
-- **[TODO: Sequential Thinking](src/sequentialthinking)** - Dynamic and
-  reflective problem-solving through thought sequences
+- **[Deep Thinking](src/deep-thinking)** - Dynamic and reflective
+  problem-solving through thought sequences.
+- **[Tasks](src/tasks)** - Self guided task planning, management, execution and
+  completion.
+- **[Knowledge Graph Memory](src/knowledge-graph-memory)** - Persistent memory
+  for through a local knowledge graph.
 
 ## 🚀 Getting Started
 
@@ -32,10 +31,10 @@ These servers aim to demonstrate MCP features and the official SDKs.
 
 Typescript-based servers in this repository can be used directly with `bunx`.
 
-For example, this will start the [Memory](src/memory) server:
+For example, this will start the [Deep Thinking](src/deep-thinking) server:
 
 ```sh
-bunx -y @wemake-ai/memory
+bunx -y @wemake-ai/mcpserver-deep-thinking@latest
 ```
 
 Python-based servers in this repository can be used directly with

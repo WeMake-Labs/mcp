@@ -1,39 +1,50 @@
 {
   "name": "@wemake-ai/mcp",
-  "private": true,
-  "version": "25.0.0",
-  "description": "WeMake Model Context Protocol servers",
-  "license": "MIT",
+  "version": "25.3.8",
   "author": "WeMake (https://wemake.cx)",
-  "homepage": "https://wemake.cx",
-  "bugs": "https://github.com/wemake-ai/mcp/issues",
-  "type": "module",
-  "workspaces": [
-    "src/*"
-  ],
-  "scripts": {
-    "build": "bun run build --workspaces",
-    "watch": "bun run watch --workspaces",
-    "publish-all": "bun publish --workspaces --access public",
-    "link-all": "bun link --workspaces",
-    "format": "bun prettier && bun lint --fix",
-    "prettier": "bunx prettier --write .",
-    "lint": "bunx eslint . --ext .ts,.tsx"
-  },
   "devDependencies": {
     "@types/bun": "latest",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
+    "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.31.0",
     "markdownlint": "^0.38.0",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
+  "bugs": "https://github.com/WeMake-ai/mcp/issues",
+  "description": "WeMake Model Context Protocol (MCP) servers",
+  "homepage": "https://wemake.cx",
+  "license": "MIT",
   "prettier": {
     "trailingComma": "none",
     "printWidth": 80,
     "proseWrap": "always"
-  }
+  },
+  "private": true,
+  "scripts": {
+    "build-all": "bun run --filter='./src/*' build",
+    "publish-all": "bun run --filter='./src/*' publish-now",
+    "deep-thinking:build": "bun run --cwd='./src/deep-thinking' build",
+    "deep-thinking:publish": "bun run --cwd='./src/deep-thinking' publish-now",
+    "knowledge-graph-memory:build": "bun run --cwd='./src/knowledge-graph-memory' build",
+    "knowledge-graph-memory:publish": "bun run --cwd='./src/knowledge-graph-memory' publish-now",
+    "tasks:build": "bun run --cwd='./src/tasks' build",
+    "tasks:publish": "bun run --cwd='./src/tasks' publish-now",
+    "format": "bunx prettier --write . && bun lint --fix",
+    "prettier": "bunx prettier --write .",
+    "lint": "bunx eslint . --ext .ts,.tsx",
+    "check": "tsc --noEmit",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage"
+  },
+  "type": "module",
+  "workspaces": [
+    "src/*"
+  ]
 }
