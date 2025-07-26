@@ -174,7 +174,7 @@ jobs:
         with:
           ref: ${{ needs.create-metadata.outputs.version }}
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
         with:
           bun-version: latest
 

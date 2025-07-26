@@ -137,7 +137,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
       - run: bun install
       - run: bun test --coverage
 ```
