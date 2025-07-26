@@ -105,25 +105,7 @@ like:
 }
 ```
 
-## 🛠️ Creating Your Own Server
-
-Interested in creating your own MCP server? Visit the official documentation at
-[modelcontextprotocol.io](https://modelcontextprotocol.io/introduction) for
-comprehensive guides, best practices, and technical details on implementing MCP
-servers.
-
 ## 📜 License
 
 This project is licensed under the Business Source License 1.1 - see the
 [LICENSE](LICENSE) file for details.
-
-## ⭐ Support
-
-If you find MCP servers useful, please consider starring the repository and
-contributing new servers or improvements!
-
----
-
-Managed by WeMake, but built together with the community. The Model Context
-Protocol is open source and we encourage everyone to contribute their own
-servers and improvements!
