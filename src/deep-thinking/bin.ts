@@ -159,7 +159,7 @@ function createServer(): {
   const server = new Server(
     {
       name: "deep-thinking-server",
-      version: "1.0.1"
+      version: "1.0.6"
     },
     {
       capabilities: {
@@ -212,7 +212,12 @@ async function runServer(): Promise<void> {
 }
 
 // Start the server when this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Use a more reliable method for detecting direct execution
+if (
+  process.argv[1] &&
+  (process.argv[1].endsWith("bin.js") ||
+    process.argv[1].includes("mcpserver-deep-thinking"))
+) {
   runServer().catch((error) => {
     console.error("Fatal error running server:", error);
     process.exit(1);
