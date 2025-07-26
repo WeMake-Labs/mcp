@@ -7,6 +7,10 @@ on:
     branches: [main]
     types: [completed]
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   create-metadata:
     runs-on: ubuntu-latest
