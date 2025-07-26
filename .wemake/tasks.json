@@ -111,6 +111,62 @@
         }
       ],
       "completed": true
+    },
+    {
+      "requestId": "req-2",
+      "originalRequest": "Provide feedback for our AI Agent team: `/Users/admin/Repositories/WeMake/mcp/.wemake/agents/`",
+      "splitDetails": "Provide feedback for our AI Agent team: `/Users/admin/Repositories/WeMake/mcp/.wemake/agents/`",
+      "tasks": [
+        {
+          "id": "task-14",
+          "title": "Collect prompt files information",
+          "description": "Gather details about all prompt files in the /Users/admin/Repositories/WeMake/mcp/.wemake/agents/ directory, including their contents and structures.",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        },
+        {
+          "id": "task-15",
+          "title": "Analyze prompts for strengths and improvements",
+          "description": "Use Deep Thinking to evaluate the prompts for integration of MCP tools, collaboration mechanisms, self-approval criteria, and overall effectiveness in their specialized areas.",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        },
+        {
+          "id": "task-16",
+          "title": "Identify patterns and trends",
+          "description": "Analyze common patterns, strengths, and areas for improvement across all prompts.",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        },
+        {
+          "id": "task-17",
+          "title": "Generate feedback report",
+          "description": "Compile a detailed feedback report summarizing findings, suggestions, and actionable recommendations.",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        },
+        {
+          "id": "task-18",
+          "title": "Store feedback in Knowledge Graph",
+          "description": "Create entities and relations in the Knowledge Graph for the feedback items to enable collaboration with other agents.",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        },
+        {
+          "id": "task-19",
+          "title": "Validate and finalize feedback",
+          "description": "Verify the feedback report for accuracy, completeness, and adherence to best practices.",
+          "done": false,
+          "approved": false,
+          "completedDetails": ""
+        }
+      ],
+      "completed": false
     }
   ]
 }

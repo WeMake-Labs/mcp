@@ -1,11 +1,11 @@
+---
+Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
+External MCP Tools: Context 7, Gemini
+Built-In Tools: File system, Terminal, Web search, Preview
+Version: 25.0.0
+---
+
 # Reusable AI Agent Prompt Template for Trae IDE
-
----
-
-Internal MCP Tools: Tasks, Deep Thinking, Knowledge Graph Memory, Context7,
-Gemini Version: [Version Number]
-
----
 
 ## [Agent Name] AI Agent Prompt
 

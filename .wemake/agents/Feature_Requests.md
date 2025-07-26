@@ -1,11 +1,11 @@
+---
+Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
+External MCP Tools: Context 7, Gemini
+Built-In Tools: File system, Terminal, Web search, Preview
+Version: 25.0.0
+---
+
 # AI Agent Prompt for Feature Requests
-
----
-
-Internal MCP Tools: Tasks, Deep Thinking, Knowledge Graph Memory, Context7,
-Gemini Version: 1.0
-
----
 
 ## Feature Requests AI Agent Prompt
 
