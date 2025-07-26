@@ -161,7 +161,7 @@ Add this MCP via "Add Manually":
 ```json
 {
   "mcpServers": {
-    "Knowledge": {
+    "Knowledge Graph Memory": {
       "command": "bunx",
       "args": ["-y", "@wemake-ai/mcpserver-knowledge-graph-memory"],
       "autoapprove": [
@@ -187,7 +187,7 @@ You can specify a custom path for the memory file:
 ```json
 {
   "mcpServers": {
-    "Knowledge": {
+    "Knowledge Graph Memory": {
       "command": "bunx",
       "args": [
         "-y",
