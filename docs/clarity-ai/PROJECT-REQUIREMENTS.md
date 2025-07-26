@@ -44,7 +44,7 @@ rapid iteration, and scalable architecture.
 - **Tools**: [Detailed tools with names, descriptions, inputSchemas as
   previously designed].
 - **Monorepo Path**:
-  /Users/admin/Repositories/WeMake/mcp/config/usrlocalmcp/Clarity-Data-Processing
+  <repo-root>/mcp/config/usrlocalmcp/Clarity-Data-Processing
 - **DevOps**: CI/CD via GitHub Actions, IaC with Terraform, monitoring with
   Prometheus.
 
