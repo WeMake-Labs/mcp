@@ -17,7 +17,6 @@ jobs:
       hash: ${{ steps.last-release.outputs.hash }}
       version: ${{ steps.create-version.outputs.version}}
       npm_packages: ${{ steps.create-npm-packages.outputs.npm_packages}}
-      pypi_packages: ${{ steps.create-pypi-packages.outputs.pypi_packages}}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,14 +52,6 @@ jobs:
           name: release-notes
           path: RELEASE_NOTES.md
 
-      - name: Create python matrix
-        id: create-pypi-packages
-        run: |
-          HASH="${{ steps.last-release.outputs.hash }}"
-          PYPI=$(uv run --script scripts/release.py generate-matrix --pypi --directory src $HASH)
-          echo "pypi_packages $PYPI"
-          echo "pypi_packages=$PYPI" >> $GITHUB_OUTPUT
-
       - name: Create npm matrix
         id: create-npm-packages
         run: |
@@ -72,10 +63,9 @@ jobs:
   update-packages:
     needs: [create-metadata]
     if:
-      ${{ (needs.create-metadata.outputs.npm_packages != '[]' ||
-      needs.create-metadata.outputs.pypi_packages != '[]') && (github.event_name
-      == 'workflow_dispatch' || (github.event_name == 'workflow_run' &&
-      github.event.workflow_run.conclusion == 'success')) }}
+      ${{ (needs.create-metadata.outputs.npm_packages != '[]') &&
+      (github.event_name == 'workflow_dispatch' || (github.event_name ==
+      'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
     runs-on: ubuntu-latest
     environment: release
     outputs:
@@ -112,50 +102,6 @@ jobs:
             git push origin "$VERSION"
             echo "changes_made=true" >> $GITHUB_OUTPUT
           fi
-
-  publish-pypi:
-    needs: [update-packages, create-metadata]
-    if:
-      ${{ github.event_name == 'workflow_dispatch' || (github.event_name ==
-      'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJson(needs.create-metadata.outputs.pypi_packages) }}
-    name: Build ${{ matrix.package }}
-    environment: release
-    permissions:
-      id-token: write # Required for trusted publishing
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.create-metadata.outputs.version }}
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: "src/${{ matrix.package }}/.python-version"
-
-      - name: Install dependencies
-        working-directory: src/${{ matrix.package }}
-        run: uv sync --frozen --all-extras --dev
-
-      - name: Run pyright
-        working-directory: src/${{ matrix.package }}
-        run: uv run --frozen pyright
-
-      - name: Build package
-        working-directory: src/${{ matrix.package }}
-        run: uv build
-
-      - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: src/${{ matrix.package }}/dist
 
   publish-npm:
     needs: [update-packages, create-metadata]
@@ -205,7 +151,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   create-release:
-    needs: [update-packages, create-metadata, publish-pypi, publish-npm]
+    needs: [update-packages, create-metadata, publish-npm]
     if:
       ${{ needs.update-packages.outputs.changes_made == 'true' &&
       (github.event_name == 'workflow_dispatch' || (github.event_name ==
