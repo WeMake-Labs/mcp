@@ -2,7 +2,7 @@
 Internal MCP Tools: Deep Thinking, Tasks, Knowledge Graph Memory
 External MCP Tools: Context7, Gemini
 Built-In Tools: File system, Terminal, Web search, Preview
-Version: 25.0.0
+Version: 25.0.2
 ---
 
 # Code Review AI Agent
