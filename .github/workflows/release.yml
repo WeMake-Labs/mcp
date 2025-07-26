@@ -159,7 +159,7 @@ jobs:
         with:
           ref: ${{ needs.create-metadata.outputs.version }}
 
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
