@@ -2,10 +2,7 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema
-} from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -26,10 +23,7 @@ let memoryPath = argv["memory-path"];
 if (memoryPath) {
   // Handle tilde expansion
   if (memoryPath.startsWith("~/")) {
-    memoryPath = path.join(
-      process.env.HOME || process.env.USERPROFILE || "",
-      memoryPath.slice(2)
-    );
+    memoryPath = path.join(process.env.HOME || process.env.USERPROFILE || "", memoryPath.slice(2));
   }
   if (!isAbsolute(memoryPath)) {
     memoryPath = path.resolve(process.cwd(), memoryPath);
@@ -83,9 +77,7 @@ export class KnowledgeGraphManager {
     } catch (error) {
       if (
         error instanceof Error &&
-        (("code" in error &&
-          (error as Error & { code: string }).code === "ENOENT") ||
-          error.name === "SyntaxError")
+        (("code" in error && (error as Error & { code: string }).code === "ENOENT") || error.name === "SyntaxError")
       ) {
         return { entities: [], relations: [] };
       }
@@ -140,9 +132,7 @@ export class KnowledgeGraphManager {
 
   async createRelations(relations: Relation[]): Promise<Relation[]> {
     const graph = await this.loadGraph();
-    const existingRelations = new Set(
-      graph.relations.map((r) => `${r.from}|${r.to}|${r.relationType}`)
-    );
+    const existingRelations = new Set(graph.relations.map((r) => `${r.from}|${r.to}|${r.relationType}`));
     const newRelations: Relation[] = [];
     for (const r of relations) {
       const key = `${r.from}|${r.to}|${r.relationType}`;
@@ -170,9 +160,7 @@ export class KnowledgeGraphManager {
           error: "Entity not found"
         };
       }
-      const newObservations = o.contents.filter(
-        (content) => !entity.observations.includes(content)
-      );
+      const newObservations = o.contents.filter((content) => !entity.observations.includes(content));
       entity.observations.push(...newObservations);
       return { entityName: o.entityName, addedObservations: newObservations };
     });
@@ -185,23 +173,17 @@ export class KnowledgeGraphManager {
     const setToDelete = new Set(entityNames);
     const initialLength = graph.entities.length;
     graph.entities = graph.entities.filter((e) => !setToDelete.has(e.name));
-    graph.relations = graph.relations.filter(
-      (r) => !setToDelete.has(r.from) && !setToDelete.has(r.to)
-    );
+    graph.relations = graph.relations.filter((r) => !setToDelete.has(r.from) && !setToDelete.has(r.to));
     await this.saveGraph(graph);
     return initialLength - graph.entities.length;
   }
 
-  async deleteObservations(
-    deletions: { entityName: string; observations: string[] }[]
-  ): Promise<void> {
+  async deleteObservations(deletions: { entityName: string; observations: string[] }[]): Promise<void> {
     const graph = await this.loadGraph();
     deletions.forEach((d) => {
       const entity = graph.entities.find((e) => e.name === d.entityName);
       if (entity) {
-        entity.observations = entity.observations.filter(
-          (o) => !d.observations.includes(o)
-        );
+        entity.observations = entity.observations.filter((o) => !d.observations.includes(o));
       }
     });
     await this.saveGraph(graph);
@@ -213,9 +195,7 @@ export class KnowledgeGraphManager {
       (r) =>
         !relations.some(
           (delRelation) =>
-            r.from === delRelation.from &&
-            r.to === delRelation.to &&
-            r.relationType === delRelation.relationType
+            r.from === delRelation.from && r.to === delRelation.to && r.relationType === delRelation.relationType
         )
     );
     await this.saveGraph(graph);
@@ -234,9 +214,7 @@ export class KnowledgeGraphManager {
       (e) =>
         e.name.toLowerCase().includes(query.toLowerCase()) ||
         e.entityType.toLowerCase().includes(query.toLowerCase()) ||
-        e.observations.some((o) =>
-          o.toLowerCase().includes(query.toLowerCase())
-        )
+        e.observations.some((o) => o.toLowerCase().includes(query.toLowerCase()))
     );
 
     // Create a Set of filtered entity names for quick lookup
@@ -259,9 +237,7 @@ export class KnowledgeGraphManager {
     const graph = await this.loadGraph();
 
     // Filter entities
-    const filteredEntities = graph.entities.filter((e) =>
-      names.includes(e.name)
-    );
+    const filteredEntities = graph.entities.filter((e) => names.includes(e.name));
 
     // Create a Set of filtered entity names for quick lookup
     const filteredEntityNames = new Set(filteredEntities.map((e) => e.name));
@@ -330,75 +306,48 @@ interface OpenNodesArgs {
 }
 
 // Add proper type to request parameter
-const callToolHandler = async (request: {
-  params: { name: string; arguments?: Record<string, unknown> };
-}) => {
-  const memoryFilePath =
-    process.env.KNOWLEDGE_GRAPH_MEMORY_FILE ||
-    path.join(__dirname, "knowledge-graph.json");
+const callToolHandler = async (request: { params: { name: string; arguments?: Record<string, unknown> } }) => {
+  const memoryFilePath = process.env.KNOWLEDGE_GRAPH_MEMORY_FILE || path.join(__dirname, "knowledge-graph.json");
   const manager = new KnowledgeGraphManager(memoryFilePath);
   const { name, arguments: args } = request.params;
   if (!args) throw new Error("No arguments provided");
-  let result:
-    | string
-    | Entity[]
-    | Relation[]
-    | KnowledgeGraph
-    | { entityName: string; addedObservations: string[] }[];
+  let result: string | Entity[] | Relation[] | KnowledgeGraph | { entityName: string; addedObservations: string[] }[];
   switch (name) {
     case "create_entities":
-      result = await manager.createEntities(
-        (args as unknown as CreateEntitiesArgs).entities
-      );
+      result = await manager.createEntities((args as unknown as CreateEntitiesArgs).entities);
       break;
     case "create_relations":
-      result = await manager.createRelations(
-        (args as unknown as CreateRelationsArgs).relations
-      );
+      result = await manager.createRelations((args as unknown as CreateRelationsArgs).relations);
       break;
     case "add_observations":
-      result = await manager.addObservations(
-        (args as unknown as AddObservationsArgs).observations
-      );
+      result = await manager.addObservations((args as unknown as AddObservationsArgs).observations);
       break;
     case "delete_entities":
-      await manager.deleteEntities(
-        (args as unknown as DeleteEntitiesArgs).entityNames
-      );
+      await manager.deleteEntities((args as unknown as DeleteEntitiesArgs).entityNames);
       result = "Entities deleted successfully";
       break;
     case "delete_observations":
-      await manager.deleteObservations(
-        (args as unknown as DeleteObservationsArgs).deletions
-      );
+      await manager.deleteObservations((args as unknown as DeleteObservationsArgs).deletions);
       result = "Observations deleted successfully";
       break;
     case "delete_relations":
-      await manager.deleteRelations(
-        (args as unknown as DeleteRelationsArgs).relations
-      );
+      await manager.deleteRelations((args as unknown as DeleteRelationsArgs).relations);
       result = "Relations deleted successfully";
       break;
     case "read_graph":
       result = await manager.readGraph();
       break;
     case "search_nodes":
-      result = await manager.searchNodes(
-        (args as unknown as SearchNodesArgs).query
-      );
+      result = await manager.searchNodes((args as unknown as SearchNodesArgs).query);
       break;
     case "open_nodes":
-      result = await manager.openNodes(
-        (args as unknown as OpenNodesArgs).names
-      );
+      result = await manager.openNodes((args as unknown as OpenNodesArgs).names);
       break;
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
   return {
-    content: [
-      { text: typeof result === "string" ? result : JSON.stringify(result) }
-    ]
+    content: [{ text: typeof result === "string" ? result : JSON.stringify(result) }]
   };
 };
 
@@ -407,9 +356,7 @@ server.setRequestHandler(ListToolsRequestSchema, listToolsHandler);
 server.setRequestHandler(CallToolRequestSchema, callToolHandler);
 
 export const testExports =
-  process.env.NODE_ENV === "test" || process.env.VITEST
-    ? { listToolsHandler, callToolHandler }
-    : undefined;
+  process.env.NODE_ENV === "test" || process.env.VITEST ? { listToolsHandler, callToolHandler } : undefined;
 
 // Define the main function
 async function main() {

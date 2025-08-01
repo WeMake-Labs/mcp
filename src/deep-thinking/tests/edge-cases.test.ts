@@ -205,9 +205,7 @@ describe("Deep Thinking Edge Cases", () => {
 
       const parsed = JSON.parse(result.content[0]?.text || "{}");
       expect(parsed.branches).toContain(branchId);
-      expect(
-        parsed.branches.filter((id: string) => id === branchId)
-      ).toHaveLength(1);
+      expect(parsed.branches.filter((id: string) => id === branchId)).toHaveLength(1);
     });
   });
 
