@@ -10,7 +10,11 @@ export default defineConfig({
       provider: "v8",
       thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 }
     },
-    projects: ["./src/deep-thinking", "./src/knowledge-graph-memory/vitest.config.ts", "./src/tasks/vitest.config.ts"],
+    projects: [
+      "./src/deep-thinking/vitest.config.ts",
+      "./src/knowledge-graph-memory/vitest.config.ts",
+      "./src/tasks/vitest.config.ts"
+    ],
     watch: false
   }
 });
