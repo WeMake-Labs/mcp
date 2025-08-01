@@ -2,17 +2,12 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-  Tool
-} from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema, Tool } from "@modelcontextprotocol/sdk/types.js";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import * as os from "node:os";
 import { z } from "zod";
 
-const DEFAULT_PATH = path.join(os.homedir(), ".wemake", "tasks.json");
+const DEFAULT_PATH = path.join(process.cwd(), ".wemake", "tasks.json");
 const TASK_FILE_PATH = process.env.TASKS_FILE_PATH || DEFAULT_PATH;
 
 interface Task {
@@ -870,8 +865,7 @@ export class TasksServer {
         }
       }
 
-      this.requestCounter =
-        allRequestIds.length > 0 ? Math.max(...allRequestIds) : 0;
+      this.requestCounter = allRequestIds.length > 0 ? Math.max(...allRequestIds) : 0;
       this.taskCounter = allTaskIds.length > 0 ? Math.max(...allTaskIds) : 0;
     } catch {
       this.data = { requests: [] };
@@ -884,11 +878,7 @@ export class TasksServer {
       const dir = path.dirname(this.filePath);
       await fs.mkdir(dir, { recursive: true });
 
-      await fs.writeFile(
-        this.filePath,
-        JSON.stringify(this.data, null, 2),
-        "utf-8"
-      );
+      await fs.writeFile(this.filePath, JSON.stringify(this.data, null, 2), "utf-8");
     } catch (error) {
       if (error instanceof Error && error.message.includes("EROFS")) {
         console.error("EROFS: read-only file system. Cannot save tasks.");
@@ -917,10 +907,8 @@ export class TasksServer {
 
   private formatRequestsList(): string {
     let output = "\nRequest List:\n";
-    output +=
-      "| Request ID | Original Request | Total Tasks | Completed | Approved |\n";
-    output +=
-      "|------------|------------------|-------------|-----------|----------|\n";
+    output += "| Request ID | Original Request | Total Tasks | Completed | Approved |\n";
+    output += "|------------|------------------|-------------|-----------|----------|\n";
 
     for (const req of this.data.requests) {
       const totalTasks = req.tasks.length;
@@ -1017,11 +1005,7 @@ export class TasksServer {
     };
   }
 
-  public async markTaskDone(
-    requestId: string,
-    taskId: string,
-    completedDetails?: string
-  ) {
+  public async markTaskDone(requestId: string, taskId: string, completedDetails?: string) {
     await this.loadTasks();
     const req = this.data.requests.find((r) => r.requestId === requestId);
     if (!req) return { status: "error", message: "Request not found" };
@@ -1056,8 +1040,7 @@ export class TasksServer {
     const task = req.tasks.find((t) => t.id === taskId);
     if (!task) return { status: "error", message: "Task not found" };
     if (!task.done) return { status: "error", message: "Task not done yet." };
-    if (task.approved)
-      return { status: "already_approved", message: "Task already approved." };
+    if (task.approved) return { status: "already_approved", message: "Task already approved." };
 
     task.approved = true;
     await this.saveTasks();
@@ -1139,10 +1122,7 @@ export class TasksServer {
     };
   }
 
-  public async addTasksToRequest(
-    requestId: string,
-    tasks: { title: string; description: string }[]
-  ) {
+  public async addTasksToRequest(requestId: string, tasks: { title: string; description: string }[]) {
     await this.loadTasks();
     const req = this.data.requests.find((r) => r.requestId === requestId);
     if (!req) return { status: "error", message: "Request not found" };
@@ -1180,19 +1160,14 @@ export class TasksServer {
     };
   }
 
-  public async updateTask(
-    requestId: string,
-    taskId: string,
-    updates: { title?: string; description?: string }
-  ) {
+  public async updateTask(requestId: string, taskId: string, updates: { title?: string; description?: string }) {
     await this.loadTasks();
     const req = this.data.requests.find((r) => r.requestId === requestId);
     if (!req) return { status: "error", message: "Request not found" };
 
     const task = req.tasks.find((t) => t.id === taskId);
     if (!task) return { status: "error", message: "Task not found" };
-    if (task.done)
-      return { status: "error", message: "Cannot update completed task" };
+    if (task.done) return { status: "error", message: "Cannot update completed task" };
 
     if (updates.title) task.title = updates.title;
     if (updates.description) task.description = updates.description;
@@ -1219,8 +1194,7 @@ export class TasksServer {
     const taskIndex = req.tasks.findIndex((t) => t.id === taskId);
     if (taskIndex === -1) return { status: "error", message: "Task not found" };
     // After checking taskIndex !== -1, we know the task exists
-    if (req.tasks[taskIndex]!.done)
-      return { status: "error", message: "Cannot delete completed task" };
+    if (req.tasks[taskIndex]!.done) return { status: "error", message: "Cannot delete completed task" };
 
     req.tasks.splice(taskIndex, 1);
     await this.saveTasks();
@@ -1263,9 +1237,7 @@ const listToolsHandler = async () => ({
 });
 server.setRequestHandler(ListToolsRequestSchema, listToolsHandler);
 
-const callToolHandler = async (request: {
-  params: { name: string; arguments?: Record<string, unknown> };
-}) => {
+const callToolHandler = async (request: { params: { name: string; arguments?: Record<string, unknown> } }) => {
   try {
     const { name, arguments: args } = request.params;
 
@@ -1276,11 +1248,7 @@ const callToolHandler = async (request: {
           throw new Error(`Invalid arguments: ${parsed.error!.message}`);
         }
         const { originalRequest, tasks, splitDetails } = parsed.data;
-        const result = await tasksServer.requestPlanning(
-          originalRequest,
-          tasks,
-          splitDetails
-        );
+        const result = await tasksServer.requestPlanning(originalRequest, tasks, splitDetails);
         return {
           content: [{ type: "text", text: JSON.stringify(result, null, 2) }]
         };
@@ -1303,11 +1271,7 @@ const callToolHandler = async (request: {
           throw new Error(`Invalid arguments: ${parsed.error!.message}`);
         }
         const { requestId, taskId, completedDetails } = parsed.data;
-        const result = await tasksServer.markTaskDone(
-          requestId,
-          taskId,
-          completedDetails
-        );
+        const result = await tasksServer.markTaskDone(requestId, taskId, completedDetails);
         return {
           content: [{ type: "text", text: JSON.stringify(result, null, 2) }]
         };
@@ -1319,10 +1283,7 @@ const callToolHandler = async (request: {
           throw new Error(`Invalid arguments: ${parsed.error!.message}`);
         }
         const { requestId, taskId } = parsed.data;
-        const result = await tasksServer.approveTaskCompletion(
-          requestId,
-          taskId
-        );
+        const result = await tasksServer.approveTaskCompletion(requestId, taskId);
         return {
           content: [{ type: "text", text: JSON.stringify(result, null, 2) }]
         };

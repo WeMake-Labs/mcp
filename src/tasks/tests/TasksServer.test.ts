@@ -27,9 +27,7 @@ describe("TasksServer", () => {
     mockData = { requests: [] };
 
     // Mock readFile to return current mockData
-    mockReadFile.mockImplementation(() =>
-      Promise.resolve(JSON.stringify(mockData))
-    );
+    mockReadFile.mockImplementation(() => Promise.resolve(JSON.stringify(mockData)));
 
     // Mock writeFile to update mockData
     mockWriteFile.mockImplementation(async (_path: string, data: string) => {
@@ -63,11 +61,7 @@ describe("TasksServer", () => {
       ];
       const splitDetails = "Test split details";
 
-      const result = await tasksServer.requestPlanning(
-        originalRequest,
-        tasks,
-        splitDetails
-      );
+      const result = await tasksServer.requestPlanning(originalRequest, tasks, splitDetails);
 
       expect(result.status).toBe("planned");
       expect(result.totalTasks).toBe(2);
@@ -95,10 +89,7 @@ describe("TasksServer", () => {
         { title: "Task 1", description: "First task" },
         { title: "Task 2", description: "Second task" }
       ];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
 
       const result = await tasksServer.getNextTask(planResult.requestId);
 
@@ -109,17 +100,10 @@ describe("TasksServer", () => {
 
     test("should return all_tasks_done when no pending tasks", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
 
       // Mark task as done
-      await tasksServer.markTaskDone(
-        planResult.requestId,
-        planResult.tasks[0]!.id,
-        "Completed"
-      );
+      await tasksServer.markTaskDone(planResult.requestId, planResult.tasks[0]!.id, "Completed");
 
       const result = await tasksServer.getNextTask(planResult.requestId);
 
@@ -135,21 +119,11 @@ describe("TasksServer", () => {
 
     test("should return already_completed for completed request", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
 
       // Mark task as done and approved, then approve request
-      await tasksServer.markTaskDone(
-        planResult.requestId,
-        planResult.tasks[0]!.id,
-        "Completed"
-      );
-      await tasksServer.approveTaskCompletion(
-        planResult.requestId,
-        planResult.tasks[0]!.id
-      );
+      await tasksServer.markTaskDone(planResult.requestId, planResult.tasks[0]!.id, "Completed");
+      await tasksServer.approveTaskCompletion(planResult.requestId, planResult.tasks[0]!.id);
       await tasksServer.approveRequestCompletion(planResult.requestId);
 
       const result = await tasksServer.getNextTask(planResult.requestId);
@@ -161,17 +135,10 @@ describe("TasksServer", () => {
   describe("markTaskDone", () => {
     test("should mark task as done with completion details", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
-      const result = await tasksServer.markTaskDone(
-        planResult.requestId,
-        taskId,
-        "Task completed successfully"
-      );
+      const result = await tasksServer.markTaskDone(planResult.requestId, taskId, "Task completed successfully");
 
       expect(result.status).toBe("task_marked_done");
       expect(result.task?.id).toBe(taskId);
@@ -181,11 +148,7 @@ describe("TasksServer", () => {
     });
 
     test("should return error for non-existent request", async () => {
-      const result = await tasksServer.markTaskDone(
-        "non-existent-req",
-        "task-1",
-        "Details"
-      );
+      const result = await tasksServer.markTaskDone("non-existent-req", "task-1", "Details");
 
       expect(result.status).toBe("error");
       expect(result.message).toBe("Request not found");
@@ -193,16 +156,9 @@ describe("TasksServer", () => {
 
     test("should return error for non-existent task", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
 
-      const result = await tasksServer.markTaskDone(
-        planResult.requestId,
-        "non-existent-task",
-        "Details"
-      );
+      const result = await tasksServer.markTaskDone(planResult.requestId, "non-existent-task", "Details");
 
       expect(result.status).toBe("error");
       expect(result.message).toBe("Task not found");
@@ -210,25 +166,14 @@ describe("TasksServer", () => {
 
     test("should return already_done for already completed task", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
       // Mark task as done first time
-      await tasksServer.markTaskDone(
-        planResult.requestId,
-        taskId,
-        "First completion"
-      );
+      await tasksServer.markTaskDone(planResult.requestId, taskId, "First completion");
 
       // Try to mark as done again
-      const result = await tasksServer.markTaskDone(
-        planResult.requestId,
-        taskId,
-        "Second completion"
-      );
+      const result = await tasksServer.markTaskDone(planResult.requestId, taskId, "Second completion");
 
       expect(result.status).toBe("already_done");
       expect(result.message).toBe("Task is already marked done.");
@@ -238,19 +183,13 @@ describe("TasksServer", () => {
   describe("approveTaskCompletion", () => {
     test("should approve completed task", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
       // Mark task as done first
       await tasksServer.markTaskDone(planResult.requestId, taskId, "Completed");
 
-      const result = await tasksServer.approveTaskCompletion(
-        planResult.requestId,
-        taskId
-      );
+      const result = await tasksServer.approveTaskCompletion(planResult.requestId, taskId);
 
       expect(result.status).toBe("task_approved");
       expect(result.task?.approved).toBe(true);
@@ -259,16 +198,10 @@ describe("TasksServer", () => {
 
     test("should return error for non-done task", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
-      const result = await tasksServer.approveTaskCompletion(
-        planResult.requestId,
-        taskId
-      );
+      const result = await tasksServer.approveTaskCompletion(planResult.requestId, taskId);
 
       expect(result.status).toBe("error");
       expect(result.message).toBe("Task not done yet.");
@@ -276,10 +209,7 @@ describe("TasksServer", () => {
 
     test("should return already_approved for already approved task", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
       // Mark task as done and approve
@@ -287,10 +217,7 @@ describe("TasksServer", () => {
       await tasksServer.approveTaskCompletion(planResult.requestId, taskId);
 
       // Try to approve again
-      const result = await tasksServer.approveTaskCompletion(
-        planResult.requestId,
-        taskId
-      );
+      const result = await tasksServer.approveTaskCompletion(planResult.requestId, taskId);
 
       expect(result.status).toBe("already_approved");
       expect(result.message).toBe("Task already approved.");
@@ -300,19 +227,14 @@ describe("TasksServer", () => {
   describe("approveRequestCompletion", () => {
     test("should approve request when all tasks are done and approved", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
       // Complete the workflow
       await tasksServer.markTaskDone(planResult.requestId, taskId, "Completed");
       await tasksServer.approveTaskCompletion(planResult.requestId, taskId);
 
-      const result = await tasksServer.approveRequestCompletion(
-        planResult.requestId
-      );
+      const result = await tasksServer.approveRequestCompletion(planResult.requestId);
 
       expect(result.status).toBe("request_approved_complete");
       expect(result.message).toBe("Request is fully completed and approved.");
@@ -324,25 +246,13 @@ describe("TasksServer", () => {
         { title: "Task 1", description: "First task" },
         { title: "Task 2", description: "Second task" }
       ];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
 
       // Only complete first task
-      await tasksServer.markTaskDone(
-        planResult.requestId,
-        planResult.tasks[0]!.id,
-        "Completed"
-      );
-      await tasksServer.approveTaskCompletion(
-        planResult.requestId,
-        planResult.tasks[0]!.id
-      );
+      await tasksServer.markTaskDone(planResult.requestId, planResult.tasks[0]!.id, "Completed");
+      await tasksServer.approveTaskCompletion(planResult.requestId, planResult.tasks[0]!.id);
 
-      const result = await tasksServer.approveRequestCompletion(
-        planResult.requestId
-      );
+      const result = await tasksServer.approveRequestCompletion(planResult.requestId);
 
       expect(result.status).toBe("error");
       expect(result.message).toBe("Not all tasks are done.");
@@ -350,18 +260,13 @@ describe("TasksServer", () => {
 
     test("should return error when not all done tasks are approved", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
       // Mark task as done but don't approve
       await tasksServer.markTaskDone(planResult.requestId, taskId, "Completed");
 
-      const result = await tasksServer.approveRequestCompletion(
-        planResult.requestId
-      );
+      const result = await tasksServer.approveRequestCompletion(planResult.requestId);
 
       expect(result.status).toBe("error");
       expect(result.message).toBe("Not all done tasks are approved.");
@@ -371,10 +276,7 @@ describe("TasksServer", () => {
   describe("openTaskDetails", () => {
     test("should return task details for existing task", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
       const result = await tasksServer.openTaskDetails(taskId);
@@ -403,15 +305,8 @@ describe("TasksServer", () => {
       const plan2 = await tasksServer.requestPlanning("Request 2", tasks2);
 
       // Complete first request
-      await tasksServer.markTaskDone(
-        plan1.requestId,
-        plan1.tasks[0]!.id,
-        "Completed"
-      );
-      await tasksServer.approveTaskCompletion(
-        plan1.requestId,
-        plan1.tasks[0]!.id
-      );
+      await tasksServer.markTaskDone(plan1.requestId, plan1.tasks[0]!.id, "Completed");
+      await tasksServer.approveTaskCompletion(plan1.requestId, plan1.tasks[0]!.id);
 
       const result = await tasksServer.listRequests();
 
@@ -429,20 +324,14 @@ describe("TasksServer", () => {
   describe("addTasksToRequest", () => {
     test("should add new tasks to existing request", async () => {
       const initialTasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        initialTasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", initialTasks);
 
       const newTasks = [
         { title: "Task 2", description: "Second task" },
         { title: "Task 3", description: "Third task" }
       ];
 
-      const result = await tasksServer.addTasksToRequest(
-        planResult.requestId,
-        newTasks
-      );
+      const result = await tasksServer.addTasksToRequest(planResult.requestId, newTasks);
 
       expect(result.status).toBe("tasks_added");
       expect(result.newTasks).toHaveLength(2);
@@ -454,10 +343,7 @@ describe("TasksServer", () => {
     test("should return error for non-existent request", async () => {
       const newTasks = [{ title: "Task 1", description: "First task" }];
 
-      const result = await tasksServer.addTasksToRequest(
-        "non-existent-req",
-        newTasks
-      );
+      const result = await tasksServer.addTasksToRequest("non-existent-req", newTasks);
 
       expect(result.status).toBe("error");
       expect(result.message).toBe("Request not found");
@@ -465,28 +351,15 @@ describe("TasksServer", () => {
 
     test("should return error for completed request", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
 
       // Complete the request
-      await tasksServer.markTaskDone(
-        planResult.requestId,
-        planResult.tasks[0]!.id,
-        "Completed"
-      );
-      await tasksServer.approveTaskCompletion(
-        planResult.requestId,
-        planResult.tasks[0]!.id
-      );
+      await tasksServer.markTaskDone(planResult.requestId, planResult.tasks[0]!.id, "Completed");
+      await tasksServer.approveTaskCompletion(planResult.requestId, planResult.tasks[0]!.id);
       await tasksServer.approveRequestCompletion(planResult.requestId);
 
       const newTasks = [{ title: "Task 2", description: "Second task" }];
-      const result = await tasksServer.addTasksToRequest(
-        planResult.requestId,
-        newTasks
-      );
+      const result = await tasksServer.addTasksToRequest(planResult.requestId, newTasks);
 
       expect(result.status).toBe("error");
       expect(result.message).toBe("Cannot add tasks to completed request");
@@ -496,10 +369,7 @@ describe("TasksServer", () => {
   describe("updateTask", () => {
     test("should update task title and description", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
       const updates = {
@@ -507,11 +377,7 @@ describe("TasksServer", () => {
         description: "Updated description"
       };
 
-      const result = await tasksServer.updateTask(
-        planResult.requestId,
-        taskId,
-        updates
-      );
+      const result = await tasksServer.updateTask(planResult.requestId, taskId, updates);
 
       expect(result.status).toBe("task_updated");
       expect(result.task?.title).toBe("Updated Task 1");
@@ -521,21 +387,14 @@ describe("TasksServer", () => {
 
     test("should return error for completed task", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
       // Mark task as done
       await tasksServer.markTaskDone(planResult.requestId, taskId, "Completed");
 
       const updates = { title: "Updated Task 1" };
-      const result = await tasksServer.updateTask(
-        planResult.requestId,
-        taskId,
-        updates
-      );
+      const result = await tasksServer.updateTask(planResult.requestId, taskId, updates);
 
       expect(result.status).toBe("error");
       expect(result.message).toBe("Cannot update completed task");
@@ -548,10 +407,7 @@ describe("TasksServer", () => {
         { title: "Task 1", description: "First task" },
         { title: "Task 2", description: "Second task" }
       ];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
       const result = await tasksServer.deleteTask(planResult.requestId, taskId);
@@ -563,10 +419,7 @@ describe("TasksServer", () => {
 
     test("should return error for completed task", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
       const taskId = planResult.tasks[0]!.id;
 
       // Mark task as done
@@ -580,15 +433,9 @@ describe("TasksServer", () => {
 
     test("should return error for non-existent task", async () => {
       const tasks = [{ title: "Task 1", description: "First task" }];
-      const planResult = await tasksServer.requestPlanning(
-        "Test request",
-        tasks
-      );
+      const planResult = await tasksServer.requestPlanning("Test request", tasks);
 
-      const result = await tasksServer.deleteTask(
-        planResult.requestId,
-        "non-existent-task"
-      );
+      const result = await tasksServer.deleteTask(planResult.requestId, "non-existent-task");
 
       expect(result.status).toBe("error");
       expect(result.message).toBe("Task not found");
@@ -602,9 +449,7 @@ describe("TasksServer", () => {
 
       const tasks = [{ title: "Task 1", description: "First task" }];
 
-      await expect(
-        tasksServer.requestPlanning("Test request", tasks)
-      ).rejects.toThrow("Permission denied");
+      await expect(tasksServer.requestPlanning("Test request", tasks)).rejects.toThrow("Permission denied");
     });
 
     test("should handle EROFS error specifically", async () => {
@@ -613,9 +458,7 @@ describe("TasksServer", () => {
 
       const tasks = [{ title: "Task 1", description: "First task" }];
 
-      await expect(
-        tasksServer.requestPlanning("Test request", tasks)
-      ).rejects.toThrow("EROFS: read-only file system");
+      await expect(tasksServer.requestPlanning("Test request", tasks)).rejects.toThrow("EROFS: read-only file system");
     });
   });
 });

@@ -1,7 +1,7 @@
 # Tasks MCP Server
 
-Model Context Protocol server for Task Management. This allows Trae IDE to
-manage and execute tasks in a queue-based system.
+Model Context Protocol server for Task Management. This allows Trae IDE to manage and execute tasks in a queue-based
+system.
 
 ## Configuration
 
@@ -11,6 +11,10 @@ Add this MCP via "Add Manually":
 
 #### bunx
 
+The default path for `tasks.json` is now the current working directory's `.wemake/tasks.json` (using `process.cwd()`).
+
+To override with a specific path, set the environment variable:
+
 ```json
 {
   "mcpServers": {
@@ -18,7 +22,7 @@ Add this MCP via "Add Manually":
       "command": "bunx",
       "args": ["-y", "@wemake-ai/mcpserver-tasks"],
       "env": {
-        "TASKS_FILE_PATH": "~/project/.wemake/tasks.json"
+        "TASKS_FILE_PATH": "./.wemake/tasks.json"
       }
     }
   }
