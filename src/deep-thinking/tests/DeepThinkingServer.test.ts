@@ -145,9 +145,7 @@ describe("DeepThinkingServer", () => {
       const result = server.processThought(invalidInput);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0]?.text).toContain(
-        "Invalid thought: must be a string"
-      );
+      expect(result.content[0]?.text).toContain("Invalid thought: must be a string");
     });
 
     test("should return error for invalid thought type", () => {
@@ -161,9 +159,7 @@ describe("DeepThinkingServer", () => {
       const result = server.processThought(invalidInput);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0]?.text).toContain(
-        "Invalid thought: must be a string"
-      );
+      expect(result.content[0]?.text).toContain("Invalid thought: must be a string");
     });
 
     test("should return error for missing thoughtNumber", () => {
@@ -176,9 +172,7 @@ describe("DeepThinkingServer", () => {
       const result = server.processThought(invalidInput);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0]?.text).toContain(
-        "Invalid thoughtNumber: must be a number"
-      );
+      expect(result.content[0]?.text).toContain("Invalid thoughtNumber: must be a number");
     });
 
     test("should return error for invalid thoughtNumber type", () => {
@@ -192,9 +186,7 @@ describe("DeepThinkingServer", () => {
       const result = server.processThought(invalidInput);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0]?.text).toContain(
-        "Invalid thoughtNumber: must be a number"
-      );
+      expect(result.content[0]?.text).toContain("Invalid thoughtNumber: must be a number");
     });
 
     test("should return error for missing totalThoughts", () => {
@@ -207,9 +199,7 @@ describe("DeepThinkingServer", () => {
       const result = server.processThought(invalidInput);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0]?.text).toContain(
-        "Invalid totalThoughts: must be a number"
-      );
+      expect(result.content[0]?.text).toContain("Invalid totalThoughts: must be a number");
     });
 
     test("should return error for invalid totalThoughts type", () => {
@@ -223,9 +213,7 @@ describe("DeepThinkingServer", () => {
       const result = server.processThought(invalidInput);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0]?.text).toContain(
-        "Invalid totalThoughts: must be a number"
-      );
+      expect(result.content[0]?.text).toContain("Invalid totalThoughts: must be a number");
     });
 
     test("should return error for missing nextThoughtNeeded", () => {
@@ -238,9 +226,7 @@ describe("DeepThinkingServer", () => {
       const result = server.processThought(invalidInput);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0]?.text).toContain(
-        "Invalid nextThoughtNeeded: must be a boolean"
-      );
+      expect(result.content[0]?.text).toContain("Invalid nextThoughtNeeded: must be a boolean");
     });
 
     test("should return error for invalid nextThoughtNeeded type", () => {
@@ -254,9 +240,7 @@ describe("DeepThinkingServer", () => {
       const result = server.processThought(invalidInput);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0]?.text).toContain(
-        "Invalid nextThoughtNeeded: must be a boolean"
-      );
+      expect(result.content[0]?.text).toContain("Invalid nextThoughtNeeded: must be a boolean");
     });
   });
 

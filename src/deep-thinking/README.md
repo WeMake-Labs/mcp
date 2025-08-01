@@ -1,7 +1,7 @@
 # Deep Thinking MCP Server
 
-An MCP server implementation that provides a tool for dynamic and reflective
-problem-solving through a structured thinking process.
+An MCP server implementation that provides a tool for dynamic and reflective problem-solving through a structured
+thinking process.
 
 ## Features
 
@@ -15,8 +15,7 @@ problem-solving through a structured thinking process.
 
 ### deep-thinking
 
-Facilitates a detailed, step-by-step thinking process for problem-solving and
-analysis.
+Facilitates a detailed, step-by-step thinking process for problem-solving and analysis.
 
 **Inputs:**
 
@@ -63,12 +62,10 @@ Add this MCP via "Add Manually":
 }
 ```
 
-To disable logging of thought information set env var: `DISABLE_THOUGHT_LOGGING`
-to `true`.
+To disable logging of thought information set env var: `DISABLE_THOUGHT_LOGGING` to `true`.
 
 ## License
 
-This MCP server is licensed under the MIT License. This means you are free to
-use, modify, and distribute the software, subject to the terms and conditions of
-the MIT License. For more details, please see the LICENSE file in the project
+This MCP server is licensed under the MIT License. This means you are free to use, modify, and distribute the software,
+subject to the terms and conditions of the MIT License. For more details, please see the LICENSE file in the project
 repository.

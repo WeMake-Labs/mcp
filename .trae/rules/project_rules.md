@@ -3,10 +3,8 @@
 ## Monorepo Best Practices
 
 - Use Bun's workspace features for managing multiple packages in `src/*`.
-- Automate builds and tests across workspaces with `bun run` scripts in the root
-  package.json.
-- Simplify operations by leveraging Bun's built-in tools for dependency
-  management and scripting.
+- Automate builds and tests across workspaces with `bun run` scripts in the root package.json.
+- Simplify operations by leveraging Bun's built-in tools for dependency management and scripting.
 
 ## TypeScript
 
@@ -16,33 +14,25 @@
 
 ## Development Principles
 
-- Prioritize velocity: Focus on rapid iteration while maintaining code quality
-  through automated tests and linting.
-- Add function-level comments when generating code, explaining purpose and key
-  logic.
-- Optimize for a single full-stack developer: Emphasize simple, maintainable
-  architectures and minimal dependencies.
+- Prioritize velocity: Focus on rapid iteration while maintaining code quality through automated tests and linting.
+- Add function-level comments when generating code, explaining purpose and key logic.
+- Optimize for a single full-stack developer: Emphasize simple, maintainable architectures and minimal dependencies.
 
 ## Additional Guidelines
 
-- Focus on automation: Use scripts for common tasks like building, testing, and
-  publishing.
-- Ensure operational simplicity: Avoid complex setups; prefer Bun's native
-  capabilities.
-- For MCP servers: Follow Model Context Protocol best practices as per
-  documentation.
+- Focus on automation: Use scripts for common tasks like building, testing, and publishing.
+- Ensure operational simplicity: Avoid complex setups; prefer Bun's native capabilities.
+- For MCP servers: Follow Model Context Protocol best practices as per documentation.
 
 ## Bun
 
 Default to using Bun instead of Node.js.
 
 - Use `bun <file>` instead of `node <file>` or `ts-node <file>`
-- Use `bun test` for simple scripts; use Vitest for comprehensive monorepo
-  testing with coverage requirements
+- Use `bun test` for simple scripts; use Vitest for comprehensive monorepo testing with coverage requirements
 - Use `bun build <file.html|file.ts|file.css>` instead of `webpack` or `esbuild`
 - Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
-- Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or
-  `pnpm run <script>`
+- Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
 - Bun automatically loads .env, so don't use dotenv.
 
 ### APIs
@@ -69,8 +59,7 @@ test("hello world", () => {
 
 ### Frontend
 
-Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully
-support React, CSS, Tailwind.
+Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully support React, CSS, Tailwind.
 
 Server:
 
@@ -105,9 +94,8 @@ Bun.serve({
 });
 ```
 
-HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will
-transpile & bundle automatically. `<link>` tags can point to stylesheets and
-Bun's CSS bundler will bundle.
+HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will transpile & bundle automatically. `<link>`
+tags can point to stylesheets and Bun's CSS bundler will bundle.
 
 ```html
 <html>
@@ -143,13 +131,12 @@ Then, run index.ts
 bun --hot ./index.ts
 ```
 
-For more information, read the Bun API docs in
-`node_modules/bun-types/docs/**.md`.
+For more information, read the Bun API docs in `node_modules/bun-types/docs/**.md`.
 
 ## Testing Strategy
 
-Use Vitest as the primary testing framework for this MCP monorepo with
-automated, reliable, scalable, and streamlined testing.
+Use Vitest as the primary testing framework for this MCP monorepo with automated, reliable, scalable, and streamlined
+testing.
 
 ### Configuration
 
@@ -184,8 +171,7 @@ Add to root `package.json`:
 
 ### Best Practices
 
-- **Test Types**: Unit tests for functions, integration tests for MCP
-  servers/tools
+- **Test Types**: Unit tests for functions, integration tests for MCP servers/tools
 - **Mocking**: Use `vi.mock` for dependencies
 - **Coverage**: Monitor and maintain 80% threshold across all metrics
 - **Watch Mode**: Use for development feedback
@@ -217,5 +203,5 @@ Add to each package's `package.json`:
 }
 ```
 
-This strategy ensures efficient testing that scales with the monorepo while
-maintaining quality through automation and coverage requirements.
+This strategy ensures efficient testing that scales with the monorepo while maintaining quality through automation and
+coverage requirements.

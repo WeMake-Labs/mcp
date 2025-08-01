@@ -19,8 +19,7 @@ export class DeepThinkingServer {
   private disableThoughtLogging: boolean;
 
   constructor() {
-    this.disableThoughtLogging =
-      (process.env.DISABLE_THOUGHT_LOGGING || "").toLowerCase() === "true";
+    this.disableThoughtLogging = (process.env.DISABLE_THOUGHT_LOGGING || "").toLowerCase() === "true";
   }
 
   private validateThoughtData(input: unknown): ThoughtData {
@@ -53,15 +52,8 @@ export class DeepThinkingServer {
   }
 
   private formatThought(thoughtData: ThoughtData): string {
-    const {
-      thought,
-      thoughtNumber,
-      totalThoughts,
-      isRevision,
-      revisesThought,
-      branchFromThought,
-      branchId
-    } = thoughtData;
+    const { thought, thoughtNumber, totalThoughts, isRevision, revisesThought, branchFromThought, branchId } =
+      thoughtData;
 
     let prefix = "";
     let context = "";
@@ -88,9 +80,7 @@ export class DeepThinkingServer {
     // Truncate thought if it's too long for the border
     const maxThoughtLength = borderLength - 2;
     const displayThought =
-      thought.length > maxThoughtLength
-        ? thought.substring(0, maxThoughtLength - 3) + "..."
-        : thought;
+      thought.length > maxThoughtLength ? thought.substring(0, maxThoughtLength - 3) + "..." : thought;
 
     return `
 ┌${border}┐

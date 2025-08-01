@@ -14,9 +14,7 @@ concurrency:
 jobs:
   create-metadata:
     runs-on: ubuntu-latest
-    if:
-      ${{ github.event_name == 'workflow_dispatch' || (github.event_name ==
-      'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
     outputs:
       hash: ${{ steps.last-release.outputs.hash }}
       version: ${{ steps.create-version.outputs.version}}
@@ -66,10 +64,7 @@ jobs:
 
   update-packages:
     needs: [create-metadata]
-    if:
-      ${{ (needs.create-metadata.outputs.npm_packages != '[]') &&
-      (github.event_name == 'workflow_dispatch' || (github.event_name ==
-      'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
+    if: ${{ (needs.create-metadata.outputs.npm_packages != '[]') && (github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
     runs-on: ubuntu-latest
     environment: release
     outputs:
@@ -109,10 +104,7 @@ jobs:
 
   publish-npm:
     needs: [update-packages, create-metadata]
-    if:
-      ${{ needs.update-packages.outputs.changes_made == 'true' &&
-      (github.event_name == 'workflow_dispatch' || (github.event_name ==
-      'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
+    if: ${{ needs.update-packages.outputs.changes_made == 'true' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
     strategy:
       fail-fast: false
       matrix:
@@ -157,10 +149,7 @@ jobs:
 
   create-release:
     needs: [update-packages, create-metadata, publish-npm]
-    if:
-      ${{ needs.update-packages.outputs.changes_made == 'true' &&
-      (github.event_name == 'workflow_dispatch' || (github.event_name ==
-      'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
+    if: ${{ needs.update-packages.outputs.changes_made == 'true' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')) }}
     runs-on: ubuntu-latest
     environment: release
     permissions:

@@ -2,11 +2,7 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-  Tool
-} from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema, Tool } from "@modelcontextprotocol/sdk/types.js";
 import { DeepThinkingServer } from "./index.js";
 
 /**
@@ -213,11 +209,7 @@ async function runServer(): Promise<void> {
 
 // Start the server when this file is executed directly
 // Use a more reliable method for detecting direct execution
-if (
-  process.argv[1] &&
-  (process.argv[1].endsWith("bin.js") ||
-    process.argv[1].includes("mcpserver-deep-thinking"))
-) {
+if (process.argv[1] && (process.argv[1].endsWith("bin.js") || process.argv[1].includes("mcpserver-deep-thinking"))) {
   runServer().catch((error) => {
     console.error("Fatal error running server:", error);
     process.exit(1);

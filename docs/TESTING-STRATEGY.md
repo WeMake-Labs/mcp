@@ -2,12 +2,10 @@
 
 ## Introduction
 
-This document outlines an automated, reliable, scalable, and streamlined testing
-strategy for the MCP monorepo using Vitest, integrated with Bun. MCP is a
-Bun-managed TypeScript monorepo with workspaces under `src/*`, including
-packages like `deep-thinking`, `knowledge-graph-memory`, and `tasks`. The
-strategy leverages Vitest's Test Projects for monorepo support, ensuring
-parallel execution, CI automation, and best practices for maintainability.
+This document outlines an automated, reliable, scalable, and streamlined testing strategy for the MCP monorepo using
+Vitest, integrated with Bun. MCP is a Bun-managed TypeScript monorepo with workspaces under `src/*`, including packages
+like `deep-thinking`, `knowledge-graph-memory`, and `tasks`. The strategy leverages Vitest's Test Projects for monorepo
+support, ensuring parallel execution, CI automation, and best practices for maintainability.
 
 Key goals:
 
@@ -41,8 +39,7 @@ Key goals:
 ### Directory Structure
 
 - Root: `vitest.config.ts`, `package.json`.
-- Packages: Add `tests/` folders in `src/deep-thinking`, etc., with `*.test.ts`
-  files.
+- Packages: Add `tests/` folders in `src/deep-thinking`, etc., with `*.test.ts` files.
 
 ## Configuration
 
@@ -99,8 +96,7 @@ export default defineConfig({
 
 ### Handling TypeScript in Monorepos
 
-To ensure live type resolution, add custom export conditions in package.json of
-each package:
+To ensure live type resolution, add custom export conditions in package.json of each package:
 
 ```json
 "exports": {

@@ -8,9 +8,7 @@ interface Entity {
 }
 
 // Mock fs module using Bun's mock
-const mockReadFile = mock(() =>
-  Promise.resolve('{"entities":[],"relations":[]}')
-);
+const mockReadFile = mock(() => Promise.resolve('{"entities":[],"relations":[]}'));
 const mockWriteFile = mock(() => Promise.resolve());
 const mockAccess = mock(() => Promise.resolve());
 const mockExistsSync = mock(() => false);
@@ -85,9 +83,7 @@ describe("Server Integration Tests", () => {
         observations: ["observation"]
       };
 
-      await expect(manager.createEntities([invalidEntity])).rejects.toThrow(
-        "Entity name must be a non-empty string"
-      );
+      await expect(manager.createEntities([invalidEntity])).rejects.toThrow("Entity name must be a non-empty string");
     });
 
     it("should validate entity type is required", async () => {
@@ -97,9 +93,7 @@ describe("Server Integration Tests", () => {
         observations: ["observation"]
       };
 
-      await expect(manager.createEntities([invalidEntity])).rejects.toThrow(
-        "Entity type must be a non-empty string"
-      );
+      await expect(manager.createEntities([invalidEntity])).rejects.toThrow("Entity type must be a non-empty string");
     });
 
     it("should validate observations must be an array", async () => {
@@ -109,9 +103,7 @@ describe("Server Integration Tests", () => {
         observations: "not an array"
       } as unknown as Entity;
 
-      await expect(manager.createEntities([invalidEntity])).rejects.toThrow(
-        "Entity observations must be an array"
-      );
+      await expect(manager.createEntities([invalidEntity])).rejects.toThrow("Entity observations must be an array");
     });
 
     it("should accept valid entity data", async () => {

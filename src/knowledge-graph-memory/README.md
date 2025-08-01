@@ -1,15 +1,13 @@
 # Knowledge Graph Memory MCP Server
 
-An improved implementation of persistent memory using a local knowledge graph
-with a customizable `--memory-path`.
+An improved implementation of persistent memory using a local knowledge graph with a customizable `--memory-path`.
 
-This lets AI models remember information about the user across chats. It works
-with any AI model that supports the Model Context Protocol (MCP) or function
-calling capabilities.
+This lets AI models remember information about the user across chats. It works with any AI model that supports the Model
+Context Protocol (MCP) or function calling capabilities.
 
 > [!NOTE] This is a fork of the original
-> [Memory Server](https://github.com/modelcontextprotocol/servers/tree/main/src/memory)
-> and is intended to not use the ephemeral memory npx installation method.
+> [Memory Server](https://github.com/modelcontextprotocol/servers/tree/main/src/memory) and is intended to not use the
+> ephemeral memory npx installation method.
 
 ## Server Name
 
@@ -39,8 +37,8 @@ Example:
 
 ### Relations
 
-Relations define directed connections between entities. They are always stored
-in active voice and describe how entities interact or relate to each other.
+Relations define directed connections between entities. They are always stored in active voice and describe how entities
+interact or relate to each other.
 
 Example:
 
@@ -66,11 +64,7 @@ Example:
 ```json
 {
   "entityName": "John_Smith",
-  "observations": [
-    "Speaks fluent Spanish",
-    "Graduated in 2019",
-    "Prefers morning meetings"
-  ]
+  "observations": ["Speaks fluent Spanish", "Graduated in 2019", "Prefers morning meetings"]
 }
 ```
 
@@ -211,13 +205,11 @@ You can specify a custom path for the memory file:
 }
 ```
 
-If no path is specified, it will default to knowledge-graph.json in the server's
-installation directory.
+If no path is specified, it will default to knowledge-graph.json in the server's installation directory.
 
 ## Data Format
 
-The knowledge graph is stored in a single JSON file with the following
-structure:
+The knowledge graph is stored in a single JSON file with the following structure:
 
 ```json
 {
@@ -242,7 +234,6 @@ structure:
 
 ## License
 
-This MCP server is licensed under the MIT License. This means you are free to
-use, modify, and distribute the software, subject to the terms and conditions of
-the MIT License. For more details, please see the LICENSE file in the project
+This MCP server is licensed under the MIT License. This means you are free to use, modify, and distribute the software,
+subject to the terms and conditions of the MIT License. For more details, please see the LICENSE file in the project
 repository.

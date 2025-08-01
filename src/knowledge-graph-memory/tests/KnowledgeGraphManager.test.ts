@@ -77,9 +77,7 @@ describe("KnowledgeGraphManager", () => {
 
   describe("createEntities", () => {
     beforeEach(() => {
-      mockReadFile.mockResolvedValue(
-        JSON.stringify({ entities: [], relations: [] })
-      );
+      mockReadFile.mockResolvedValue(JSON.stringify({ entities: [], relations: [] }));
       mockWriteFile.mockResolvedValue(undefined);
     });
 
@@ -112,9 +110,7 @@ describe("KnowledgeGraphManager", () => {
         }
       ];
 
-      await expect(manager.createEntities(invalidEntities)).rejects.toThrow(
-        "Entity name must be a non-empty string"
-      );
+      await expect(manager.createEntities(invalidEntities)).rejects.toThrow("Entity name must be a non-empty string");
     });
 
     it("should validate entity type is non-empty string", async () => {
@@ -126,9 +122,7 @@ describe("KnowledgeGraphManager", () => {
         }
       ];
 
-      await expect(manager.createEntities(invalidEntities)).rejects.toThrow(
-        "Entity type must be a non-empty string"
-      );
+      await expect(manager.createEntities(invalidEntities)).rejects.toThrow("Entity type must be a non-empty string");
     });
   });
 
