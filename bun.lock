@@ -59,7 +59,7 @@
     },
     "src/tasks": {
       "name": "@wemake-ai/mcpserver-tasks",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "bin": {
         "mcpserver-tasks": "dist/index.js",
       },
