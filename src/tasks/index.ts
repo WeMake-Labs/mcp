@@ -876,9 +876,9 @@ export class TasksServer {
     try {
       // Ensure directory exists
       const dir = path.dirname(this.filePath);
-      await fs.mkdir(dir, { recursive: true });
+      await fs.mkdir(dir, { recursive: true, mode: 0o700 });
 
-      await fs.writeFile(this.filePath, JSON.stringify(this.data, null, 2), "utf-8");
+      await fs.writeFile(this.filePath, JSON.stringify(this.data, null, 2), { encoding: "utf-8", mode: 0o600 });
     } catch (error) {
       if (error instanceof Error && error.message.includes("EROFS")) {
         console.error("EROFS: read-only file system. Cannot save tasks.");
