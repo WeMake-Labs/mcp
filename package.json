@@ -1,6 +1,6 @@
 {
   "name": "@wemake-ai/mcp",
-  "version": "25.3.16",
+  "version": "25.3.17",
   "author": "WeMake (https://wemake.cx)",
   "devDependencies": {
     "@types/bun": "latest",
@@ -24,8 +24,9 @@
   "license": "BSL-1.1",
   "prettier": {
     "trailingComma": "none",
-    "printWidth": 80,
-    "proseWrap": "always"
+    "printWidth": 120,
+    "proseWrap": "always",
+    "endOfLine": "lf"
   },
   "private": true,
   "scripts": {
