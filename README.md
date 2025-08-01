@@ -19,8 +19,8 @@ implemented with an MCP SDK:
 These servers aim to demonstrate MCP features and the official SDKs.
 
 - **[Deep Thinking](src/deep-thinking)** - Dynamic and reflective problem-solving through thought sequences.
-- **[Tasks](src/tasks)** - Self guided task planning, management, execution and completion.
 - **[Knowledge Graph Memory](src/knowledge-graph-memory)** - Persistent memory for through a local knowledge graph.
+- **[Tasks](src/tasks)** - Self guided task planning, management, execution and completion.
 
 ## 🚀 Getting Started
 
