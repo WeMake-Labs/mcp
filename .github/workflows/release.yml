@@ -160,7 +160,7 @@ jobs:
           ref: ${{ needs.create-metadata.outputs.version }}
 
       - name: Download release notes
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: release-notes
 
