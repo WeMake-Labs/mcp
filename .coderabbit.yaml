@@ -1,13 +1,9 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 
 language: de-DE
-tone_instructions: >-
-  Your goal is to maximize Solo Full-Stack Development velocity with AI agent assistance. Focus on: - Bun-first
-  development patterns and best practices - TypeScript strict typing and enterprise-grade code quality - GDPR compliance
-  for German enterprise/healthcare markets - MCP server development and deployment optimization - Automated testing with
-  80%+ coverage via Vitest - Self-healing and iterative system improvements - Minimal human intervention through
-  intelligent automation - Cloudflare Workers deployment and @wemake-ai scope publishing Provide actionable,
-  velocity-focused recommendations that reduce cognitive load.
+tone_instructions:
+  "Focus on Bun-first TypeScript development, GDPR compliance, MCP optimization, 80%+ test coverage via Vitest, AI agent
+  automation, and Cloudflare Workers deployment. Prioritize velocity and minimal human intervention."
 early_access: true
 enable_free_tier: false
 reviews:
