@@ -18,82 +18,17 @@ implemented with an MCP SDK:
 
 These servers aim to demonstrate MCP features and the official SDKs.
 
-- **[Deep Thinking](src/deep-thinking)** - Dynamic and reflective problem-solving through thought sequences.
-- **[Knowledge Graph Memory](src/knowledge-graph-memory)** - Persistent memory for through a local knowledge graph.
-- **[Tasks](src/tasks)** - Self guided task planning, management, execution and completion.
+- [TODO]
 
 ## 🚀 Getting Started
 
 ### Using MCP Servers in this Repository
 
-Typescript-based servers in this repository can be used directly with `bunx`.
-
-For example, this will start the [Deep Thinking](src/deep-thinking) server:
-
-```sh
-bunx -y @wemake-ai/mcpserver-deep-thinking@latest
-```
-
-Python-based servers in this repository can be used directly with [`uvx`](https://docs.astral.sh/uv/concepts/tools/) or
-[`pip`](https://pypi.org/project/pip/). `uvx` is recommended for ease of use and setup.
-
-For example, this will start the [Git](src/git) server:
-
-```sh
-# With uvx
-uvx mcp-server-git
-
-# With pip
-pip install mcp-server-git
-python -m mcp_server_git
-```
-
-Follow [these](https://docs.astral.sh/uv/getting-started/installation/) instructions to install `uv` / `uvx` and
-[these](https://pip.pypa.io/en/stable/installation/) to install `pip`.
+- [TODO]
 
 ### Using an MCP Client
 
-However, running a server on its own isn't very useful, and should instead be configured into an MCP client. For
-example, here's the Claude Desktop configuration to use the above server:
-
-```json
-{
-  "mcpServers": {
-    "memory": {
-      "command": "bunx",
-      "args": ["-y", "@wemake-ai/mcp-memory"]
-    }
-  }
-}
-```
-
-Additional examples of using the Claude Desktop as an MCP client might look like:
-
-```json
-{
-  "mcpServers": {
-    "filesystem": {
-      "command": "bunx",
-      "args": ["-y", "@wemake-ai/mcp-filesystem", "/path/to/allowed/files"]
-    },
-    "git": {
-      "command": "uvx",
-      "args": ["mcp-server-git", "--repository", "path/to/git/repo"]
-    },
-    "github": {
-      "command": "bunx",
-      "args": ["-y", "@wemake-ai/mcp-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
-      }
-    },
-    "postgres": {
-      "command": "bunx",
-      "args": ["-y", "@wemake-ai/mcp-postgres", "postgresql://localhost/mydb"]
-    }
-  }
-}
-```
+- [TODO]
 
 ## 📜 License
 
