@@ -2,19 +2,20 @@
 
 language: de-DE
 tone_instructions:
-  "Focus on Bun-first TypeScript development, GDPR compliance, MCP optimization, 80%+ test coverage via Vitest, AI agent
-  automation, and Cloudflare Workers deployment. Prioritize velocity and minimal human intervention."
+  "AI-first enterprise development: Bun TypeScript, MCP excellence, GDPR compliance, 90%+ Vitest coverage, zero-downtime
+  CF Workers deployment, autonomous code quality."
 early_access: true
 enable_free_tier: false
 reviews:
   profile: assertive
   request_changes_workflow: true
   high_level_summary: true
-  high_level_summary_placeholder: "@coderabbitai summary"
+  high_level_summary_placeholder: "@coderabbitai enterprise-summary"
   high_level_summary_in_walkthrough: true
-  auto_title_placeholder: "@coderabbitai"
+  auto_title_placeholder: "@coderabbitai ai-title"
   auto_title_instructions:
-    "Generate concise, action-oriented titles focusing on business impact and technical improvements"
+    "Generate enterprise-grade titles emphasizing code understanding: [TYPE] Brief impact description (affects:
+    component/system). Highlight review complexity, knowledge transfer requirements, and maintainability implications."
   review_status: true
   commit_status: true
   fail_commit_status: true
@@ -27,48 +28,46 @@ reviews:
   related_prs: true
   suggested_labels: true
   auto_apply_labels: true
-  suggested_reviewers: false
-  auto_assign_reviewers: false
+  suggested_reviewers: true
+  auto_assign_reviewers: true
   poem: false
   labeling_instructions:
-    - label: Bug Fix
-      instructions: Corrects an error, bug, or unintended behavior in existing code.
-    - label: Chore
-      instructions: >
-        Maintenance tasks, build process updates, dependency bumps, config changes.
-    - label: Dependencies
-      instructions: >
-        Updates to project dependencies, libraries, frameworks, or runtime versions.
-    - label: Documentation
-      instructions: >
-        Changes solely related to documentation (READMEs, guides, code comments).
-    - label: Feature
-      instructions: Adds new user-facing functionality or capabilities.
-    - label: Hotfix
-      instructions: Urgent fix for a critical production issue (often cherry-picked).
-    - label: Improvement
-      instructions: >
-        Enhances existing code, performance, reliability, or developer experience (non-functional).
-    - label: Performance
-      instructions: Optimizes performance or reduces resource usage.
-    - label: Refactor
-      instructions: Improves code structure or readability without changing behavior.
-    - label: Security
-      instructions: Addresses a security vulnerability or improves security posture.
-    - label: Testing
-      instructions: Adds or significantly updates tests (unit, integration, e2e).
-    - label: MCP
-      instructions: Changes related to Model Context Protocol server development or configuration.
-    - label: GDPR
-      instructions: Changes ensuring GDPR compliance for German enterprise/healthcare markets.
-    - label: Bun
-      instructions: Changes leveraging Bun runtime, tooling, or built-in APIs.
-    - label: AI Agent
-      instructions: Changes supporting AI agent automation, self-healing, or iterative improvements.
-    - label: Cloudflare
-      instructions: Changes related to Cloudflare Workers deployment or edge computing.
-    - label: Enterprise
-      instructions: Changes supporting enterprise-grade features, scalability, or compliance.
+    - label: "🐛 Bug Fix"
+      instructions: Corrects errors, bugs, or unintended behavior affecting system reliability.
+    - label: "🔧 Chore"
+      instructions: Maintenance tasks, build updates, dependency management, configuration changes.
+    - label: "📦 Dependencies"
+      instructions: Updates to Bun, npm packages, or runtime dependencies with security/performance impact.
+    - label: "📚 Documentation"
+      instructions: Documentation updates, API guides, architectural decisions, or code comments.
+    - label: "✨ Feature"
+      instructions: New enterprise functionality, user capabilities, or business value additions.
+    - label: "🚨 Hotfix"
+      instructions: Critical production fixes requiring immediate deployment (zero-downtime priority).
+    - label: "⚡ Performance"
+      instructions: Optimizations for speed, memory, or resource efficiency in enterprise environments.
+    - label: "♻️ Refactor"
+      instructions: Code structure improvements maintaining behavior while enhancing maintainability.
+    - label: "🔒 Security"
+      instructions: Security vulnerabilities, GDPR compliance, or enterprise security posture improvements.
+    - label: "🧪 Testing"
+      instructions: Test coverage improvements, Vitest enhancements, or quality assurance updates.
+    - label: "🤖 MCP Server"
+      instructions: Model Context Protocol server development, tool implementations, or schema updates.
+    - label: "🛡️ GDPR Compliance"
+      instructions: Data protection, privacy controls, or German/EU regulatory compliance features.
+    - label: "🐰 Bun Runtime"
+      instructions: Bun-specific optimizations, built-in API usage, or runtime feature implementations.
+    - label: "🌌 AI Agent"
+      instructions: Autonomous systems, self-healing capabilities, or AI-driven automation features.
+    - label: "☁️ Cloudflare Workers"
+      instructions: Edge computing, serverless deployment, or Cloudflare-specific optimizations.
+    - label: "🏢 Enterprise"
+      instructions: Enterprise-grade scalability, compliance, monitoring, or business-critical features.
+    - label: "🔄 CI/CD"
+      instructions: Build automation, deployment pipelines, or development workflow improvements.
+    - label: "📊 Monitoring"
+      instructions: Observability, logging, metrics, or enterprise monitoring capabilities.
   path_filters:
     - "!**/node_modules/**"
     - "!**/dist/**"
@@ -76,26 +75,45 @@ reviews:
     - "!**/coverage/**"
     - "!**/bun.lock"
   path_instructions:
+    - path: "*"
+      instructions: >
+        CRITICAL INSIGHT: Code understanding is the primary bottleneck, not code generation. Focus reviews on: 1. Code
+        Comprehension: Ensure AI-generated code is easily understood by human reviewers 2. Knowledge Transfer:
+        Prioritize clear documentation and decision rationale over speed 3. Review Quality: The real bottlenecks are
+        code reviews, testing, and coordination - not writing code 4. Maintainability: Code must be self-documenting
+        with comprehensive business context 5. Team Collaboration: Facilitate effective knowledge sharing through clear,
+        well-documented code 6. AI-First Development: Generate code optimized for human understanding and review
+        efficiency Remember: Writing code was never the bottleneck - understanding and maintaining it is.
     - path: "src/**/tests/**"
       instructions: >
-        Focus on test coverage, edge cases, and Vitest best practices. Ensure 80%+ coverage thresholds. Validate test
-        naming conventions (functionName.test.ts) and proper TypeScript typing.
+        Enforce 90%+ coverage with Vitest. Validate enterprise test patterns: unit/integration/e2e separation,
+        performance benchmarks, security test cases, and GDPR compliance validation. Use descriptive test naming.
     - path: "src/**/mcp/**"
       instructions: >
-        Emphasize MCP protocol compliance, schema validation, security patterns, and tool discovery. Ensure proper error
-        handling and HITL (Human-in-the-Loop) for sensitive operations.
+        MCP protocol excellence: schema validation, security boundaries, tool discovery optimization, error handling
+        with graceful degradation. Ensure enterprise-grade logging and monitoring integration.
     - path: "**/*.config.*"
       instructions: >
-        Validate configuration against Bun-first principles. Ensure compatibility with monorepo structure and enterprise
-        deployment requirements.
+        Bun-first configuration validation: monorepo compatibility, enterprise deployment readiness, security hardening,
+        and zero-downtime deployment support. Validate against project_rules.md standards.
     - path: "src/**/*.ts"
       instructions: >
-        Enforce strict TypeScript, function-level comments, and Bun built-in API usage. Validate GDPR compliance
-        patterns and enterprise security practices.
+        Enterprise TypeScript standards prioritizing code understanding: strict typing, comprehensive JSDoc explaining
+        business context and decision rationale, Bun built-in API preference, GDPR compliance patterns. Focus on review
+        quality over generation speed - code understanding is the bottleneck, not writing code. Ensure maintainability
+        and knowledge transfer through clear, self-documenting code.
     - path: ".github/workflows/**"
       instructions: >
-        Optimize for Bun-based CI/CD, automated testing, and @wemake-ai scope publishing. Ensure Cloudflare Workers
-        deployment compatibility.
+        AI-driven CI/CD: Bun-optimized pipelines, automated quality gates, security scanning, enterprise deployment to
+        Cloudflare Workers, and autonomous monitoring integration.
+    - path: "docs/**"
+      instructions: >
+        Enterprise documentation standards: architectural decisions, API specifications, security guidelines, GDPR
+        compliance procedures, and AI agent integration patterns.
+    - path: "src/**/ai/**"
+      instructions: >
+        AI agent development: autonomous systems design, self-healing capabilities, enterprise AI safety, monitoring
+        integration, and human-in-the-loop patterns for critical operations.
   abort_on_close: true
   disable_cache: false
   auto_review:
@@ -118,10 +136,9 @@ reviews:
   pre_merge_checks:
     docstrings:
       mode: error
-      threshold: 90
+      threshold: 95
     title:
       mode: error
-      requirements: "Must be descriptive, action-oriented, and indicate business/technical impact"
     description:
       mode: error
     issue_assessment:
@@ -236,6 +253,9 @@ knowledge_base:
       - "**/docs/**"
       - "**/CONTRIBUTING.md"
       - "**/SECURITY.md"
+      - "**/CODE_OF_CONDUCT.md"
+      - "**/tsconfig.json"
+      - "**/vitest.config.ts"
   learnings:
     scope: global
   issues:
@@ -246,40 +266,39 @@ knowledge_base:
   linear:
     usage: enabled
     team_keys:
-      - DEVX
-      - MCP
-      - AI
+      - CX
   pull_requests:
     scope: local
   mcp:
     usage: auto
     disabled_servers: []
-  enterprise:
-    gdpr_compliance: true
-    healthcare_compliance: true
-    german_market_focus: true
-  ai_agent:
-    self_healing: true
-    iterative_improvements: true
-    minimal_human_intervention: true
 code_generation:
   docstrings:
     language: en-US
     path_instructions:
       - path: "src/**/*.ts"
         instructions: >
-          Generate comprehensive JSDoc comments with @param, @returns, @throws, and @example. Include business context
-          and GDPR compliance notes where applicable.
+          Generate enterprise-grade JSDoc: @param, @returns, @throws, @example, @since, @deprecated. Include business
+          context, GDPR compliance notes, performance implications, and AI agent integration patterns.
       - path: "src/**/mcp/**"
         instructions: >
-          Focus on MCP protocol compliance, security considerations, and tool discovery patterns.
+          MCP-specific documentation: protocol compliance, security boundaries, tool discovery patterns, error handling
+          strategies, and enterprise integration guidelines.
+      - path: "src/**/ai/**"
+        instructions: >
+          AI agent documentation: autonomous behavior patterns, self-healing mechanisms, monitoring integration,
+          human-in-the-loop triggers, and enterprise safety considerations.
   unit_tests:
     path_instructions:
       - path: "src/**/*.ts"
         instructions: >
-          Generate Vitest tests with 80%+ coverage. Use descriptive test names following 'should [expected behavior]
-          when [condition]' pattern. Include edge cases and error scenarios.
+          Generate comprehensive Vitest tests with 90%+ coverage. Use enterprise test patterns: 'Given-When-Then'
+          structure, performance benchmarks, security validation, and GDPR compliance checks.
       - path: "src/**/mcp/**"
         instructions: >
-          Test MCP protocol compliance, schema validation, error handling, and security boundaries. Include integration
-          tests for tool discovery and execution flows.
+          MCP protocol testing: schema validation, security boundaries, error handling, tool discovery flows, enterprise
+          integration scenarios, and performance under load.
+      - path: "src/**/ai/**"
+        instructions: >
+          AI agent testing: autonomous behavior validation, self-healing scenarios, monitoring integration, enterprise
+          safety checks, and human-in-the-loop trigger conditions.

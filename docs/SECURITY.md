@@ -1,185 +1,151 @@
-# Security Policy
+# WeMake AI Security Policy
+
+## Enterprise Security Standards
+
+WeMake AI maintains enterprise-grade security standards for all Model Context Protocol (MCP) server implementations, AI
+agent integrations, and Cloudflare Workers deployments. Our security framework is designed to meet German and European
+regulatory requirements, including GDPR, NIS2, and emerging AI governance standards.
+
+## Supported Versions
+
+We provide security updates for the following versions of our MCP server implementations:
+
+| Version | Support Status | Security Updates | GDPR Compliance  | AI Safety      |
+| ------- | -------------- | ---------------- | ---------------- | -------------- |
+| 2.x.x   | ✅ Active      | ✅ Full          | ✅ Certified     | ✅ Verified    |
+| 1.x.x   | ⚠️ Maintenance | ✅ Critical Only | ✅ Certified     | ⚠️ Legacy      |
+| < 1.0   | ❌ Deprecated  | ❌ None          | ❌ Non-compliant | ❌ Unsupported |
 
 This Security Policy was last updated on August 18, 2024 and applies to citizens and permanent residents of the European
 Economic Area and Switzerland.
 
-## Technical and organizational measures
+## AI Security Framework
 
-We use technical and organizational measures to ensure the security and confidentiality of the personal data we process.
-These include, among others:
+### Model Context Protocol (MCP) Security
 
-- **Access restrictions:** Only authorized team members have access to the data according to the V-Code classification.
-- **Encryption:** We use end-to-end SSL encryption as standard for the transmission of sensitive data.
-- **Server security:** We use strong firewalls and regularly monitor our servers for security breaches.
-- **Security audits:** We carry out regular security audits to check the effectiveness of our security measures.
+- **Authentication & Authorization**: Multi-layered access controls with role-based permissions for MCP server
+  interactions
+- **Data Validation**: Strict input/output validation for all MCP tool calls and responses
+- **Code Understanding & Review**: Prioritize security through comprehensive code review processes, as understanding
+  code is more critical than generating it. Implement mandatory human review for AI-generated security-sensitive code
+- **Sandboxing**: Isolated execution environments for AI agent operations
+- **Audit Logging**: Comprehensive logging of all AI interactions for compliance and security monitoring
+- **Rate Limiting**: Advanced throttling mechanisms to prevent abuse and ensure service availability
 
-## Confidentiality system
+### Cloudflare Workers Security
 
-### What are V-Codes?
+- **Edge Security**: Leveraging Cloudflare's global security infrastructure
+- **Zero Trust Architecture**: No implicit trust for any component or user
+- **DDoS Protection**: Built-in protection against distributed denial-of-service attacks
+- **SSL/TLS Encryption**: End-to-end encryption for all data in transit
+- **Content Security Policy**: Strict CSP headers to prevent XSS and injection attacks
 
-The V-codes represent our internal code system for confidentiality levels and were originally created as part of
-cn23-Identity. They mark the level of confidentiality that certain data or resources have in relation to our work. The
-aim is to make it easier for 💙 WeMake AI Team members to recognize and correctly handle sensitive information. The
-V-codes range from publicly available information (VC0) to closely guarded secrets (VC3).
+### GDPR & Data Protection
 
-### Public VC0
+- **Data Minimization**: Collecting only necessary data for AI operations
+- **Purpose Limitation**: Using data solely for specified, legitimate purposes
+- **Storage Limitation**: Automatic data retention and deletion policies
+- **Data Subject Rights**: Comprehensive support for access, rectification, and erasure requests
+- **Privacy by Design**: Built-in privacy protections in all AI systems
+- **Cross-Border Transfers**: Compliant data transfer mechanisms for global operations
 
-These documents can be easily distributed worldwide as they do not contain any confidential information.
+## Vulnerability Reporting
 
-### Internal VC1
+### Responsible Disclosure
 
-These documents are intended exclusively for our team. They contain information about our daily work and internal
-projects. They may contain sensitive data, such as details of our technologies or operating procedures.
+We encourage responsible disclosure of security vulnerabilities. Please report security issues to:
 
-### Confidential VC2
+**Email**: <security@wemake.cx>  
+**PGP Key**: Available at <https://wemake.cx/.well-known/pgp-key.asc>  
+**Response Time**: Initial acknowledgment within 24 hours
 
-These files contain sensitive information and are strictly confidential. They are only available to certain team members
-and may contain critical strategic data or upcoming business decisions.
+### Reporting Guidelines
 
-### Secret VC3
+When reporting vulnerabilities, please include:
 
-This level is strictly confidential: only selected team members are allowed to view these documents. They contain
-sensitive information that must be protected at all costs and must never be made accessible to outsiders. The security
-protocols are strict and compliance is mandatory at all times. Any negligence can have serious consequences - for the
-person concerned, the team and the company as a whole.
+1. **Vulnerability Type**: Classification (e.g., AI safety, data privacy, infrastructure)
+2. **Affected Components**: Specific MCP servers, AI agents, or infrastructure components
+3. **Impact Assessment**: Potential business and security impact
+4. **Reproduction Steps**: Detailed steps to reproduce the vulnerability
+5. **Proof of Concept**: Non-destructive demonstration if applicable
+6. **Suggested Remediation**: Proposed fixes or mitigations
 
-## Data transmission
+### Security Response Process
 
-Data sent over the internet is not completely secure. While we will take all reasonable steps to ensure the security of
-your data, we cannot guarantee the absolute security of any data you transmit to us. Any transmission is at your own
-risk.
+1. **Acknowledgment** (24 hours): Confirmation of receipt and initial triage
+2. **Investigation** (72 hours): Technical analysis and impact assessment
+3. **Remediation** (7-30 days): Development and testing of fixes
+4. **Disclosure** (30-90 days): Coordinated public disclosure after remediation
+5. **Recognition**: Public acknowledgment of responsible reporters (with permission)
 
-## Breach of data security
+## Technical and Organizational Measures
 
-In the event of a data security breach where your personal data has been compromised, we will notify you as soon as
-possible. We will also take all necessary steps to rectify the breach and prevent it from happening again.
+### Enterprise AI Security Controls
 
-## Commitment of our team members and service providers
+WeMake AI has implemented comprehensive technical and organizational measures appropriate for enterprise AI development
+and MCP server operations:
 
-All our team members and service providers are required to comply with the security policy and procedures that we
-establish.
+#### Data Protection & Encryption
 
-## Updates
+- **End-to-End Encryption**: AES-256 encryption for data at rest and in transit
+- **Key Management**: Hardware Security Modules (HSMs) for cryptographic key protection
+- **Pseudonymization**: Advanced anonymization techniques for AI training data
+- **Data Masking**: Dynamic data masking for development and testing environments
 
-We may occasionally change or update this Security Policy to reflect changes in our practices or for other operational,
-legal or regulatory reasons. We encourage you to periodically review this policy to stay informed about our privacy
-practices.
+#### AI System Security
 
-## Security Measures for Contact Form API
+- **Model Integrity**: Cryptographic signatures for AI model verification
+- **Prompt Injection Protection**: Advanced filtering and validation for AI inputs
+- **Output Sanitization**: Comprehensive validation of AI-generated content
+- **Adversarial Defense**: Protection against model poisoning and evasion attacks
 
-This document outlines the security measures implemented in the contact form API to protect against common web
-vulnerabilities.
+#### Infrastructure Security
 
-## API Endpoint Security
+- **Zero Trust Network**: Micro-segmentation and continuous verification
+- **Container Security**: Hardened container images with vulnerability scanning
+- **Secrets Management**: Automated rotation and secure storage of credentials
+- **Network Isolation**: Segregated environments for different security zones
 
-The `/api/contact` endpoint implements the following security features:
+#### Operational Security
 
-### Input Validation and Sanitization
+- **Continuous Monitoring**: 24/7 security operations center (SOC) monitoring
+- **Incident Response**: Automated threat detection and response capabilities
+- **Backup & Recovery**: Automated, encrypted backups with tested recovery procedures
+- **Business Continuity**: Disaster recovery plans with defined RTO/RPO objectives
 
-- All user inputs are sanitized to prevent XSS attacks
-- Required fields are validated (full_name, work_email, project_details)
-- Email format validation using regex pattern
-- Input length restrictions to prevent abuse
-- Strict type checking of all form data
+#### Compliance & Governance
 
-### CSRF Protection
+- **Regular Audits**: Quarterly security assessments and penetration testing
+- **Compliance Monitoring**: Automated GDPR and regulatory compliance checking
+- **Risk Assessment**: Continuous risk evaluation and mitigation strategies
+- **Security Training**: Regular security awareness training for all personnel
 
-- CSRF token required for all form submissions
-- Token validation on server side
-- Custom headers (`X-Requested-With`) required for submissions
+### AI-Specific Risk Mitigation
 
-### Rate Limiting
+Our security framework addresses unique risks in AI development, recognizing that code understanding is the primary
+security challenge:
 
-- IP-based rate limiting to prevent abuse
-- Configurable request window (default: 5 requests per minute)
-- 429 status code returned when limit is exceeded
+- **Code Comprehension Security**: Mandatory documentation explaining AI-generated code decisions and security
+  implications
+- **Review Quality Assurance**: Enhanced review processes for AI-generated code with focus on understanding over speed
+- **Data Poisoning**: Robust data validation and provenance tracking
+- **Model Extraction**: Protection against unauthorized model access and replication
+- **Bias Detection**: Automated monitoring for algorithmic bias and fairness
+- **Explainability**: Transparent AI decision-making processes for audit trails with emphasis on reviewer understanding
+- **Human Oversight**: Mandatory human review for high-risk AI decisions with sufficient time for proper comprehension
 
-### Bot Protection
+---
 
-- Honeypot field to detect automated submissions
-- Gives false success response to bots while discarding the submission
+_This Security Policy is regularly updated to address emerging threats in AI and enterprise security. Last updated:
+August 2025_
 
-### Secure Headers
+## Contact & Support
 
-- `X-Content-Type-Options: nosniff` to prevent MIME type sniffing
-- `Cache-Control: no-store` to prevent caching of sensitive data
-- Appropriate content type headers
+For security-related inquiries, vulnerability reports, or compliance questions:
 
-### Error Handling
+- **Security Team**: <security@wemake.cx>
+- **Compliance Officer**: <florentin@wemake.cx>
+- **Emergency Hotline**: Available 24/7 for critical security incidents
 
-- Sanitized error messages that don't leak implementation details
-- Consistent error response format
-- All exceptions are caught and properly handled
-
-## Contact Form Security
-
-The contact form (`Contact.astro`) includes the following security features:
-
-### Client-side Validation
-
-- HTML5 pattern validation for all fields
-- Required field validation
-- Field length limits
-- Client-side email format validation
-- Character counter for text areas
-
-### CSRF Protection
-
-- Automatic CSRF token generation
-- Token included in all form submissions
-
-### Bot Protection
-
-- Hidden honeypot field, invisible to users but visible to bots
-- ARIA attributes to maintain accessibility
-
-### UX Enhancements
-
-- Clear validation feedback to users
-- Visible labels for all form fields
-- Required field indicators
-- Disabled submit button during form submission to prevent double-submission
-- Clear success/error messages
-
-## Test Coverage
-
-The security features are tested with comprehensive test cases:
-
-- Testing CSRF token validation
-- Testing form validation for various input scenarios
-- Testing rate limiting
-- Testing API responses for different types of requests
-- Testing database integration with security features
-
-### Standalone Security Tests
-
-We have implemented dedicated security tests in a separate test file (`tests/security.spec.ts`) that runs after all
-functional tests are completed. These security-specific tests verify:
-
-1. **CSRF Protection**: Confirms that requests without valid CSRF tokens are rejected
-2. **XSS Prevention**: Tests that malicious script input is either rejected or sanitized
-3. **Bot Detection**: Verifies that the honeypot field successfully identifies and handles bot submissions
-4. **Email Validation**: Ensures that invalid email formats including potentially malicious inputs are rejected
-5. **Rate Limiting**: Tests that the API enforces request limits to prevent abuse
-
-These standalone security tests are configured to run last in the test sequence to ensure that basic functionality is
-verified before security edge cases are tested. This approach allows us to:
-
-- Focus specifically on security vulnerabilities without mixing them with functional tests
-- Run security tests independently when needed (using `bun test:security`)
-- Ensure security tests don't interfere with other tests due to rate limiting or other security measures
-
-## Best Practices
-
-- All user data is sanitized before storage
-- Secure headers are used in all responses
-- Environment-specific configurations for production vs development
-- Error handling that prevents information disclosure
-- Regular security testing via automated tests
-
-## Future Enhancements
-
-- Integration with reCAPTCHA for enhanced bot protection
-- Content Security Policy (CSP) implementation
-- Advanced logging for security events
-- API key-based authentication for service-to-service communication
+WeMake AI is committed to maintaining the highest standards of security and privacy in all our AI development and
+deployment activities.

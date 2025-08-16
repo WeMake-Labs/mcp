@@ -4,7 +4,13 @@ node_modules
 # output
 out
 dist
+assets
 *.tgz
+
+# test artifacts
+test-results.html
+test-results.json
+html.meta.json.gz
 
 # Bun runtime artefacts
 bun.lockb
@@ -36,8 +42,6 @@ report.*.json
 
 # Finder (MacOS) folder config
 .DS_Store
-
-
 
 .nx/cache
 .nx/workspace-data

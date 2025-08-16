@@ -1,94 +1,84 @@
-# Ethics Policy
+# WeMake AI Code of Conduct
 
-WeMake is committed to ethical excellence in service of our team, customers, and society. Our ethics policy guides us
-toward a sustainable, fair, and human-centered digital future.
+## Our Mission-Driven Pledge
 
-## Core Principles
+As WeMake AI, we are committed to advancing artificial intelligence for enterprise excellence while fostering an
+inclusive, innovative, and ethically-driven community. We pledge to make participation in our AI-first development
+ecosystem a harassment-free, collaborative experience for everyone, regardless of age, body size, visible or invisible
+disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education,
+socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
-### People and Environment First
+We are dedicated to building AI systems that respect human dignity, promote enterprise innovation, and contribute to a
+sustainable digital future. Our commitment extends to GDPR compliance, ethical AI development, and responsible
+technology stewardship in the German and European enterprise markets.
 
-- Prioritize human and environmental well-being over profit
-- Maintain high working standards and team welfare
-- Minimize environmental impact across all operations
-- Promote sustainability in all business processes
-- Ensure basic needs of team, customers, and society are met
+## Core Principles for AI-First Development
 
-### Equality and Inclusion
+- **Ethical AI Leadership**: We develop AI systems that augment human capabilities while maintaining human agency,
+  dignity, and decision-making authority. Our AI solutions prioritize transparency, explainability, and accountability.
 
-- Zero tolerance for discrimination
-- Active promotion of equal opportunities
-- Support for minority rights and representation
-- Inclusive digital transformation
-- Protection of rights for all gender identities and orientations
-- Equal access to opportunities regardless of background
+- **Enterprise Excellence**: We deliver production-ready, scalable solutions that meet the highest standards of German
+  and European enterprise requirements, including GDPR compliance, data sovereignty, and regulatory adherence.
 
-### Integrity and Transparency
+- **Inclusive Innovation**: We foster diverse perspectives in AI development, ensuring our solutions serve all users
+  equitably and address potential biases in algorithms, data, and deployment strategies.
 
-- Open dialogue culture
-- Rejection of corrupt practices
-- Clear accountability measures
-- Public documentation of ethical performance
-- Sustainable relationship building
-- Transparent business practices
+- **Collaborative Intelligence**: We believe in Human-AI collaboration where AI agents enhance human productivity while
+  preserving human oversight, creativity, and ethical judgment in critical decisions.
 
-### Environmental Stewardship
+- **Sustainable Technology**: We develop efficient, resource-conscious AI systems that minimize environmental impact
+  while maximizing business value and societal benefit.
 
-- Active promotion of green technologies
-- Regular assessment of ecological impact
-- Continuous process optimization for sustainability
-- Ecological footprint monitoring
-- Environmental protection initiatives
+- **Security by Design**: We implement enterprise-grade security patterns, privacy protection, and data governance from
+  the ground up, ensuring robust protection against emerging threats.
 
-### Continuous Improvement
+## Community Standards & Enforcement
 
-- Anonymous reporting mechanisms
-- Regular ethical audits
-- Measurable goals and public accountability
-- Active stakeholder engagement
-- Self-reflection and adaptation
-- Clear goal setting and review processes
+### Expected Behavior
 
-## Enforcement
+- **Professional Excellence**: Maintain high standards of technical and professional conduct in all AI development
+  activities
+- **Constructive Collaboration**: Engage in respectful, solution-oriented discussions that advance our AI-first mission
+- **Ethical AI Advocacy**: Promote responsible AI development practices and challenge unethical applications
+- **Inclusive Participation**: Welcome diverse perspectives and ensure equitable access to learning and contribution
+  opportunities
+- **Enterprise Integrity**: Uphold the highest standards of business ethics, data protection, and regulatory compliance
 
-We maintain clear mechanisms for reporting ethical concerns and take appropriate action against violations. Our
-commitment to these principles is absolute and reflected in all aspects of our operations. Violations are addressed with
-appropriate measures commensurate with their severity.
+### Unacceptable Behavior
 
-## People and the environment always before profit
+- Harassment, discrimination, or exclusionary behavior of any kind
+- Unethical AI development practices or promotion of harmful AI applications
+- Violation of data privacy, GDPR requirements, or enterprise security standards
+- Deliberate misinformation about AI capabilities, limitations, or risks
+- Disrespectful or unprofessional conduct in community spaces
 
-We set priorities: People and their environment come before profit. It is important to us that we do not put profit
-maximization above the basic needs of our team, our customers and society as a whole. We constantly review and adapt our
-working standards and conditions to ensure the wellbeing of our team. We constantly strive to reduce our environmental
-impact and promote sustainability in all our business processes.
+### Reporting and Resolution
 
-## Equal opportunities and non-discrimination
+Instances of unacceptable behavior may be reported to our community leaders at conduct@wemake.cx. All reports will be
+reviewed promptly, fairly, and confidentially. We are committed to protecting the privacy and security of all reporters.
 
-We are committed to equal opportunities for all, regardless of gender, age, race, sexual orientation, religion or
-disability. As a minimum standard, we do not tolerate any form of discrimination, both in the workplace and in our
-services and products. We also actively promote the rights and freedoms of minority groups, including but not limited to
-women, lesbian, gay, bi, trans, intersex and asexual persons.
+Our enforcement approach prioritizes education, mediation, and community healing while maintaining firm boundaries
+against harmful behavior.
 
-## Solidarity and strength in cooperation
+## Our Commitment to Responsible AI
 
-We see our strengths in solidarity and cooperation. On the one hand, this is reflected in our culture of open dialog
-within the team and with our business partners and customers. On the other hand, in our commitment to a fair and
-inclusive digital transition.
+WeMake AI is dedicated to developing artificial intelligence that serves humanity's best interests while driving
+enterprise innovation. We prioritize:
 
-## Acting with integrity and doing business transparently
+- **Human-Centered AI**: Technology that augments rather than replaces human capabilities
+- **Environmental Responsibility**: Efficient AI systems that minimize computational waste and environmental impact
+- **Sustainable Business Practices**: Long-term value creation over short-term profits
+- **Community Benefit**: AI solutions that contribute to societal well-being and economic prosperity
 
-We act with exceptional integrity and transparency. We strictly distance ourselves from corrupt business practices and
-instead focus on sustainable relationships in line with our principles. Any violation of the values documented here will
-result in appropriate action commensurate with the severity of the violation.
+## Living Document
 
-## Environmental protection and sustainability
+This Code of Conduct evolves with our community and the rapidly advancing field of artificial intelligence. We welcome
+feedback, suggestions, and contributions from our community to help us maintain the highest standards of ethical AI
+development.
 
-We recognize our responsibility to the environment and work tirelessly to protect it. This includes the active promotion
-of green technologies as well as the constant review and improvement of our own processes and the ecological footprint
-we leave behind.
+For questions, suggestions, or to report concerns, please contact us at conduct@wemake.cx.
 
-## Continuous improvement and responsibility
+---
 
-Our team, our customers and our partners have the right and are encouraged to point out ethical missteps. To this end,
-we have mechanisms in place that allow violations to be reported anonymously and without hindrance. We are also
-committed to constant self-reflection and further improvements. To this end, we set clear and measurable goals, the
-fulfillment of which we periodically review and publicly document.
+_This Code of Conduct is inspired by the Contributor Covenant and adapted for WeMake AI's mission of responsible
+enterprise AI development._
