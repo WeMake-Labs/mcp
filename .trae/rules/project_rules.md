@@ -1,207 +1,84 @@
 # Project Rules
 
-## Monorepo Best Practices
+## Core Guidelines
 
-- Use Bun's workspace features for managing multiple packages in `src/*`.
-- Automate builds and tests across workspaces with `bun run` scripts in the root package.json.
-- Simplify operations by leveraging Bun's built-in tools for dependency management and scripting.
+- **Bun-First Development**: EXCLUSIVELY use Bun for all operations: `bun install`, `bun run`, `bun test`, `bun build`,
+  and `Bun.serve()` for servers. PROHIBITED: Node.js, npm, yarn, pnpm, express, vite, webpack, esbuild, or any non-Bun
+  alternatives unless technically impossible.
 
-## TypeScript
+- **Bun Built-in APIs**: MANDATORY use of Bun's native APIs: `Bun.serve()` for HTTP/WebSocket servers, `bun:sqlite` for
+  SQLite, `Bun.redis` for Redis, `Bun.sql` for PostgreSQL, `Bun.file` for file operations, `Bun.$` for shell commands,
+  and `Bun.password` for secure hashing. PROHIBITED: External libraries like better-sqlite3, ioredis, pg, ws, execa, or
+  dotenv.
 
-- Use TypeScript for all code.
-- Follow the project's tsconfig.json settings.
-- Enable strict type checking.
+- **Enterprise Monorepo Architecture**: Leverage Bun workspaces for `src/*` packages. Implement automated builds, tests,
+  and deployment via root package.json. ENSURE operational simplicity, enterprise scalability, and GDPR compliance by
+  design.
 
-## Development Principles
+- **AI-First Development Principles**: Prioritize code understanding and review quality over generation speed. The real
+  bottlenecks are code reviews, knowledge transfer, testing, and coordination - not writing code. Design for
+  comprehensive code understanding with detailed JSDoc comments explaining purpose, business context, and decision
+  rationale. Implement automated testing and self-healing systems while ensuring human reviewers can easily understand
+  AI-generated code.
 
-- Prioritize velocity: Focus on rapid iteration while maintaining code quality through automated tests and linting.
-- Add function-level comments when generating code, explaining purpose and key logic.
-- Optimize for a single full-stack developer: Emphasize simple, maintainable architectures and minimal dependencies.
+- **Enterprise Testing Standards**: Use Vitest with `bun test` execution. Configure vitest.config.ts for monorepo test
+  projects. MANDATORY 90%+ coverage for lines, functions, branches, and statements. Place tests in `tests/` folders
+  using `functionName.test.ts` naming. Integrate with GitHub Actions for CI/CD with coverage enforcement and automated
+  deployment to Cloudflare Workers.
 
-## Additional Guidelines
+- **Modern Frontend Architecture**: Use HTML imports with `Bun.serve()` for SSR/SPA hybrid approach. Import
+  .tsx/.jsx/.js and .css files directly in HTML with Bun's native bundling. Support React, TypeScript, and Tailwind CSS.
+  Enable HMR and comprehensive error logging in development.
 
-- Focus on automation: Use scripts for common tasks like building, testing, and publishing.
-- Ensure operational simplicity: Avoid complex setups; prefer Bun's native capabilities.
-- For MCP servers: Follow Model Context Protocol best practices as per documentation.
+- **MCP Server Excellence**: Implement Model Context Protocol servers following enterprise security patterns: tool
+  discovery, schema validation, transactional integrity, least-privilege access, Human-in-the-Loop (HITL) for sensitive
+  operations, comprehensive audit logging, and GDPR-compliant data handling.
 
-## Bun
+### Zero-Shot CoT
 
-Default to using Bun instead of Node.js.
+**AI-First Reasoning Process:** For all development tasks, code generation, configuration, and troubleshooting:
 
-- Use `bun <file>` instead of `node <file>` or `ts-node <file>`
-- Use `bun test` for simple scripts; use Vitest for comprehensive monorepo testing with coverage requirements
-- Use `bun build <file.html|file.ts|file.css>` instead of `webpack` or `esbuild`
-- Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
-- Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
-- Bun automatically loads .env, so don't use dotenv.
+1. **Enterprise Requirements Analysis:** Identify core requirements and map to WeMake's enterprise standards: Bun-first
+   architecture, GDPR compliance, MCP protocol adherence, and Cloudflare Workers deployment compatibility. Prioritize
+   code understanding and maintainability over generation speed. Resolve ambiguities using the most secure, scalable,
+   and comprehensible approach that facilitates effective code reviews and knowledge transfer.
 
-### APIs
+2. **Strategic Solution Planning:** Decompose tasks into atomic, testable components aligned with Bun ecosystem,
+   TypeScript strict mode, and enterprise security patterns. Define clear interfaces, error boundaries, and monitoring
+   points for self-healing systems.
 
-- `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.
-- `bun:sqlite` for SQLite. Don't use `better-sqlite3`.
-- `Bun.redis` for Redis. Don't use `ioredis`.
-- `Bun.sql` for Postgres. Don't use `pg` or `postgres.js`.
-- `WebSocket` is built-in. Don't use `ws`.
-- Prefer `Bun.file` over `node:fs`'s readFile/writeFile
-- Bun.$`ls` instead of execa.
+3. **Implementation with Excellence:** Generate production-ready code optimized for understanding and review quality.
+   Include comprehensive JSDoc documentation explaining not just what code does, but why specific solutions were chosen.
+   Use strict TypeScript typing, enterprise security patterns, and GDPR compliance. Prioritize code clarity and
+   maintainability to reduce review burden and facilitate knowledge transfer.
 
-### Testing
+4. **Quality Assurance & Compliance:** Validate against enterprise standards: 90%+ test coverage, security best
+   practices, performance benchmarks, accessibility requirements, and regulatory compliance. Implement automated quality
+   gates and monitoring.
 
-Use `bun test` to run tests.
+5. **Deployment-Ready Delivery:** Provide complete, self-contained solutions with deployment configurations, monitoring
+   setup, documentation, and maintenance procedures. Include rollback strategies and incident response procedures.
 
-```ts
-import { test, expect } from "bun:test";
+### Enterprise Output Standards
 
-test("hello world", () => {
-  expect(1).toBe(1);
-});
-```
+- **Production-Ready Code:** TypeScript with strict mode, comprehensive JSDoc with business context, enterprise security
+  patterns, GDPR compliance annotations, performance optimizations, and self-healing error recovery mechanisms.
 
-### Frontend
+- **Enterprise Architecture:** Complete monorepo structure with clear domain boundaries, dependency injection patterns,
+  configuration management, secrets handling, audit logging, and compliance documentation.
 
-Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully support React, CSS, Tailwind.
+- **Comprehensive Testing:** Vitest test suites with 90%+ coverage, integration tests, security tests, performance
+  benchmarks, accessibility tests, and compliance validation. Include test data management and mock strategies.
 
-Server:
+- **Enterprise Documentation:** Technical specifications, API documentation, security assessments, compliance reports,
+  deployment guides, incident response procedures, and business continuity plans.
 
-```ts
-import index from "./index.html";
+- **Cloud-Native Deployment:** Cloudflare Workers configurations, infrastructure as code, monitoring and alerting setup,
+  automated scaling policies, disaster recovery procedures, and compliance audit trails.
 
-Bun.serve({
-  routes: {
-    "/": index,
-    "/api/users/:id": {
-      GET: (req) => {
-        return new Response(JSON.stringify({ id: req.params.id }));
-      }
-    }
-  },
-  // optional websocket support
-  websocket: {
-    open: (ws) => {
-      ws.send("Hello, world!");
-    },
-    message: (ws, message) => {
-      ws.send(message);
-    },
-    close: (ws) => {
-      // handle close
-    }
-  },
-  development: {
-    hmr: true,
-    console: true
-  }
-});
-```
+- **AI Agent Integration:** Self-documenting code with clear interfaces for AI agents, automated quality gates,
+  continuous improvement feedback loops, and minimal human intervention requirements.
 
-HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will transpile & bundle automatically. `<link>`
-tags can point to stylesheets and Bun's CSS bundler will bundle.
-
-```html
-<html>
-  <body>
-    <h1>Hello, world!</h1>
-    <script type="module" src="./frontend.tsx"></script>
-  </body>
-</html>
-```
-
-With the following `frontend.tsx`:
-
-```tsx
-import React from "react";
-
-// import .css files directly and it works
-import "./index.css";
-
-import { createRoot } from "react-dom/client";
-
-const root = createRoot(document.body);
-
-export default function Frontend() {
-  return <h1>Hello, world!</h1>;
-}
-
-root.render(<Frontend />);
-```
-
-Then, run index.ts
-
-```sh
-bun --hot ./index.ts
-```
-
-For more information, read the Bun API docs in `node_modules/bun-types/docs/**.md`.
-
-## Testing Strategy
-
-Use Vitest as the primary testing framework for this MCP monorepo with automated, reliable, scalable, and streamlined
-testing.
-
-### Configuration
-
-- Use `vitest.config.ts` in root with Test Projects for monorepo support
-- Configure coverage thresholds: 80% for lines, functions, branches, statements
-- Enable TypeScript support with `vite-tsconfig-paths` plugin
-- Use project-specific configurations for each package under `src/*`
-
-### Directory Structure
-
-- Root: `vitest.config.ts`, test scripts in `package.json`
-- Packages: Add `tests/` folders in each `src/*` package with `*.test.ts` files
-- Naming convention: `functionName.test.ts`
-
-### Scripts
-
-Add to root `package.json`:
-
-```json
-"scripts": {
-  "test": "bun run vitest",
-  "test:watch": "bun run vitest --watch",
-  "test:coverage": "bun run vitest --coverage"
-}
-```
-
-### CI Integration
-
-- Run tests on push/pull requests via GitHub Actions
-- Use `bun test --coverage` in CI pipeline
-- Ensure coverage thresholds are met for quality gates
-
-### Best Practices
-
-- **Test Types**: Unit tests for functions, integration tests for MCP servers/tools
-- **Mocking**: Use `vi.mock` for dependencies
-- **Coverage**: Monitor and maintain 80% threshold across all metrics
-- **Watch Mode**: Use for development feedback
-- **Parallelism**: Leverage Vitest's automatic parallel execution
-- **TypeScript**: Enable live type resolution with custom export conditions
-
-### Example Test
-
-```ts
-import { expect, test } from "vitest";
-import { someFunction } from "../index";
-
-test("someFunction works", () => {
-  expect(someFunction()).toBe(true);
-});
-```
-
-### Monorepo TypeScript Resolution
-
-Add to each package's `package.json`:
-
-```json
-"exports": {
-  ".": {
-    "import": "./dist/index.js",
-    "default": "./dist/index.js",
-    "bun": "./src/index.ts"
-  }
-}
-```
-
-This strategy ensures efficient testing that scales with the monorepo while maintaining quality through automation and
-coverage requirements.
+- **Response Format:** ALWAYS use markdown with code blocks for files/scripts. Include full file contents with
+  TypeScript types, comprehensive comments, and tests. Be thorough yet concise, professional and directive. Limit to
+  rule-compliant solutions; explain violations and suggest alternatives.
