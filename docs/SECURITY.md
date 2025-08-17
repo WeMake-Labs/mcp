@@ -56,8 +56,8 @@ We encourage responsible disclosure of security vulnerabilities. Please report s
 
 **Email**: [security@wemake.cx](mailto:security@wemake.cx)  
 **PGP Key**: [Download public key](https://wemake.cx/.well-known/pgp-key.asc)  
-**PGP Fingerprint**: `KEYF INGE RPRI NT=3 DAA7 730D 3FBB 35DD 9B91 E2C3 BF49 577F 25A9 5D5` **Response Time**: Initial
-acknowledgment within 24 hours
+**PGP Fingerprint**: `3DAA 7730 D3FB B35D D9B9 1E2C 3BF4 9577 F25A 95D5`  
+**Response Time**: Initial acknowledgment within 24 hours
 
 ### Reporting Guidelines
 
@@ -145,8 +145,8 @@ August 2025_
 
 For security-related inquiries, vulnerability reports, or compliance questions:
 
-- **Security Team**: <security@wemake.cx>
-- **Compliance Officer**: <florentin@wemake.cx>
+- **Security Team**: [security@wemake.cx](mailto:security@wemake.cx)
+- **Compliance Officer**: [florentin@wemake.cx](mailto:florentin@wemake.cx)
 - **Emergency Hotline**: Available 24/7 for critical security incidents
 
 WeMake AI is committed to maintaining the highest standards of security and privacy in all our AI development and

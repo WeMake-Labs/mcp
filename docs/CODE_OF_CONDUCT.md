@@ -36,11 +36,11 @@ technology stewardship in the German and European enterprise markets.
 
 ### Expected Behavior
 
-- **Professional Excellence**: Maintain high standards of technical and professional conduct in all AI development  
+- **Professional Excellence**: Maintain high standards of technical and professional conduct in all AI development
   activities
 - **Constructive Collaboration**: Engage in respectful, solution-oriented discussions that advance our AI-first mission
 - **Ethical AI Advocacy**: Promote responsible AI development practices and challenge unethical applications
-- **Inclusive Participation**: Welcome diverse perspectives and ensure equitable access to learning and contribution  
+- **Inclusive Participation**: Welcome diverse perspectives and ensure equitable access to learning and contribution
   opportunities
 - **Enterprise Integrity**: Uphold the highest standards of business ethics, data protection, and regulatory compliance
 
@@ -69,13 +69,29 @@ event of a conflict of interest, delegation is made to an uninvolved person.
 - Temporary Ban: Temporary exclusion for repeated/serious violations
 - Permanent Ban: Exclusion for continued or serious violations
 
+#### Timelines & Acknowledgement
+
+- Acknowledgement: within 72 hours of receipt
+- Initial assessment: within 7 days (severity, next steps)
+- Completion/intermediate status: every 30 days until resolution
+
+#### Appeals
+
+Affected parties can appeal against decisions. The appeal is reviewed by an uninvolved person (or a separate body). The
+results and reasons are documented and communicated to the person concerned.
+
+#### Record-Keeping
+
+Measures and decisions are documented in compliance with data protection regulations and stored in an audit-proof manner
+(minimization, storage limitation, access only on a need-to-know basis).
+
 ### Reporting and Resolution
 
 Instances of unacceptable behavior may be reported to our community leaders at
-[conduct@wemake.cx](mailto:conduct@wemake.cx). All reports will be  
-reviewed promptly, fairly, and confidentially. We are committed to protecting the privacy and security of all reporters.
+[conduct@wemake.cx](mailto:conduct@wemake.cx). All reports will be reviewed promptly, fairly, and confidentially. We are
+committed to protecting the privacy and security of all reporters.
 
-Our enforcement approach prioritizes education, mediation, and community healing while maintaining firm boundaries  
+Our enforcement approach prioritizes education, mediation, and community healing while maintaining firm boundaries
 against harmful behavior.
 
 #### Data Protection for Reports (GDPR)

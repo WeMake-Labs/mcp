@@ -1,6 +1,10 @@
 {
   "name": "@wemake-ai/mcp",
   "author": "WeMake (https://wemake.cx)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WeMake-AI/mcp.git"
+  },
   "bugs": {
     "url": "https://github.com/WeMake-AI/mcp/issues"
   },

@@ -74,10 +74,10 @@ cd mcp
 bun install
 
 # Run enterprise tests
-bun test
+bun run test
 
 # Start development server
-bun dev
+bun run dev
 ```
 
 _Note: Bun loads `.env` automatically, so no separate `dotenv` setup is required._
