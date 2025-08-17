@@ -13,7 +13,7 @@ We are finalizing our formal support policy. Interim commitment:
 - Supported versions: latest two minor releases of 1.x (rolling window)
 - Security updates: Critical/High for supported versions
 - EOL: 90 days after the next minor release
-- Full policy will be published by Q4 2025
+- Full policy will be published by Q4 2025 (Tracking: #32)
 
 This Security Policy was last updated in August 2025 and applies to data subjects in the European Economic Area and
 Switzerland.
@@ -27,6 +27,9 @@ Switzerland.
 - **Data Validation**: Strict input/output validation for all MCP tool calls and responses
 - **Code Understanding & Review**: Prioritize security through comprehensive code review processes, as understanding
   code is more critical than generating it. Implement mandatory human review for AI-generated security-sensitive code
+- **SAST/DAST/SCA**: Static/dynamic analyses and dependency audits mandatory in CI
+- **SBOM**: Signed SBOMs (e.g. SPDX/CycloneDX) for MCP servers and AI agents
+- **Test Coverage Gate**: ≥90% (branches/lines) as a merge requirement for security-relevant components
 - **Sandboxing**: Isolated execution environments for AI agent operations
 - **Audit Logging**: Comprehensive logging of all AI interactions for compliance and security monitoring
 - **Rate Limiting**: Advanced throttling mechanisms to prevent abuse and ensure service availability
@@ -36,8 +39,8 @@ Switzerland.
 - **Edge Security**: Leveraging Cloudflare's global security infrastructure
 - **Zero Trust Architecture (Edge/Access)**: No implicit trust for any component or user
 - **DDoS Protection**: Built-in protection against distributed denial-of-service attacks
-- **Encryption in Transit (TLS)**: TLS 1.2+/1.3 with strong cipher suites; mTLS for service-to-service traffic where
-  applicable
+- **Encryption in Transit (TLS)**: TLS 1.2+/1.3; mTLS for service-to-service traffic (for details see
+  [Data Protection & Encryption](#data-protection--encryption))
 - **Content Security Policy**: Strict CSP headers to mitigate XSS and injection attack vectors
 
 ### GDPR & Data Protection
@@ -100,8 +103,8 @@ When reporting vulnerabilities, please include:
 
 Note on timelines:
 
-- SLAs refer to calendar days unless stated otherwise; timezone: CET/CEST
-- Coordinated disclosure and embargo periods will be honored per mutual agreement
+- SLAs refer to calendar days unless stated otherwise; timezone: UTC
+- Coordinated disclosure and embargo periods honored as agreed
 - SLA clock starts: upon receipt at [security@wemake.cx](mailto:security@wemake.cx) (mail server timestamp)
 - CVE handling: We request CVEs (via CNA or MITRE) for qualifying issues and coordinate IDs before disclosure
 
@@ -133,6 +136,8 @@ and MCP server operations:
 - **Prompt Injection Protection**: Advanced filtering and validation for AI inputs
 - **Output Sanitization**: Comprehensive validation of AI-generated content
 - **Adversarial Defense**: Protection against model poisoning and evasion attacks
+- **Model Supply Chain Security**: Signierte Artefakte (z. B. Sigstore), SLSA-Level-Ziele und Provenance-Nachweise
+- **Model/Dataset Cards**: Standardisierte Dokumentation zu Herkunft, Intended Use, Limitierungen und Risiken
 
 #### Infrastructure Security
 
@@ -140,6 +145,8 @@ and MCP server operations:
 - **Container Security**: Hardened container images with vulnerability scanning
 - **Secrets Management**: Automated rotation and secure storage of credentials
 - **Network Isolation**: Segregated environments for different security zones
+- **Egress Filtering**: Restriktive ausgehende Firewall-Regeln, nur notwendige Ziele/Ports
+- **DNS Security**: DNSSEC/DoT/DoH, Threat-Intelligence-Blocking und egress-DNS-Pinning
 
 #### Operational Security
 
