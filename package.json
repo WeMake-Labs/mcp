@@ -1,23 +1,28 @@
 {
   "name": "@wemake-ai/mcp",
   "author": "WeMake (https://wemake.cx)",
-  "bugs": "https://github.com/WeMake-ai/mcp/issues",
+  "bugs": {
+    "url": "https://github.com/WeMake-AI/mcp/issues"
+  },
   "description": "WeMake Model Context Protocol (MCP) servers",
   "homepage": "https://wemake.cx",
-  "license": "BSL-1.1",
+  "license": "BUSL-1.1",
   "type": "module",
   "workspaces": [
     "src/*"
   ],
   "private": true,
+  "engines": {
+    "bun": ">=1.1.0"
+  },
   "scripts": {
     "build-all": "bun run --filter='./src/*' build",
     "publish-all": "bun run --filter='./src/*' publish-now",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
-    "prettier": "prettier .",
+    "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit",
-    "test": "vitest",
+    "test": "vitest run",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage"
   },
@@ -27,15 +32,13 @@
     "@typescript-eslint/eslint-plugin": "^8.39.1",
     "@typescript-eslint/parser": "^8.39.1",
     "@vitest/coverage-v8": "^3.2.4",
-    "@vitest/ui": "3.2.4",
+    "@vitest/ui": "^3.2.4",
     "eslint": "^9.33.0",
     "markdownlint": "^0.38.0",
     "nx": "21.3.7",
     "prettier": "^3.6.2",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4"
-  },
-  "peerDependencies": {
+    "vitest": "^3.2.4",
     "typescript": "^5.8.3"
   },
   "prettier": {

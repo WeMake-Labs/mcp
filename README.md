@@ -65,7 +65,7 @@ scalability.
 
 ### Quick Start
 
-```bash
+```sh
 # Clone the repository
 git clone https://github.com/wemake-ai/mcp.git
 cd mcp
@@ -80,9 +80,11 @@ bun test
 bun dev
 ```
 
+_Note: Bun loads `.env` automatically, so no separate `dotenv` setup is required._
+
 ### Enterprise Installation
 
-```bash
+```sh
 # Install specific MCP server
 bun add @wemake-ai/mcp-gdpr-server
 
@@ -117,11 +119,12 @@ ALERT_WEBHOOK=https://alerts.your-company.de
 {
   "mcpServers": {
     "wemake-gdpr": {
-      "command": "bun",
-      "args": ["run", "@wemake-ai/mcp-gdpr-server"],
+      "command": "bunx",
+      "args": ["@wemake-ai/mcp-gdpr-server"],
       "env": {
         "GDPR_ENABLED": "true"
       }
+    }
     }
   }
 }
@@ -147,7 +150,7 @@ await client.connect();
 
 ### Cloudflare Workers Deployment
 
-```bash
+```sh
 # Deploy to Cloudflare Workers
 bun run deploy:production
 
@@ -212,9 +215,9 @@ spec:
 ### Contact
 
 - **Website**: [wemake.cx](https://wemake.cx)
-- **Enterprise Sales**: enterprise@wemake.cx
-- **Technical Support**: support@wemake.cx
-- **Security Issues**: security@wemake.cx
+- **Enterprise Sales**: [enterprise@wemake.cx](mailto:enterprise@wemake.cx)
+- **Technical Support**: [support@wemake.cx](mailto:support@wemake.cx)
+- **Security Issues**: [security@wemake.cx](mailto:security@wemake.cx)
 
 ### Community
 
@@ -232,7 +235,7 @@ This project is licensed under the Business Source License 1.1 (BSL-1.1). See th
 - **Enterprise License**: Commercial license available for production deployments
 - **Custom Licensing**: Tailored licensing for specific enterprise requirements
 
-For enterprise licensing inquiries, contact: licensing@wemake.cx
+For enterprise licensing inquiries, contact: <licensing@wemake.cx>
 
 ---
 

@@ -22,7 +22,7 @@
   AI-generated code.
 
 - **Enterprise Testing Standards**: Use Vitest with `bun test` execution. Configure vitest.config.ts for monorepo test
-  projects. MANDATORY 80%+ coverage for lines, functions, branches, and statements. Place tests in `tests/` folders
+  projects. MANDATORY 90%+ coverage for lines, functions, branches, and statements. Place tests in `tests/` folders
   using `functionName.test.ts` naming. Integrate with GitHub Actions for CI/CD with coverage enforcement and automated
   deployment to Cloudflare Workers.
 
@@ -52,7 +52,7 @@
    Use strict TypeScript typing, enterprise security patterns, and GDPR compliance. Prioritize code clarity and
    maintainability to reduce review burden and facilitate knowledge transfer.
 
-4. **Quality Assurance & Compliance:** Validate against enterprise standards: 80%+ test coverage, security best
+4. **Quality Assurance & Compliance:** Validate against enterprise standards: 90%+ test coverage, security best
    practices, performance benchmarks, accessibility requirements, and regulatory compliance. Implement automated quality
    gates and monitoring.
 
@@ -67,7 +67,7 @@
 - **Enterprise Architecture:** Complete monorepo structure with clear domain boundaries, dependency injection patterns,
   configuration management, secrets handling, audit logging, and compliance documentation.
 
-- **Comprehensive Testing:** Vitest test suites with 80%+ coverage, integration tests, security tests, performance
+- **Comprehensive Testing:** Vitest test suites with 90%+ coverage, integration tests, security tests, performance
   benchmarks, accessibility tests, and compliance validation. Include test data management and mock strategies.
 
 - **Enterprise Documentation:** Technical specifications, API documentation, security assessments, compliance reports,

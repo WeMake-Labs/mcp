@@ -36,11 +36,11 @@ technology stewardship in the German and European enterprise markets.
 
 ### Expected Behavior
 
-- **Professional Excellence**: Maintain high standards of technical and professional conduct in all AI development
+- **Professional Excellence**: Maintain high standards of technical and professional conduct in all AI development  
   activities
 - **Constructive Collaboration**: Engage in respectful, solution-oriented discussions that advance our AI-first mission
 - **Ethical AI Advocacy**: Promote responsible AI development practices and challenge unethical applications
-- **Inclusive Participation**: Welcome diverse perspectives and ensure equitable access to learning and contribution
+- **Inclusive Participation**: Welcome diverse perspectives and ensure equitable access to learning and contribution  
   opportunities
 - **Enterprise Integrity**: Uphold the highest standards of business ethics, data protection, and regulatory compliance
 
@@ -52,13 +52,38 @@ technology stewardship in the German and European enterprise markets.
 - Deliberate misinformation about AI capabilities, limitations, or risks
 - Disrespectful or unprofessional conduct in community spaces
 
+### Scope
+
+These rules of conduct apply to all project and community spaces (repository, issues, PRs, discussions, chat, events) as
+well as when people officially represent the project.
+
+### Enforcement Responsibilities
+
+Community maintainers (and Compliance/HR if applicable) are responsible for clarification, moderation and action. In the
+event of a conflict of interest, delegation is made to an uninvolved person.
+
+### Enforcement Guidelines
+
+- Correction: Notice and expectation of correction
+- Warning: Warning for violations without malicious intent
+- Temporary Ban: Temporary exclusion for repeated/serious violations
+- Permanent Ban: Exclusion for continued or serious violationsrespectful or unprofessional conduct in community spaces
+
 ### Reporting and Resolution
 
-Instances of unacceptable behavior may be reported to our community leaders at conduct@wemake.cx. All reports will be
+Instances of unacceptable behavior may be reported to our community leaders at
+[conduct@wemake.cx](mailto:conduct@wemake.cx). All reports will be  
 reviewed promptly, fairly, and confidentially. We are committed to protecting the privacy and security of all reporters.
 
-Our enforcement approach prioritizes education, mediation, and community healing while maintaining firm boundaries
+Our enforcement approach prioritizes education, mediation, and community healing while maintaining firm boundaries  
 against harmful behavior.
+
+#### Data Protection for Reports (GDPR)
+
+- Purpose: Processing and documentation of reports pursuant to Art. 6 para. 1 lit. f GDPR
+- Data: Contact details, descriptions, metadata; storage only as long as necessary
+- Rights: information, rectification, erasure, restriction, objection
+- Contact data protection: [privacy@wemake.cx](mailto:privacy@wemake.cx)
 
 ## Our Commitment to Responsible AI
 
@@ -76,9 +101,4 @@ This Code of Conduct evolves with our community and the rapidly advancing field 
 feedback, suggestions, and contributions from our community to help us maintain the highest standards of ethical AI
 development.
 
-For questions, suggestions, or to report concerns, please contact us at conduct@wemake.cx.
-
----
-
-_This Code of Conduct is inspired by the Contributor Covenant and adapted for WeMake AI's mission of responsible
-enterprise AI development._
+For questions, suggestions, or to report concerns, please contact us at [conduct@wemake.cx](mailto:conduct@wemake.cx).

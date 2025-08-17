@@ -43,7 +43,7 @@ export default defineConfig({
       thresholds: {
         lines: 90,
         functions: 90,
-        branches: 85,
+        branches: 90,
         statements: 90
       },
       all: true,
@@ -79,10 +79,9 @@ export default defineConfig({
     ],
 
     // Enterprise testing features
-    reporters: ["verbose", "json", "html"],
+    reporters: ["verbose", "json"],
     outputFile: {
-      json: "./test-results.json",
-      html: "./test-results.html"
+      json: "./test-results.json"
     },
 
     // Performance and reliability

@@ -12,12 +12,11 @@ We provide security updates for the following versions of our MCP server impleme
 
 | Version | Support Status | Security Updates | GDPR Compliance  | AI Safety      |
 | ------- | -------------- | ---------------- | ---------------- | -------------- |
-| 2.x.x   | ✅ Active      | ✅ Full          | ✅ Certified     | ✅ Verified    |
-| 1.x.x   | ⚠️ Maintenance | ✅ Critical Only | ✅ Certified     | ⚠️ Legacy      |
+| 1.x.x   | ⚠️ TBA         | ⚠️ TBA           | ⚠️ TBA           | ⚠️ TBA         |
 | < 1.0   | ❌ Deprecated  | ❌ None          | ❌ Non-compliant | ❌ Unsupported |
 
-This Security Policy was last updated on August 18, 2024 and applies to citizens and permanent residents of the European
-Economic Area and Switzerland.
+This Security Policy was last updated in August 2025 and applies to data subjects in the European Economic Area and
+Switzerland.
 
 ## AI Security Framework
 
@@ -55,9 +54,10 @@ Economic Area and Switzerland.
 
 We encourage responsible disclosure of security vulnerabilities. Please report security issues to:
 
-**Email**: <security@wemake.cx>  
-**PGP Key**: Available at <https://wemake.cx/.well-known/pgp-key.asc>  
-**Response Time**: Initial acknowledgment within 24 hours
+**Email**: [security@wemake.cx](mailto:security@wemake.cx)  
+**PGP Key**: [Download public key](https://wemake.cx/.well-known/pgp-key.asc)  
+**PGP Fingerprint**: `KEYF INGE RPRI NT=3 DAA7 730D 3FBB 35DD 9B91 E2C3 BF49 577F 25A9 5D5` **Response Time**: Initial
+acknowledgment within 24 hours
 
 ### Reporting Guidelines
 
@@ -72,11 +72,12 @@ When reporting vulnerabilities, please include:
 
 ### Security Response Process
 
-1. **Acknowledgment** (24 hours): Confirmation of receipt and initial triage
-2. **Investigation** (72 hours): Technical analysis and impact assessment
-3. **Remediation** (7-30 days): Development and testing of fixes
-4. **Disclosure** (30-90 days): Coordinated public disclosure after remediation
-5. **Recognition**: Public acknowledgment of responsible reporters (with permission)
+1. **Acknowledgment** (24h): Confirmation of receipt and initial triage
+2. **Investigation** (72h): Technical analysis and impact assessment
+3. **Severity Classification**: CVSS v3.1 score mapping to Critical/High/Medium/Low
+4. **Remediation** (Target SLAs): Critical ≤7d, High ≤14d, Medium ≤30d, Low ≤90d (best effort)
+5. **Disclosure** (30–90d): Coordinated public disclosure after remediation
+6. **Recognition**: Public acknowledgment of responsible reporters (with permission)
 
 ## Technical and Organizational Measures
 
@@ -87,7 +88,8 @@ and MCP server operations:
 
 #### Data Protection & Encryption
 
-- **End-to-End Encryption**: AES-256 encryption for data at rest and in transit
+- **End-to-End Encryption**: AES-256 encryption for data at rest; TLS 1.2+/1.3 with strong cipher suites (AES-GCM-256 or
+  ChaCha20-Poly1305) for data in transit
 - **Key Management**: Hardware Security Modules (HSMs) for cryptographic key protection
 - **Pseudonymization**: Advanced anonymization techniques for AI training data
 - **Data Masking**: Dynamic data masking for development and testing environments

@@ -4,13 +4,18 @@ node_modules
 # output
 out
 dist
-assets
+/assets/
 *.tgz
 
-# test artifacts
-test-results.html
-test-results.json
-html.meta.json.gz
+# test artifacts  
+test-results.html  
+test-results.json  
+html.meta.json.gz  
+
+# common reporters  
+playwright-report/  
+test-results/  
+junit.xml
 
 # Bun runtime artefacts
 bun.lockb

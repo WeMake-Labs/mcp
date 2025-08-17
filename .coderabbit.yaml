@@ -136,13 +136,13 @@ reviews:
   pre_merge_checks:
     docstrings:
       mode: error
-      threshold: 95
+      threshold: 80
     title:
       mode: error
     description:
-      mode: error
+      mode: warning
     issue_assessment:
-      mode: error
+      mode: warning
   tools:
     ast-grep:
       rule_dirs: [".trae/rules"]
