@@ -136,8 +136,8 @@ and MCP server operations:
 - **Prompt Injection Protection**: Advanced filtering and validation for AI inputs
 - **Output Sanitization**: Comprehensive validation of AI-generated content
 - **Adversarial Defense**: Protection against model poisoning and evasion attacks
-- **Model Supply Chain Security**: Signierte Artefakte (z. B. Sigstore), SLSA-Level-Ziele und Provenance-Nachweise
-- **Model/Dataset Cards**: Standardisierte Dokumentation zu Herkunft, Intended Use, Limitierungen und Risiken
+- **Model Supply Chain Security**: Signed artifacts (e.g., Sigstore), SLSA level targets, and provenance attestations
+- **Model/Dataset Cards**: Standardized documentation on provenance, intended use, limitations, and risks
 
 #### Infrastructure Security
 
@@ -145,8 +145,8 @@ and MCP server operations:
 - **Container Security**: Hardened container images with vulnerability scanning
 - **Secrets Management**: Automated rotation and secure storage of credentials
 - **Network Isolation**: Segregated environments for different security zones
-- **Egress Filtering**: Restriktive ausgehende Firewall-Regeln, nur notwendige Ziele/Ports
-- **DNS Security**: DNSSEC/DoT/DoH, Threat-Intelligence-Blocking und egress-DNS-Pinning
+- **Egress Filtering**: Restrictive outbound firewall policies; allow only required destinations/ports
+- **DNS Security**: DNSSEC/DoT/DoH, threat-intelligence blocklists, and egress DNS pinning
 
 #### Operational Security
 
