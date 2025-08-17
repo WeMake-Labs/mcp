@@ -66,8 +66,8 @@ we will not pursue legal action for your research activities.
 
 #### security.txt
 
-Our security disclosure details are also published at:  
-<https://wemake.cx/.well-known/security.txt>
+Our security disclosure details are also published at:
+[security.txt (RFC 9116)](https://wemake.cx/.well-known/security.txt)
 
 ### Reporting Guidelines
 
