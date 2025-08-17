@@ -67,7 +67,7 @@ event of a conflict of interest, delegation is made to an uninvolved person.
 - Correction: Notice and expectation of correction
 - Warning: Warning for violations without malicious intent
 - Temporary Ban: Temporary exclusion for repeated/serious violations
-- Permanent Ban: Exclusion for continued or serious violationsrespectful or unprofessional conduct in community spaces
+- Permanent Ban: Exclusion for continued or serious violations
 
 ### Reporting and Resolution
 

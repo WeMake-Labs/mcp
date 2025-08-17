@@ -36,7 +36,7 @@ Switzerland.
 - **Edge Security**: Leveraging Cloudflare's global security infrastructure
 - **Zero Trust Architecture**: No implicit trust for any component or user
 - **DDoS Protection**: Built-in protection against distributed denial-of-service attacks
-- **SSL/TLS Encryption**: End-to-end encryption for all data in transit
+- **TLS Encryption**: End-to-end encryption for all data in transit
 - **Content Security Policy**: Strict CSP headers to prevent XSS and injection attacks
 
 ### GDPR & Data Protection

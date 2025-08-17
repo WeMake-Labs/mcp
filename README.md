@@ -99,7 +99,9 @@ Create a `.env` file with your enterprise configuration:
 ```env
 # GDPR Compliance
 GDPR_ENABLED=true
-DATA_RETENTION_DAYS=2555  # 7 years for German compliance
+
+# 7 years for German compliance
+DATA_RETENTION_DAYS=2555
 AUDIT_LOG_LEVEL=enterprise
 
 # Cloudflare Workers
@@ -124,7 +126,6 @@ ALERT_WEBHOOK=https://alerts.your-company.de
       "env": {
         "GDPR_ENABLED": "true"
       }
-    }
     }
   }
 }
@@ -167,7 +168,7 @@ COPY package.json bun.lockb ./
 RUN bun install --frozen-lockfile
 COPY . .
 EXPOSE 3000
-CMD ["bun", "start"]
+CMD ["bun", "run", "start"]
 ```
 
 ### Kubernetes Deployment

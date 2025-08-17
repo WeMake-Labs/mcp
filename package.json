@@ -16,6 +16,8 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
+    "dev": "bun run --filter='./src/*' dev",
+    "start": "bun run --filter='./src/*' start",
     "build-all": "bun run --filter='./src/*' build",
     "publish-all": "bun run --filter='./src/*' publish-now",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
