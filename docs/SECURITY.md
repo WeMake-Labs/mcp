@@ -8,12 +8,12 @@ regulatory requirements, including GDPR, NIS2, and emerging AI governance standa
 
 ## Supported Versions
 
-We provide security updates for the following versions of our MCP server implementations:
+We are finalizing our formal support policy. Interim commitment:
 
-| Version | Support Status | Security Updates | GDPR Compliance  | AI Safety      |
-| ------- | -------------- | ---------------- | ---------------- | -------------- |
-| 1.x.x   | ⚠️ TBA         | ⚠️ TBA           | ⚠️ TBA           | ⚠️ TBA         |
-| < 1.0   | ❌ Deprecated  | ❌ None          | ❌ Non-compliant | ❌ Unsupported |
+- Supported versions: latest two minor releases of 1.x (rolling window)
+- Security updates: Critical/High for supported versions
+- EOL: 90 days after the next minor release
+- Full policy will be published by Q4 2025
 
 This Security Policy was last updated in August 2025 and applies to data subjects in the European Economic Area and
 Switzerland.
@@ -36,8 +36,9 @@ Switzerland.
 - **Edge Security**: Leveraging Cloudflare's global security infrastructure
 - **Zero Trust Architecture**: No implicit trust for any component or user
 - **DDoS Protection**: Built-in protection against distributed denial-of-service attacks
-- **TLS Encryption**: End-to-end encryption for all data in transit
-- **Content Security Policy**: Strict CSP headers to prevent XSS and injection attacks
+- **Encryption in Transit (TLS)**: TLS 1.2+/1.3 with strong cipher suites; mTLS for service-to-service traffic where
+  applicable
+- **Content Security Policy**: Strict CSP headers to mitigate XSS and injection attack vectors
 
 ### GDPR & Data Protection
 
@@ -47,6 +48,9 @@ Switzerland.
 - **Data Subject Rights**: Comprehensive support for access, rectification, and erasure requests
 - **Privacy by Design**: Built-in privacy protections in all AI systems
 - **Cross-Border Transfers**: Compliant data transfer mechanisms for global operations
+- **Data Portability/Restriction/Objection**: Support for Art. 20/18/21 GDPR requests
+- **DPIA**: Data Protection Impact Assessments for high-risk processing (Art. 35 GDPR)
+- **RoPA**: Records of Processing Activities maintained (Art. 30 GDPR)
 
 ## Vulnerability Reporting
 
@@ -89,6 +93,11 @@ When reporting vulnerabilities, please include:
 5. **Disclosure** (30–90d): Coordinated public disclosure after remediation
 6. **Recognition**: Public acknowledgment of responsible reporters (with permission)
 
+Note on timelines:
+
+- SLAs refer to calendar days unless stated otherwise; timezone: CET/CEST
+- Coordinated disclosure and embargo periods will be honored per mutual agreement
+
 #### CVSS v3.1 Mapping (Guidance)
 
 - Critical: 9.0–10.0
@@ -105,10 +114,10 @@ and MCP server operations:
 
 #### Data Protection & Encryption
 
-- **End-to-End Encryption**: AES-256 encryption for data at rest; TLS 1.2+/1.3 with strong cipher suites (AES-GCM-256 or
-  ChaCha20-Poly1305) for data in transit
+- **Encryption at Rest & In Transit**: AES-256 encryption for data at rest; TLS 1.2+/1.3 with strong cipher suites
+  (AES-GCM-256 or ChaCha20-Poly1305) for data in transit
 - **Key Management**: Hardware Security Modules (HSMs) for cryptographic key protection
-- **Pseudonymization**: Advanced anonymization techniques for AI training data
+- **Pseudonymization/Anonymization**: Pseudonymization by default; anonymization where feasible for AI training data
 - **Data Masking**: Dynamic data masking for development and testing environments
 
 #### AI System Security
