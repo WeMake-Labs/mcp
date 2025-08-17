@@ -99,7 +99,7 @@ against harmful behavior.
 - Purpose: Processing and documentation of reports pursuant to Art. 6 para. 1 lit. f GDPR
 - Data: Contact details, descriptions, metadata; storage only as long as necessary
 - Rights: information, rectification, erasure, restriction, objection
-- Contact data protection: [privacy@wemake.cx](mailto:privacy@wemake.cx)
+- Data Protection Officer (DPO): [privacy@wemake.cx](mailto:privacy@wemake.cx)
 
 ## Our Commitment to Responsible AI
 

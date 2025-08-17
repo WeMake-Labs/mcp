@@ -220,6 +220,8 @@ spec:
 - **Technical Support**: [support@wemake.cx](mailto:support@wemake.cx)
 - **Security Issues**: [security@wemake.cx](mailto:security@wemake.cx)
 
+See also: [Security Policy](docs/SECURITY.md) • [Code of Conduct](docs/CODE_OF_CONDUCT.md)
+
 ### Community
 
 - **GitHub Discussions**: [Community Forum](https://github.com/wemake-ai/mcp/discussions)

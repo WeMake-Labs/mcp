@@ -19,6 +19,7 @@
   "engines": {
     "bun": ">=1.1.0"
   },
+  "packageManager": "bun@1.1.0",
   "scripts": {
     "dev": "bun run --filter='./src/*' dev",
     "start": "bun run --filter='./src/*' start",
@@ -30,7 +31,9 @@
     "check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest --watch",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "deploy:production": "bun run --filter='./src/*' deploy:production",
+    "deploy:enterprise": "bun run --filter='./src/*' deploy:enterprise"
   },
   "devDependencies": {
     "@nx/eslint": "21.3.7",

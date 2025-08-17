@@ -59,6 +59,16 @@ We encourage responsible disclosure of security vulnerabilities. Please report s
 **PGP Fingerprint**: `3DAA 7730 D3FB B35D D9B9 1E2C 3BF4 9577 F25A 95D5`  
 **Response Time**: Initial acknowledgment within 24 hours
 
+#### Safe Harbor
+
+WeMake AI supports good-faith security research. If you comply with this policy and act responsibly,  
+we will not pursue legal action for your research activities.
+
+#### security.txt
+
+Our security disclosure details are also published at:  
+<https://wemake.cx/.well-known/security.txt>
+
 ### Reporting Guidelines
 
 When reporting vulnerabilities, please include:
@@ -78,6 +88,13 @@ When reporting vulnerabilities, please include:
 4. **Remediation** (Target SLAs): Critical ≤7d, High ≤14d, Medium ≤30d, Low ≤90d (best effort)
 5. **Disclosure** (30–90d): Coordinated public disclosure after remediation
 6. **Recognition**: Public acknowledgment of responsible reporters (with permission)
+
+#### CVSS v3.1 Mapping (Guidance)
+
+- Critical: 9.0–10.0
+- High: 7.0–8.9
+- Medium: 4.0–6.9
+- Low: 0.1–3.9
 
 ## Technical and Organizational Measures
 
