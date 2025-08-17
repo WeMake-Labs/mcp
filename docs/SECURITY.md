@@ -52,7 +52,7 @@ Switzerland.
 - **DPIA**: Data Protection Impact Assessments for high-risk processing (Art. 35 GDPR)
 - **RoPA**: Records of Processing Activities maintained (Art. 30 GDPR)
 - **How to submit DSRs**: [privacy@wemake.cx](mailto:privacy@wemake.cx) or DSR portal:
-  <https://wemake.cx/privacy/requests>
+  [https://wemake.cx/privacy/requests](https://wemake.cx/privacy/requests)
 
 ## Vulnerability Reporting
 
@@ -65,7 +65,8 @@ We encourage responsible disclosure of security vulnerabilities. Please report s
 **PGP Fingerprint**: `3DAA 7730 D3FB B35D D9B9 1E2C 3BF4 9577 F25A 95D5`  
 **Response Time**: Initial acknowledgment within 24 hours  
 **PGP Key ID**: 3BF49577F25A95D5  
-**Algorithm**: ed25519 **Valid Until**: 2027-08-17 (Rotation policy: biannual)
+**Algorithm**: ed25519  
+**Valid Until**: 2027-08-17 (Rotation policy: biannual)
 
 #### Safe Harbor
 
@@ -101,7 +102,7 @@ Note on timelines:
 
 - SLAs refer to calendar days unless stated otherwise; timezone: CET/CEST
 - Coordinated disclosure and embargo periods will be honored per mutual agreement
-- SLA clock starts: upon receipt at <security@wemake.cx> (mail server timestamp)
+- SLA clock starts: upon receipt at [security@wemake.cx](mailto:security@wemake.cx) (mail server timestamp)
 - CVE handling: We request CVEs (via CNA or MITRE) for qualifying issues and coordinate IDs before disclosure
 
 #### CVSS v3.1 Mapping (Guidance)
