@@ -5,8 +5,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
-  Tool,
-  CallToolRequest
+  type Tool,
+  type CallToolRequest
 } from "@modelcontextprotocol/sdk/types.js";
 import chalk from "chalk";
 
@@ -78,7 +78,13 @@ class AnalogicalReasoningServer {
     }
   > = {};
   private nextElementId = 1;
-  constructor(private server: Server) {}
+  /**
+   * Initialize server reference for potential future use.
+   * The field is intentionally referenced to satisfy strict noUnused rules.
+   */
+  constructor(private server: Server) {
+    void this.server;
+  }
 
   private validateAnalogicalReasoningData(input: unknown): AnalogicalReasoningData {
     const data = input as Record<string, unknown>;
@@ -263,12 +269,15 @@ class AnalogicalReasoningServer {
     return validated;
   }
 
+  /**
+   * Merge provided domain's elements into the registry, deduplicating by id.
+   */
   private updateDomainRegistry(domain: { name: string; elements: DomainElement[] }): void {
-    if (!this.domainRegistry[domain.name]) {
-      this.domainRegistry[domain.name] = { name: domain.name, elements: [] };
+    let existing = this.domainRegistry[domain.name];
+    if (!existing) {
+      existing = this.domainRegistry[domain.name] = { name: domain.name, elements: [] };
     }
 
-    const existing = this.domainRegistry[domain.name];
     const existingIds = new Set(existing.elements.map((e) => e.id));
 
     for (const element of domain.elements) {

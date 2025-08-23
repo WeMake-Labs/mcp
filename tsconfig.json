@@ -2,12 +2,15 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "docs": "https://bun.sh/docs/typescript",
   "extends": "@tsconfig/bun/tsconfig.json",
+  "exclude": ["node_modules", "dist"],
 
   "compilerOptions": {
     "lib": ["ESNext"],
     "target": "ESNext",
     "module": "Preserve",
     "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": true,
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -15,18 +18,29 @@
     "noEmit": true,
 
     "strict": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
 
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "sourceMap": true,
     "resolveJsonModule": true,
+    "isolatedModules": true,
     "exactOptionalPropertyTypes": true,
-    "noImplicitReturns": true
-  },
-  "exclude": ["node_modules", "dist", "build", "coverage"]
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "useUnknownInCatchVariables": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "removeComments": false,
+    "preserveConstEnums": true
+  }
 }
