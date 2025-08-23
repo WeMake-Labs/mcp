@@ -178,5 +178,54 @@ The server is implemented using TypeScript with:
 - Inference projection guidelines
 - Standard MCP server connection via stdin/stdout
 
+## Privacy & Logging Controls
+
+- PII awareness: Analogical data may include personal data (names, IDs, free-text justifications). Before any
+  visualization or logging, you must redact or aggregate such content. Treat all free-text fields as potentially
+  sensitive (e.g., DomainElement.name/description, mapping.justification, inferences[].statement,
+  strengths/limitations).
+- Environment toggles:
+  - AR_SILENT: When set to a truthy value, disables visualization emission to stderr; visualization is otherwise
+    printed. See emission in [index.ts](/src/analogical-reasoning/index.ts) where visualization is written unless this
+    variable is set.
+  - AUDIT_LOG_LEVEL: Sets the minimal log level for your environment (e.g., error, warn, info). Used across the monorepo
+    for audit logging. See guidance in [README.md](../../README.md).
+  - PII_REDACTION_STRICT: When set to true, enforce strict upstream redaction before constructing
+    `AnalogicalReasoningData` and before any server call. Redaction must occur in the client adapter or gateway (see
+    references below).
+- Data retention & deletion: This server keeps state in-memory only; no data is persisted by default. If you forward
+  outputs or persist data, enforce a retention window via DATA_RETENTION_DAYS in your environment and ensure periodic
+  deletion jobs. See [README.md](../../README.md) and [SECURITY.md](../../docs/SECURITY.md).
+- Data subject requests (DSRs): For access/erasure requests, contact <privacy@wemake.cx> or use the DSR portal linked in
+  [SECURITY.md](../../docs/SECURITY.md). Ensure request handling covers any downstream storage/log sinks integrated with
+  this server.
+
+Example: disable visualization output and minimize logs via environment variables
+
+```env
+# Disable visualization emission to stderr for this server
+AR_SILENT=true
+
+# Enterprise audit logging minimum level (example)
+AUDIT_LOG_LEVEL=error
+
+# Enforce strict upstream redaction prior to any MCP call
+PII_REDACTION_STRICT=true
+
+# Optional: retention if your environment persists logs/outputs
+DATA_RETENTION_DAYS=30
+GDPR_ENABLED=true
+```
+
+Redaction configuration locations
+
+- Upstream redaction layer: Apply masking/tokenization before building AnalogicalReasoningData in your client adapter or
+  gateway.
+- Code emit points: Visualization surfaces at [visualizeMapping](/src/analogical-reasoning/index.ts#L320) and is written
+  in [processAnalogicalReasoning](/src/analogical-reasoning/index.ts#L476). If `AR_SILENT` is set, emission is
+  suppressed.
+- Policies & retention: See [README.md](../../README.md) and [SECURITY.md](../../docs/SECURITY.md) for GDPR guidance
+  (data minimization, purpose limitation, storage limitation, DSR handling).
+
 This server enhances model capabilities in domains requiring creative problem-solving, explanation of complex concepts,
 and transfer of knowledge between different fields or contexts.
