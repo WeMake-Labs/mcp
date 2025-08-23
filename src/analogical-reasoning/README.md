@@ -178,6 +178,11 @@ The server is implemented using TypeScript with:
 - Inference projection guidelines
 - Standard MCP server connection via stdin/stdout
 
+## License
+
+**Note: This sub-package is licensed under the MIT License (see LICENSE file in this directory), while the repository
+root uses the BSL-1.1 license.**
+
 ## Privacy & Logging Controls
 
 - PII awareness: Analogical data may include personal data (names, IDs, free-text justifications). Before any
