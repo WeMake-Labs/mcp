@@ -13,9 +13,9 @@
     "allowJs": true,
 
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": true,
-    "noEmit": true,
+    "noEmit": false,
 
     "strict": true,
     "skipLibCheck": true,
