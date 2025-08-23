@@ -1,9 +1,14 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "docs": "https://bun.sh/docs/typescript",
   "extends": "../../tsconfig.json",
+
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "."
+    "rootDir": ".",
+    "strict": true
   },
+
   "include": ["*.ts"],
   "exclude": ["node_modules", "dist"]
 }
