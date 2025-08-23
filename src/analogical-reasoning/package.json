@@ -27,8 +27,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && shx chmod +x dist/*.js",
-    "prepare": "bun run build",
+    "build": "bun tsc && shx chmod +x dist/*.js",
+    "types": "bun tsc --declaration --emitDeclarationOnly --declarationDir dist/types",
+    "prepare": "bun run types && bun run build",
     "publish": "bun publish",
     "watch": "tsc --watch"
   },
