@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -94,8 +94,17 @@ class AnalogicalReasoningServer {
       throw new Error("Invalid analogyId: must be a string");
     }
 
-    if (!data.purpose || typeof data.purpose !== "string") {
-      throw new Error("Invalid purpose: must be a string");
+    const allowedPurpose = ["explanation", "prediction", "problem-solving", "creative-generation"] as const;
+    if (
+      !data.purpose ||
+      typeof data.purpose !== "string" ||
+      !allowedPurpose.includes(data.purpose as (typeof allowedPurpose)[number])
+    ) {
+      throw new Error(`Invalid purpose: must be one of ${allowedPurpose.join(", ")}`);
+    }
+
+    if (typeof data.confidence !== "number" || data.confidence < 0 || data.confidence > 1) {
+      throw new Error("Invalid confidence: must be a number between 0 and 1");
     }
 
     if (typeof data.confidence !== "number" || data.confidence < 0 || data.confidence > 1) {
@@ -141,9 +150,8 @@ class AnalogicalReasoningServer {
     // Validate elements
     const sourceElements: DomainElement[] = [];
     for (const element of sourceDomain.elements as Array<Record<string, unknown>>) {
-      if (!element.id || typeof element.id !== "string") {
-        element.id = `elem-${this.nextElementId++}`;
-      }
+      // Derive the ID locally rather than mutating the input object
+      const id = typeof element.id === "string" ? element.id : `elem-${this.nextElementId++}`;
 
       if (!element.name || typeof element.name !== "string") {
         throw new Error(`Invalid element name for element ${element.id}: must be a string`);
@@ -164,7 +172,7 @@ class AnalogicalReasoningServer {
       }
 
       sourceElements.push({
-        id: element.id as string,
+        id,
         name: element.name as string,
         type: element.type,
         description: element.description as string
@@ -173,9 +181,7 @@ class AnalogicalReasoningServer {
 
     const targetElements: DomainElement[] = [];
     for (const element of targetDomain.elements as Array<Record<string, unknown>>) {
-      if (!element.id || typeof element.id !== "string") {
-        element.id = `elem-${this.nextElementId++}`;
-      }
+      const id = typeof element.id === "string" ? element.id : `elem-${this.nextElementId++}`;
 
       if (!element.name || typeof element.name !== "string") {
         throw new Error(`Invalid element name for element ${element.id}: must be a string`);
@@ -196,7 +202,7 @@ class AnalogicalReasoningServer {
       }
 
       targetElements.push({
-        id: element.id as string,
+        id,
         name: element.name as string,
         type: element.type,
         description: element.description as string
@@ -206,13 +212,22 @@ class AnalogicalReasoningServer {
     // Validate mappings
     const mappings: AnalogicalMapping[] = [];
     if (Array.isArray(data.mappings)) {
+      // Ensure mappings only reference known element IDs
+      const sourceIds = new Set(sourceElements.map((e) => e.id));
+      const targetIds = new Set(targetElements.map((e) => e.id));
+
       for (const mapping of data.mappings as Array<Record<string, unknown>>) {
         if (!mapping.sourceElement || typeof mapping.sourceElement !== "string") {
           throw new Error("Invalid mapping sourceElement: must be a string");
         }
-
         if (!mapping.targetElement || typeof mapping.targetElement !== "string") {
           throw new Error("Invalid mapping targetElement: must be a string");
+        }
+        if (!sourceIds.has(mapping.sourceElement as string)) {
+          throw new Error(`Mapping references unknown sourceElement id: ${mapping.sourceElement as string}`);
+        }
+        if (!targetIds.has(mapping.targetElement as string)) {
+          throw new Error(`Mapping references unknown targetElement id: ${mapping.targetElement as string}`);
         }
 
         if (typeof mapping.mappingStrength !== "number" || mapping.mappingStrength < 0 || mapping.mappingStrength > 1) {
@@ -305,7 +320,7 @@ class AnalogicalReasoningServer {
   private visualizeMapping(data: AnalogicalReasoningData): string {
     const { sourceDomain, targetDomain, mappings } = data;
 
-    let output = `\n${chalk.bold(`ANALOGY: ${sourceDomain.name}  ${targetDomain.name}`)} (ID: ${data.analogyId})\n\n`;
+    let output = `\n${chalk.bold(`ANALOGY: ${sourceDomain.name} → ${targetDomain.name}`)} (ID: ${data.analogyId})\n\n`;
 
     // Purpose and confidence
     output += `${chalk.cyan("Purpose:")} ${data.purpose}\n`;
@@ -469,7 +484,9 @@ class AnalogicalReasoningServer {
 
       // Generate visualization
       const visualization = this.visualizeMapping(validatedInput);
-      console.error(visualization);
+      if (!process.env.AR_SILENT) {
+        console.error(visualization);
+      }
 
       let samplingSummary: string | undefined;
       try {
@@ -479,9 +496,10 @@ class AnalogicalReasoningServer {
         console.error("Sampling failed", e);
       }
 
-      // Return the analysis result
+      // Return the analysis result (include visualization for clients)
       return {
         content: [
+          { type: "text", text: visualization },
           {
             type: "text",
             text: JSON.stringify(
@@ -654,7 +672,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest)
   }
 
   return {
-    content: [{ type: "text", text: "Unknown tool" }]
+    content: [{ type: "text", text: "Unknown tool" }],
+    isError: true
   };
 });
 
