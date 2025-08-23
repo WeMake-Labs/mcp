@@ -7,6 +7,9 @@ dist
 /assets/
 *.tgz
 
+# import
+/import/
+
 # test artifacts  
 test-results.html  
 test-results.json  

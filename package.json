@@ -1,5 +1,5 @@
 {
-  "name": "@wemake-ai/mcp",
+  "name": "@WeMake-AI/mcp",
   "author": "WeMake (https://wemake.cx)",
   "repository": {
     "type": "git",
@@ -23,8 +23,8 @@
   "scripts": {
     "dev": "bun run --filter='./src/*' dev",
     "start": "bun run --filter='./src/*' start",
-    "build-all": "bun run --filter='./src/*' build",
-    "publish-all": "bun run --filter='./src/*' publish-now",
+    "build": "bun run --filter='./src/*' build",
+    "publish": "bun run --filter='./src/*' publish",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
@@ -66,5 +66,12 @@
         }
       }
     ]
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "chalk": "^5.6.0",
+    "ioredis": "^5.7.0",
+    "uuid": "^11.1.0",
+    "yargs": "^18.0.0"
   }
 }
