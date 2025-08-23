@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 
-language: de-DE
+language: en-US
 tone_instructions:
   "AI-first enterprise development: Bun TypeScript, MCP excellence, GDPR compliance, 90%+ Vitest coverage, zero-downtime
   CF Workers deployment, autonomous code quality."
