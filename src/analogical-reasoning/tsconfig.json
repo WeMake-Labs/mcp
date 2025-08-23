@@ -5,8 +5,11 @@
 
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": ".",
-    "strict": true
+    "rootDir": "./src",
+    "strict": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "./dist/types"
   },
 
   "include": ["./**/*.ts"],

@@ -10,7 +10,7 @@
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "bun": "./dist/index.js",
+      "bun": "./src/index.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
@@ -31,7 +31,9 @@
     "mcp",
     "model-context-protocol",
     "thinking",
-    "model-enhancement"
+    "model-enhancement",
+    "mcp-server",
+    "analogical-reasoning"
   ],
   "bin": {
     "mcp-server-analogical-reasoning": "dist/index.js"
@@ -40,11 +42,11 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun tsc && shx chmod +x dist/*.js",
-    "types": "bun tsc --declaration --emitDeclarationOnly --declarationDir dist/types",
+    "build": "bun build --entrypoints ./src/index.ts --outdir ./dist --format esm --target=bun --sourcemap && shx chmod +x dist/*.js",
+    "types": "bun tsc",
     "prepare": "bun run types && bun run build",
     "publish": "bun publish",
-    "watch": "tsc --watch"
+    "watch": "bun tsc --watch"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
