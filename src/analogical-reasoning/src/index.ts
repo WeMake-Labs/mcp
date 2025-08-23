@@ -107,12 +107,8 @@ class AnalogicalReasoningServer {
       throw new Error("Invalid confidence: must be a number between 0 and 1");
     }
 
-    if (typeof data.confidence !== "number" || data.confidence < 0 || data.confidence > 1) {
-      throw new Error("Invalid confidence: must be a number between 0 and 1");
-    }
-
-    if (typeof data.iteration !== "number" || data.iteration < 0) {
-      throw new Error("Invalid iteration: must be a non-negative number");
+    if (typeof data.iteration !== "number" || !Number.isInteger(data.iteration) || data.iteration < 0) {
+      throw new Error("Invalid iteration: must be a non-negative integer");
     }
 
     if (typeof data.nextOperationNeeded !== "boolean") {
@@ -268,11 +264,22 @@ class AnalogicalReasoningServer {
       strengths: Array.isArray(data.strengths) ? (data.strengths as string[]) : [],
       limitations: Array.isArray(data.limitations) ? (data.limitations as string[]) : [],
       inferences: Array.isArray(data.inferences)
-        ? (data.inferences as Array<Record<string, unknown>>).map((inf) => ({
-            statement: String(inf.statement ?? ""),
-            confidence: Number(inf.confidence ?? 0),
-            basedOnMappings: Array.isArray(inf.basedOnMappings) ? (inf.basedOnMappings as string[]) : []
-          }))
+        ? (data.inferences as Array<Record<string, unknown>>).map((inf, i) => {
+            if (typeof inf.statement !== "string" || inf.statement.length === 0) {
+              throw new Error(`Invalid inferences[${i}].statement: must be a non-empty string`);
+            }
+            if (typeof inf.confidence !== "number" || inf.confidence < 0 || inf.confidence > 1) {
+              throw new Error(`Invalid inferences[${i}].confidence: must be a number between 0 and 1`);
+            }
+            if (!Array.isArray(inf.basedOnMappings) || inf.basedOnMappings.some((v) => typeof v !== "string")) {
+              throw new Error(`Invalid inferences[${i}].basedOnMappings: must be string[]`);
+            }
+            return {
+              statement: inf.statement,
+              confidence: inf.confidence,
+              basedOnMappings: inf.basedOnMappings as string[]
+            };
+          })
         : [],
       nextOperationNeeded: data.nextOperationNeeded as boolean
     };
@@ -298,6 +305,7 @@ class AnalogicalReasoningServer {
     for (const element of domain.elements) {
       if (!existingIds.has(element.id)) {
         existing.elements.push(element);
+        existingIds.add(element.id);
       }
     }
   }
@@ -331,9 +339,11 @@ class AnalogicalReasoningServer {
     output += `${chalk.bold("STRUCTURAL MAPPINGS:")}\n\n`;
 
     const mappingsBySourceType = new Map<string, AnalogicalMapping[]>();
+    const srcById = new Map<string, DomainElement>(sourceDomain.elements.map((e) => [e.id, e]));
+    const tgtById = new Map<string, DomainElement>(targetDomain.elements.map((e) => [e.id, e]));
 
     for (const mapping of mappings) {
-      const sourceElement = sourceDomain.elements.find((e) => e.id === mapping.sourceElement);
+      const sourceElement = srcById.get(mapping.sourceElement);
       if (!sourceElement) continue;
 
       if (!mappingsBySourceType.has(sourceElement.type)) {
@@ -348,8 +358,8 @@ class AnalogicalReasoningServer {
       output += `${chalk.yellow(type.toUpperCase())} MAPPINGS:\n`;
 
       for (const mapping of typeMappings) {
-        const sourceElement = sourceDomain.elements.find((e) => e.id === mapping.sourceElement);
-        const targetElement = targetDomain.elements.find((e) => e.id === mapping.targetElement);
+        const sourceElement = srcById.get(mapping.sourceElement);
+        const targetElement = tgtById.get(mapping.targetElement);
 
         if (!sourceElement || !targetElement) continue;
 
@@ -493,7 +503,9 @@ class AnalogicalReasoningServer {
         // Fallback local summary instead of calling a non-existent server method.
         samplingSummary = this.createLocalSamplingSummary(validatedInput);
       } catch (e) {
-        console.error("Sampling failed", e);
+        if (!process.env.AR_SILENT) {
+          console.error("Sampling failed", e);
+        }
       }
 
       // Return the analysis result (include visualization for clients)
@@ -563,15 +575,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       description: "Analyze and visualize analogical mappings between domains.",
       inputSchema: {
         type: "object",
+        additionalProperties: false,
         properties: {
           sourceDomain: {
             type: "object",
+            additionalProperties: false,
             properties: {
               name: { type: "string" },
               elements: {
                 type: "array",
                 items: {
                   type: "object",
+                  additionalProperties: false,
                   properties: {
                     id: { type: "string" },
                     name: { type: "string" },
@@ -586,12 +601,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
           targetDomain: {
             type: "object",
+            additionalProperties: false,
             properties: {
               name: { type: "string" },
               elements: {
                 type: "array",
                 items: {
                   type: "object",
+                  additionalProperties: false,
                   properties: {
                     id: { type: "string" },
                     name: { type: "string" },
@@ -608,6 +625,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             type: "array",
             items: {
               type: "object",
+              additionalProperties: false,
               properties: {
                 sourceElement: { type: "string" },
                 targetElement: { type: "string" },
@@ -621,7 +639,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           analogyId: { type: "string" },
           purpose: { type: "string", enum: ["explanation", "prediction", "problem-solving", "creative-generation"] },
           confidence: { type: "number", minimum: 0, maximum: 1 },
-          iteration: { type: "number", minimum: 0 },
+          iteration: { type: "integer", minimum: 0 },
           strengths: { type: "array", items: { type: "string" } },
           limitations: { type: "array", items: { type: "string" } },
           inferences: {
