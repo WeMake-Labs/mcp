@@ -51,7 +51,7 @@ interface AnalogicalReasoningData {
   analogyId: string;
   purpose: "explanation" | "prediction" | "problem-solving" | "creative-generation";
   confidence: number; // 0.0-1.0
-  iteration: number;
+  iteration: number; // (integer)
 
   // Evaluation
   strengths: string[];

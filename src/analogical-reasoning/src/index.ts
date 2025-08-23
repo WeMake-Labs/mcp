@@ -108,7 +108,7 @@ class AnalogicalReasoningServer {
     }
 
     if (typeof data.iteration !== "number" || !Number.isInteger(data.iteration) || data.iteration < 0) {
-      throw new Error("Invalid iteration: must be a non-negative integer");
+      throw new Error("Invalid iteration: iteration must be an integer");
     }
 
     if (typeof data.nextOperationNeeded !== "boolean") {
