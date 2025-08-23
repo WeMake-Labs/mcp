@@ -38,7 +38,6 @@
     "emitDecoratorMetadata": true,
     "removeComments": false,
     "preserveConstEnums": true,
-    "types": ["bun"],
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": ["src/**/*", "vitest.config.ts", "eslint.config.mjs", "**/*.d.ts"],
