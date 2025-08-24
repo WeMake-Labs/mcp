@@ -6,12 +6,18 @@ on:
       - main
   pull_request:
 
+# Global permissions - restrict to minimum required
+permissions:
+  contents: read
+
 env:
   BUN_VERSION: "1.2.0"
 
 jobs:
   detect-packages:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       packages: ${{ steps.find-packages.outputs.packages }}
     steps:
@@ -81,6 +87,8 @@ jobs:
         package: ${{ fromJson(needs.detect-packages.outputs.packages) }}
     name: Test ${{ matrix.package }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
@@ -110,6 +118,9 @@ jobs:
         package: ${{ fromJson(needs.detect-packages.outputs.packages) }}
     name: Build ${{ matrix.package }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
@@ -121,16 +132,23 @@ jobs:
       - name: Build package
         working-directory: src/${{ matrix.package }}
         run: bun run build
+      - name: Sanitize package name for artifact
+        id: sanitize-name
+        run: |
+          SANITIZED_NAME=$(echo "${{ matrix.package }}" | sed 's|^\./||')
+          echo "sanitized-name=$SANITIZED_NAME" >> "$GITHUB_OUTPUT"
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.package }}
-          path: src/${{ matrix.package }}/dist/
+          name: build-${{ steps.sanitize-name.outputs.sanitized-name }}
+          path: src/${{ steps.sanitize-name.outputs.sanitized-name }}/dist/
           retention-days: 7
 
   quality-gate:
     needs: [lint-and-format, type-check, test-monorepo, build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: always()
     steps:
       - name: Check all jobs status
