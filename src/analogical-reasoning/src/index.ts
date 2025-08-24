@@ -126,13 +126,12 @@ export class AnalogicalReasoningServer {
   private readonly cleanupLock = new Set<string>(); // Thread-safe cleanup coordination
 
   /**
-   * Initialize server reference and start periodic cleanup.
-   * The field is intentionally referenced to satisfy strict noUnused rules.
+   * Initialize analogical reasoning server and start periodic cleanup.
+   * Validates environment configuration and sets up automatic cleanup processes.
    */
-  constructor(private server: Server) {
+  constructor() {
     // Validate environment configuration during instantiation
     validateEnvironmentConfig();
-    void this.server;
     // Start periodic cleanup every 5 minutes
     setInterval(() => this.performPeriodicCleanup(), 5 * 60 * 1000);
   }
@@ -802,6 +801,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               type: "object",
               additionalProperties: false,
               properties: {
+                id: { type: "string" },
                 sourceElement: { type: "string" },
                 targetElement: { type: "string" },
                 mappingStrength: { type: "number", minimum: 0, maximum: 1 },
@@ -857,7 +857,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   };
 });
 
-const analogicalReasoningServer = new AnalogicalReasoningServer(server);
+const analogicalReasoningServer = new AnalogicalReasoningServer();
 
 server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest) => {
   if (request.params.name === "analogicalReasoning") {

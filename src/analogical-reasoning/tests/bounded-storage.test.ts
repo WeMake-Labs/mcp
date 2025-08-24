@@ -1,7 +1,6 @@
 #!/usr/bin/env bun
 
 import { describe, it, expect, beforeEach, afterEach, jest } from "bun:test";
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { AnalogicalReasoningServer } from "../src/index.ts";
 
 /**
@@ -37,33 +36,28 @@ describe("Bounded Storage with Eviction", () => {
     it("should throw error for invalid AR_MAX_HISTORY", async () => {
       process.env["AR_MAX_HISTORY"] = "0";
       const { AnalogicalReasoningServer } = await import("../src/index.ts");
-      const mockServer = { setRequestHandler: jest.fn() } as unknown as Server;
-      expect(() => new AnalogicalReasoningServer(mockServer)).toThrow("AR_MAX_HISTORY must be positive");
+      expect(() => new AnalogicalReasoningServer()).toThrow("AR_MAX_HISTORY must be positive");
     });
 
     it("should throw error for invalid AR_TTL_MINUTES", async () => {
       process.env["AR_TTL_MINUTES"] = "-1";
       const { AnalogicalReasoningServer } = await import("../src/index.ts");
-      const mockServer = { setRequestHandler: jest.fn() } as unknown as Server;
-      expect(() => new AnalogicalReasoningServer(mockServer)).toThrow("AR_TTL_MINUTES must be positive");
+      expect(() => new AnalogicalReasoningServer()).toThrow("AR_TTL_MINUTES must be positive");
     });
 
     it("should throw error for invalid AR_MAX_DOMAINS", async () => {
       process.env["AR_MAX_DOMAINS"] = "0";
       const { AnalogicalReasoningServer } = await import("../src/index.ts");
-      const mockServer = { setRequestHandler: jest.fn() } as unknown as Server;
-      expect(() => new AnalogicalReasoningServer(mockServer)).toThrow("AR_MAX_DOMAINS must be positive");
+      expect(() => new AnalogicalReasoningServer()).toThrow("AR_MAX_DOMAINS must be positive");
     });
   });
 
   describe("Analogy History Bounded Storage", () => {
-    let server: Server;
     let analogicalServer: AnalogicalReasoningServer;
 
     beforeEach(async () => {
       const { AnalogicalReasoningServer } = await import("../src/index.ts");
-      server = new Server({ name: "test", version: "1.0.0" }, { capabilities: { tools: {} } });
-      analogicalServer = new AnalogicalReasoningServer(server);
+      analogicalServer = new AnalogicalReasoningServer();
     });
 
     it("should store analogy history with timestamps", async () => {
@@ -251,13 +245,11 @@ describe("Bounded Storage with Eviction", () => {
   });
 
   describe("Domain Registry Bounded Storage", () => {
-    let server: Server;
     let analogicalServer: AnalogicalReasoningServer;
 
     beforeEach(async () => {
       const { AnalogicalReasoningServer } = await import("../src/index.ts");
-      server = new Server({ name: "test", version: "1.0.0" }, { capabilities: { tools: {} } });
-      analogicalServer = new AnalogicalReasoningServer(server);
+      analogicalServer = new AnalogicalReasoningServer();
     });
 
     it("should store domains with timestamps", async () => {
@@ -432,13 +424,11 @@ describe("Bounded Storage with Eviction", () => {
   });
 
   describe("Thread Safety", () => {
-    let server: Server;
     let analogicalServer: AnalogicalReasoningServer;
 
     beforeEach(async () => {
       const { AnalogicalReasoningServer } = await import("../src/index.ts");
-      server = new Server({ name: "test", version: "1.0.0" }, { capabilities: { tools: {} } });
-      analogicalServer = new AnalogicalReasoningServer(server);
+      analogicalServer = new AnalogicalReasoningServer();
     });
 
     it("should handle concurrent cleanup operations safely", async () => {
