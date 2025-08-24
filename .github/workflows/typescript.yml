@@ -15,9 +15,9 @@ env:
 
 jobs:
   detect-packages:
-    runs-on: ubuntu-latest
     permissions:
       contents: read
+    runs-on: ubuntu-latest
     outputs:
       packages: ${{ steps.find-packages.outputs.packages }}
     steps:
@@ -26,13 +26,13 @@ jobs:
         id: find-packages
         working-directory: src
         run: |
-          PACKAGES=$(find . -name package.json -not -path "*/node_modules/*" -exec dirname {} \; | sed 's/^\.\/\///' | jq -R -s -c 'split("\n")[:-1]')
+          PACKAGES=$(find . -name package.json -not -path "*/node_modules/*" -exec dirname {} \; | sed -E 's|^\./||' | jq -R -s -c 'split("\n")[:-1]')
           echo "packages=$PACKAGES" >> $GITHUB_OUTPUT
 
   lint-and-format:
-    runs-on: ubuntu-latest
     permissions:
       contents: read
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
@@ -46,9 +46,9 @@ jobs:
         run: bun run prettier
 
   type-check:
-    runs-on: ubuntu-latest
     permissions:
       contents: read
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
@@ -60,9 +60,9 @@ jobs:
         run: bun run check
 
   test-monorepo:
-    runs-on: ubuntu-latest
     permissions:
       contents: read
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
@@ -77,18 +77,19 @@ jobs:
         with:
           name: test-results
           path: |
-            test-results.xml
+            test-results.xml  
+            coverage/**
           retention-days: 30
         if: always()
   test-packages:
+    permissions:
+      contents: read
     needs: [detect-packages, lint-and-format, type-check]
     strategy:
       matrix:
         package: ${{ fromJson(needs.detect-packages.outputs.packages) }}
     name: Test ${{ matrix.package }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
@@ -112,15 +113,15 @@ jobs:
         run: bun run test
 
   build:
+    permissions:
+      contents: read
+      actions: read
     needs: [detect-packages, test-monorepo, test-packages]
     strategy:
       matrix:
         package: ${{ fromJson(needs.detect-packages.outputs.packages) }}
     name: Build ${{ matrix.package }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: read
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
@@ -145,17 +146,17 @@ jobs:
           retention-days: 7
 
   quality-gate:
-    needs: [lint-and-format, type-check, test-monorepo, build]
-    runs-on: ubuntu-latest
     permissions:
       contents: read
+    needs: [lint-and-format, type-check, test-monorepo, build]
+    runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Check all jobs status
         run: |
-          if [[ "${{ needs.lint-and-format.result }}" != "success" || 
-                "${{ needs.type-check.result }}" != "success" || 
-                "${{ needs.test-monorepo.result }}" != "success" || 
+          if [[ "${{ needs.lint-and-format.result }}" != "success" ||
+                "${{ needs.type-check.result }}" != "success" ||
+                "${{ needs.test-monorepo.result }}" != "success" ||
                 "${{ needs.build.result }}" != "success" ]]; then
             echo "Quality gate failed - one or more jobs failed"
             exit 1

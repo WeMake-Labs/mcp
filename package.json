@@ -19,11 +19,11 @@
   "engines": {
     "bun": ">=1.2.0"
   },
-  "packageManager": "bun@1.1.0",
+  "packageManager": "bun@1.2.0",
   "scripts": {
     "dev": "bun run --filter='./src/*' dev",
     "start": "bun run --filter='./src/*' start",
-    "build": "bun run --filter='./src/*' prepare",
+    "build": "bun run --filter='./src/*' build",
     "publish": "bun run --filter='./src/*' release",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",

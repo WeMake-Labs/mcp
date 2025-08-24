@@ -5,6 +5,7 @@
   "exclude": ["node_modules", "dist"],
 
   "compilerOptions": {
+    "types": ["bun-types"],
     "lib": ["ESNext"],
     "target": "ESNext",
     "module": "Preserve",

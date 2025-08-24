@@ -10,6 +10,7 @@
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
     "declaration": true,
     "emitDeclarationOnly": true,
     "declarationDir": "./dist/types",
