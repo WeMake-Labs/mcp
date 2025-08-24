@@ -27,7 +27,7 @@
   "homepage": "https://github.com/wemake-ai/mcp/tree/main/src/analogical-reasoning",
   "author": "heyFlorentin",
   "engines": {
-    "bun": ">=1.1.0"
+    "bun": ">=1.2.0"
   },
   "keywords": [
     "mcp",
