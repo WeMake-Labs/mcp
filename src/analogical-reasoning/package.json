@@ -1,6 +1,6 @@
 {
   "name": "@wemake-testkitchen/analogical-reasoning",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "MCP server for analogical reasoning: structured pattern mapping, domain-to-domain structure alignment, and explainable inference",
   "license": "MIT",
   "type": "module",
@@ -12,7 +12,6 @@
       "types": "./dist/types/index.d.ts",
       "bun": "./src/index.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./package.json": "./package.json"
@@ -27,6 +26,9 @@
   },
   "homepage": "https://github.com/wemake-ai/mcp/tree/main/src/analogical-reasoning",
   "author": "heyFlorentin",
+  "engines": {
+    "bun": ">=1.1.0"
+  },
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -39,7 +41,8 @@
     "mcp-server-analogical-reasoning": "dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "bun build --entrypoints ./src/index.ts --outdir ./dist --format esm --target=bun --sourcemap && shx chmod +x dist/*.js",
