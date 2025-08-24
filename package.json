@@ -31,6 +31,8 @@
     "check": "tsc --noEmit",
     "test": "bun test",
     "test:coverage": "bun test --coverage",
+    "test:watch": "bun test --watch",
+    "test:ci": "bun test --reporter=junit --reporter-outfile=test-results.xml --coverage",
     "deploy:production": "bun run --filter='./src/*' deploy:production",
     "deploy:enterprise": "bun run --filter='./src/*' deploy:enterprise"
   },

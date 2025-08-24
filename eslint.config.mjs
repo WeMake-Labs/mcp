@@ -16,6 +16,7 @@ export default [
   },
   {
     files: ["**/*.ts", "**/*.tsx"],
+    ignores: ["**/*.d.ts"], // Exclude type declaration files from linting
     plugins: {
       "@typescript-eslint": typescriptEslint
     },

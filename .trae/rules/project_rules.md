@@ -21,10 +21,10 @@
   rationale. Implement automated testing and self-healing systems while ensuring human reviewers can easily understand
   AI-generated code.
 
-- **Enterprise Testing Standards**: Use Vitest with `bun test` execution. Configure vitest.config.ts for monorepo test
-  projects. MANDATORY 90%+ coverage for lines, functions, branches, and statements. Place tests in `tests/` folders
-  using `functionName.test.ts` naming. Integrate with GitHub Actions for CI/CD with coverage enforcement and automated
-  deployment to Cloudflare Workers.
+- **Enterprise Testing Standards**: Use Bun's native test runner exclusively with `bun test` execution. MANDATORY 90%+
+  coverage for lines, functions, branches, and statements. Place tests in `tests/` folders using `functionName.test.ts`
+  naming. Configure test environment via `bunfig.toml` for monorepo projects. Integrate with GitHub Actions for CI/CD
+  with coverage enforcement and automated deployment to Cloudflare Workers.
 
 - **Modern Frontend Architecture**: Use HTML imports with `Bun.serve()` for SSR/SPA hybrid approach. Import
   .tsx/.jsx/.js and .css files directly in HTML with Bun's native bundling. Support React, TypeScript, and Tailwind CSS.
@@ -33,6 +33,104 @@
 - **MCP Server Excellence**: Implement Model Context Protocol servers following enterprise security patterns: tool
   discovery, schema validation, transactional integrity, least-privilege access, Human-in-the-Loop (HITL) for sensitive
   operations, comprehensive audit logging, and GDPR-compliant data handling.
+
+## Bun Native Test Runner Standards
+
+### Core Testing Principles
+
+- **Bun-First Testing**: EXCLUSIVELY use Bun's native test runner with `bun:test` imports. PROHIBITED: Vitest, Jest,
+  Mocha, or any external test frameworks. Bun's test runner provides 10-30x faster execution than alternatives.
+
+- **Jest-Compatible API**: Leverage Bun's built-in Jest-compatible API including `describe`, `it`, `test`, `expect`,
+  `beforeEach`, `afterEach`, `beforeAll`, `afterAll`. Full compatibility with Jest matchers and mocking patterns.
+
+- **TypeScript Global Support**: Enable TypeScript support for global test functions with triple-slash directive:
+  `/// <reference types="bun/test-globals" />` in any single `.ts` file in your project.
+
+### Test File Organization
+
+```typescript
+#!/usr/bin/env bun
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
+import { MyModule } from "../src/myModule.ts";
+
+/**
+ * Test suite for MyModule functionality.
+ * Validates core business logic and edge cases.
+ */
+describe("MyModule", () => {
+  beforeEach(() => {
+    // Setup code
+  });
+
+  it("should handle valid input correctly", () => {
+    expect(MyModule.process("valid")).toBe("expected");
+  });
+});
+```
+
+### Test Discovery Patterns
+
+Bun automatically discovers test files matching these patterns:
+
+- `*.test.{js|jsx|ts|tsx}`
+- `*_test.{js|jsx|ts|tsx}`
+- `*.spec.{js|jsx|ts|tsx}`
+- `*_spec.{js|jsx|ts|tsx}`
+
+### Configuration via bunfig.toml
+
+```toml
+[test]
+# Test environment configuration
+root = "."
+preload = ["./test-setup.ts"]
+
+# Coverage reporting
+[test.coverage]
+threshold = 90
+reports = ["text", "html", "json"]
+
+# Test reporter configuration
+[test.reporter]
+junit = "test-results.xml"
+```
+
+### Migration from Vitest
+
+1. **Remove Vitest Dependencies**: Delete `vitest.config.ts`, remove Vitest from `package.json`
+2. **Update Imports**: Replace `import { test, expect } from 'vitest'` with `import { test, expect } from 'bun:test'`
+3. **Configuration Migration**: Move test configuration from `vitest.config.ts` to `bunfig.toml`
+4. **Mock Updates**: Use Bun's native mocking with `jest.fn()`, `jest.spyOn()`, or `vi.fn()` for Vitest compatibility
+
+### Performance Benefits
+
+- **10-30x Faster**: Bun's test runner significantly outperforms Jest, Vitest, and other alternatives
+- **Native TypeScript**: No transpilation overhead, direct TypeScript execution
+- **Built-in Coverage**: Integrated coverage reporting without additional dependencies
+- **Watch Mode**: Fast incremental testing with `bun test --watch`
+
+### Enterprise Test Commands
+
+```bash
+# Run all tests
+bun test
+
+# Run with coverage (90%+ required)
+bun test --coverage
+
+# Run specific test file
+bun test ./tests/myModule.test.ts
+
+# Run tests matching pattern
+bun test --test-name-pattern "authentication"
+
+# Watch mode for development
+bun test --watch
+
+# Generate JUnit XML for CI/CD
+bun test --reporter=junit --reporter-outfile=junit.xml
+```
 
 ### Zero-Shot CoT
 
@@ -67,8 +165,9 @@
 - **Enterprise Architecture:** Complete monorepo structure with clear domain boundaries, dependency injection patterns,
   configuration management, secrets handling, audit logging, and compliance documentation.
 
-- **Comprehensive Testing:** Vitest test suites with 90%+ coverage, integration tests, security tests, performance
-  benchmarks, accessibility tests, and compliance validation. Include test data management and mock strategies.
+- **Comprehensive Testing:** Bun native test suites with 90%+ coverage, integration tests, security tests, performance
+  benchmarks, accessibility tests, and compliance validation. Leverage Bun's built-in Jest-compatible API with
+  `bun:test` imports. Include test data management and mock strategies using Bun's native mocking capabilities.
 
 - **Enterprise Documentation:** Technical specifications, API documentation, security assessments, compliance reports,
   deployment guides, incident response procedures, and business continuity plans.
