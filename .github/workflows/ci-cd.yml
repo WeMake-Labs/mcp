@@ -1,0 +1,164 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# Global permissions - restrict to minimum required
+permissions:
+  contents: read
+
+env:
+  BUN_VERSION: "1.2.0"
+
+jobs:
+  detect-packages:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.find-packages.outputs.packages }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Find MCP packages
+        id: find-packages
+        working-directory: src
+        run: |
+          PACKAGES=$(find . -name package.json -not -path "*/node_modules/*" -exec dirname {} \; | sed -E 's|^\./||' | jq -R -s -c 'split("\n")[:-1]')
+          echo "packages=$PACKAGES" >> $GITHUB_OUTPUT
+
+  lint-and-format:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install dependencies
+        run: bun install
+      - name: Run linting
+        run: bun run lint
+      - name: Check formatting
+        run: bun run prettier
+
+  type-check:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install dependencies
+        run: bun install
+      - name: Type check
+        run: bun run check
+
+  test-monorepo:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install dependencies
+        run: bun install
+      - name: Run tests with coverage
+        run: bun run test:ci
+      - name: Upload test results and coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            test-results.xml  
+            coverage/**
+          retention-days: 30
+        if: always()
+  test-packages:
+    permissions:
+      contents: read
+    needs: [detect-packages, lint-and-format, type-check]
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.detect-packages.outputs.packages) }}
+    name: Test ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install dependencies
+        working-directory: src/${{ matrix.package }}
+        run: bun install
+      - name: Check if tests script exists
+        id: check-tests
+        working-directory: src/${{ matrix.package }}
+        run: |
+          if jq -e '.scripts.test' package.json >/dev/null; then
+            echo "has-tests=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-tests=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run package tests
+        if: steps.check-tests.outputs.has-tests == 'true'
+        working-directory: src/${{ matrix.package }}
+        run: bun run test
+
+  build:
+    permissions:
+      contents: read
+      actions: read
+    needs: [detect-packages, test-monorepo, test-packages]
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.detect-packages.outputs.packages) }}
+    name: Build ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install dependencies
+        working-directory: src/${{ matrix.package }}
+        run: bun install
+      - name: Build package
+        working-directory: src/${{ matrix.package }}
+        run: bun run build
+      - name: Sanitize package name for artifact
+        id: sanitize-name
+        run: |
+          SANITIZED_NAME=$(echo "${{ matrix.package }}" | sed 's|^\./||')
+          echo "sanitized-name=$SANITIZED_NAME" >> "$GITHUB_OUTPUT"
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ steps.sanitize-name.outputs.sanitized-name }}
+          path: src/${{ steps.sanitize-name.outputs.sanitized-name }}/dist/
+          retention-days: 7
+
+  quality-gate:
+    permissions:
+      contents: read
+    needs: [lint-and-format, type-check, test-monorepo, build]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check all jobs status
+        run: |
+          if [[ "${{ needs.lint-and-format.result }}" != "success" ||
+                "${{ needs.type-check.result }}" != "success" ||
+                "${{ needs.test-monorepo.result }}" != "success" ||
+                "${{ needs.build.result }}" != "success" ]]; then
+            echo "Quality gate failed - one or more jobs failed"
+            exit 1
+          fi
+          echo "Quality gate passed - all jobs successful"

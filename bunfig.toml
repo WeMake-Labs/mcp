@@ -1,0 +1,43 @@
+# Bun Configuration for WeMake MCP Enterprise Monorepo
+# Optimized for enterprise testing standards and CI/CD integration
+
+[test]
+# Test discovery configuration
+root = "."
+
+# Preload scripts for test environment setup
+# preload = ["./test-setup.ts"]
+
+# Enable coverage reporting
+coverage = true
+
+# Test reporter configuration for CI/CD
+# Note: Use CLI flags for reporter configuration
+# bun test --reporter=junit --reporter-outfile=test-results.xml
+
+# Install configuration
+[install]
+# Use exact versions for enterprise stability
+exact = true
+
+# Registry configuration
+registry = "https://registry.npmjs.org/"
+
+# Development server configuration
+[dev]
+# Enable hot module replacement
+hmr = true
+
+# Development server port
+port = 3000
+
+# Build configuration
+[build]
+# Target ES2022 for modern runtime compatibility
+target = "es2022"
+
+# Enable source maps for debugging
+sourcemap = true
+
+# Minify for production builds
+minify = true

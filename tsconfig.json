@@ -1,48 +1,47 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "docs": "https://bun.sh/docs/typescript",
+  "extends": "@tsconfig/bun/tsconfig.json",
+  "exclude": ["node_modules", "dist"],
+
   "compilerOptions": {
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["bun-types"],
+    "lib": ["ESNext"],
     "target": "ESNext",
-    "module": "ESNext",
+    "module": "Preserve",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": false,
+
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "noEmit": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "strict": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noImplicitOverride": true,
-    "noUncheckedIndexedAccess": true,
-    "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": true,
     "useUnknownInCatchVariables": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "skipLibCheck": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "experimentalDecorators": false,
+    "emitDecoratorMetadata": false,
     "removeComments": false,
-    "preserveConstEnums": true,
-    "typeRoots": ["./node_modules/@types", "./src/types"]
-  },
-  "include": ["src/**/*", "vitest.config.ts", "eslint.config.mjs", "**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "build", "coverage"],
-  "ts-node": {
-    "esm": true
+    "preserveConstEnums": true
   }
 }

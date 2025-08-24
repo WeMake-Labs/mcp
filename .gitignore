@@ -7,6 +7,9 @@ dist
 /assets/
 *.tgz
 
+# import
+/import/
+
 # test artifacts  
 test-results.html  
 test-results.json  
@@ -14,7 +17,7 @@ html.meta.json.gz
 
 # common reporters  
 playwright-report/  
-test-results/  
+test-results.xml
 junit.xml
 
 # Bun runtime artefacts

@@ -32,27 +32,27 @@ scalability.
 
 ### 🏥 Healthcare & GDPR Compliance
 
-- **`@wemake-ai/mcp-gdpr-server`** - GDPR-compliant data processing with audit trails
-- **`@wemake-ai/mcp-healthcare-server`** - German healthcare standards (DiGA, ePA, TI)
-- **`@wemake-ai/mcp-audit-server`** - Enterprise audit logging and compliance reporting
+- **`@wemake.cx/mcp-gdpr-server`** - GDPR-compliant data processing with audit trails
+- **`@wemake.cx/mcp-healthcare-server`** - German healthcare standards (DiGA, ePA, TI)
+- **`@wemake.cx/mcp-audit-server`** - Enterprise audit logging and compliance reporting
 
 ### 🤖 AI Agent Automation
 
-- **`@wemake-ai/mcp-agent-server`** - Autonomous AI agent orchestration
-- **`@wemake-ai/mcp-monitoring-server`** - Self-healing systems with predictive analytics
-- **`@wemake-ai/mcp-workflow-server`** - Enterprise workflow automation
+- **`@wemake.cx/mcp-agent-server`** - Autonomous AI agent orchestration
+- **`@wemake.cx/mcp-monitoring-server`** - Self-healing systems with predictive analytics
+- **`@wemake.cx/mcp-workflow-server`** - Enterprise workflow automation
 
 ### 🔧 Developer Experience
 
-- **`@wemake-ai/mcp-devtools-server`** - Bun-optimized development tools
-- **`@wemake-ai/mcp-testing-server`** - Enterprise testing and quality assurance
-- **`@wemake-ai/mcp-deployment-server`** - Zero-downtime Cloudflare Workers deployment
+- **`@wemake.cx/mcp-devtools-server`** - Bun-optimized development tools
+- **`@wemake.cx/mcp-testing-server`** - Enterprise testing and quality assurance
+- **`@wemake.cx/mcp-deployment-server`** - Zero-downtime Cloudflare Workers deployment
 
 ### 🏢 Enterprise Integration
 
-- **`@wemake-ai/mcp-crm-server`** - Enterprise CRM integration (SAP, Salesforce)
-- **`@wemake-ai/mcp-erp-server`** - German ERP systems integration
-- **`@wemake-ai/mcp-security-server`** - Enterprise security and identity management
+- **`@wemake.cx/mcp-crm-server`** - Enterprise CRM integration (SAP, Salesforce)
+- **`@wemake.cx/mcp-erp-server`** - German ERP systems integration
+- **`@wemake.cx/mcp-security-server`** - Enterprise security and identity management
 
 ## 🚀 Getting Started
 
@@ -65,7 +65,7 @@ scalability.
 
 ### Quick Start
 
-```sh
+```bash
 # Clone the repository
 git clone https://github.com/wemake-ai/mcp.git
 cd mcp
@@ -84,12 +84,12 @@ _Note: Bun loads `.env` automatically, so no separate `dotenv` setup is required
 
 ### Enterprise Installation
 
-```sh
+```bash
 # Install specific MCP server
-bun add @wemake-ai/mcp-gdpr-server
+bun add @wemake.cx/mcp-gdpr-server
 
 # Or install the complete enterprise suite
-bun add @wemake-ai/mcp-enterprise-suite
+bun add @wemake.cx/mcp-enterprise-suite
 ```
 
 ### Configuration
@@ -122,7 +122,7 @@ ALERT_WEBHOOK=https://alerts.your-company.de
   "mcpServers": {
     "wemake-gdpr": {
       "command": "bunx",
-      "args": ["@wemake-ai/mcp-gdpr-server"],
+      "args": ["@wemake.cx/mcp-gdpr-server"],
       "env": {
         "GDPR_ENABLED": "true"
       }
@@ -134,7 +134,7 @@ ALERT_WEBHOOK=https://alerts.your-company.de
 #### With Enterprise AI Platforms
 
 ```typescript
-import { MCPClient } from "@wemake-ai/mcp-client";
+import { MCPClient } from "@wemake.cx/mcp-client";
 
 const client = new MCPClient({
   serverUrl: "https://mcp.wemake.cx",
@@ -151,7 +151,7 @@ await client.connect();
 
 ### Cloudflare Workers Deployment
 
-```sh
+```bash
 # Deploy to Cloudflare Workers
 bun run deploy:production
 
@@ -224,9 +224,7 @@ See also: [Security Policy](docs/SECURITY.md) • [Code of Conduct](docs/CODE_OF
 
 ### Community
 
-- **GitHub Discussions**: [Community Forum](https://github.com/wemake-ai/mcp/discussions)
-- **Discord**: [WeMake AI Community](https://discord.gg/wemake-ai)
-- **LinkedIn**: [WeMake AI](https://linkedin.com/company/wemake-ai)
+- **LinkedIn**: [WeMake AI](https://linkedin.com/company/wemake-cx)
 
 ## 📜 License
 

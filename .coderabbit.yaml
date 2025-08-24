@@ -1,9 +1,9 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 
-language: de-DE
+language: en-US
 tone_instructions:
-  "AI-first enterprise development: Bun TypeScript, MCP excellence, GDPR compliance, 90%+ Vitest coverage, zero-downtime
-  CF Workers deployment, autonomous code quality."
+  "AI-first enterprise development: Bun TypeScript, MCP excellence, GDPR compliance, 90%+ Bun test coverage,
+  zero-downtime CF Workers deployment, autonomous code quality."
 early_access: true
 enable_free_tier: false
 reviews:
@@ -51,7 +51,7 @@ reviews:
     - label: "🔒 Security"
       instructions: Security vulnerabilities, GDPR compliance, or enterprise security posture improvements.
     - label: "🧪 Testing"
-      instructions: Test coverage improvements, Vitest enhancements, or quality assurance updates.
+      instructions: Test coverage improvements, Bun test runner enhancements, or quality assurance updates.
     - label: "🤖 MCP Server"
       instructions: Model Context Protocol server development, tool implementations, or schema updates.
     - label: "🛡️ GDPR Compliance"
@@ -86,8 +86,9 @@ reviews:
         efficiency Remember: Writing code was never the bottleneck - understanding and maintaining it is.
     - path: "src/**/tests/**"
       instructions: >
-        Enforce 90%+ coverage with Vitest. Validate enterprise test patterns: unit/integration/e2e separation,
-        performance benchmarks, security test cases, and GDPR compliance validation. Use descriptive test naming.
+        Enforce 90%+ coverage with Bun's native test runner. Validate enterprise test patterns: unit/integration/e2e
+        separation, performance benchmarks, security test cases, and GDPR compliance validation. Use descriptive test
+        naming.
     - path: "src/**/mcp/**"
       instructions: >
         MCP protocol excellence: schema validation, security boundaries, tool discovery optimization, error handling
@@ -255,7 +256,7 @@ knowledge_base:
       - "**/SECURITY.md"
       - "**/CODE_OF_CONDUCT.md"
       - "**/tsconfig.json"
-      - "**/vitest.config.ts"
+      - "**/bunfig.toml"
   learnings:
     scope: global
   issues:
@@ -292,7 +293,7 @@ code_generation:
     path_instructions:
       - path: "src/**/*.ts"
         instructions: >
-          Generate comprehensive Vitest tests with 90%+ coverage. Use enterprise test patterns: 'Given-When-Then'
+          Generate comprehensive Bun native tests with 90%+ coverage. Use enterprise test patterns: 'Given-When-Then'
           structure, performance benchmarks, security validation, and GDPR compliance checks.
       - path: "src/**/mcp/**"
         instructions: >

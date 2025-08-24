@@ -1,12 +1,12 @@
 {
-  "name": "@wemake-ai/mcp",
+  "name": "@wemake.cx/mcp",
   "author": "WeMake (https://wemake.cx)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/WeMake-AI/mcp.git"
+    "url": "https://github.com/wemake-ai/mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/WeMake-AI/mcp/issues"
+    "url": "https://github.com/wemake-ai/mcp/issues"
   },
   "description": "WeMake Model Context Protocol (MCP) servers",
   "homepage": "https://wemake.cx",
@@ -17,38 +17,37 @@
   ],
   "private": true,
   "engines": {
-    "bun": ">=1.1.0"
+    "bun": ">=1.2.0"
   },
-  "packageManager": "bun@1.1.0",
+  "packageManager": "bun@1.2.0",
   "scripts": {
     "dev": "bun run --filter='./src/*' dev",
     "start": "bun run --filter='./src/*' start",
-    "build-all": "bun run --filter='./src/*' build",
-    "publish-all": "bun run --filter='./src/*' publish-now",
+    "build": "bun run --filter='./src/*' build",
+    "publish": "bun run --filter='./src/*' release",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest --watch",
-    "test:coverage": "vitest --coverage",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "test:watch": "bun test --watch",
+    "test:ci": "bun test --reporter=junit --reporter-outfile=test-results.xml --coverage",
     "deploy:production": "bun run --filter='./src/*' deploy:production",
     "deploy:enterprise": "bun run --filter='./src/*' deploy:enterprise"
   },
   "devDependencies": {
     "@nx/eslint": "21.3.7",
+    "@tsconfig/bun": "^1.0.8",
     "@types/bun": "^1.2.20",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
-    "@vitest/coverage-v8": "^3.2.4",
-    "@vitest/ui": "^3.2.4",
     "eslint": "^9.34.0",
     "markdownlint": "^0.38.0",
     "nx": "21.3.7",
     "prettier": "^3.6.2",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "prettier": {
     "trailingComma": "none",

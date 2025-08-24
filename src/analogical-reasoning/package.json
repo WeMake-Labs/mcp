@@ -1,0 +1,63 @@
+{
+  "name": "@wemake.cx/analogical-reasoning",
+  "version": "0.1.1",
+  "description": "MCP server for analogical reasoning: structured pattern mapping, domain-to-domain structure alignment, and explainable inference",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "bun": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wemake-ai/mcp.git",
+    "directory": "src/analogical-reasoning"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/wemake-ai/mcp/tree/main/src/analogical-reasoning",
+  "author": "heyFlorentin",
+  "engines": {
+    "bun": ">=1.2.0"
+  },
+  "packageManager": "bun@1.2.0",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "thinking",
+    "model-enhancement",
+    "mcp-server",
+    "analogical-reasoning"
+  ],
+  "bin": {
+    "mcp-server-analogical-reasoning": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "bun build --entrypoints ./src/index.ts --outdir ./dist --format esm --target=bun --sourcemap && shx chmod +x dist/*.js",
+    "types": "bun tsc",
+    "prepare": "bun run types && bun run build",
+    "release": "bun publish",
+    "watch": "bun tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "chalk": "^5.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.17.2",
+    "shx": "^0.3.4",
+    "typescript": "^5.9.2"
+  }
+}
