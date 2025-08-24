@@ -114,7 +114,7 @@ coverage = true
 
 The workflow supports the following monorepo structure:
 
-```sh
+```bash
 src/
 ├── analogical-reasoning/
 │   ├── package.json

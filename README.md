@@ -65,7 +65,7 @@ scalability.
 
 ### Quick Start
 
-```sh
+```bash
 # Clone the repository
 git clone https://github.com/wemake-ai/mcp.git
 cd mcp
@@ -84,7 +84,7 @@ _Note: Bun loads `.env` automatically, so no separate `dotenv` setup is required
 
 ### Enterprise Installation
 
-```sh
+```bash
 # Install specific MCP server
 bun add @wemake.cx/mcp-gdpr-server
 
@@ -151,7 +151,7 @@ await client.connect();
 
 ### Cloudflare Workers Deployment
 
-```sh
+```bash
 # Deploy to Cloudflare Workers
 bun run deploy:production
 

@@ -1,0 +1,293 @@
+name: Automated Release
+
+# Trigger on pushes to main branch after successful CI/CD
+on:
+  workflow_run:
+    workflows: ["CI/CD"]
+    types:
+      - completed
+    branches:
+      - main
+
+# Global permissions - restrict to minimum required for releases
+permissions:
+  contents: write
+  packages: write
+  actions: read
+
+env:
+  BUN_VERSION: "1.2.0"
+
+jobs:
+  # Only proceed if the CI/CD workflow was successful
+  check-ci-status:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    outputs:
+      should-release: ${{ steps.check-status.outputs.should-release }}
+    steps:
+      - name: Check CI/CD workflow status
+        id: check-status
+        run: |
+          if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+            echo "should-release=true" >> "$GITHUB_OUTPUT"
+            echo "CI/CD workflow completed successfully, proceeding with release"
+          else
+            echo "should-release=false" >> "$GITHUB_OUTPUT"
+            echo "CI/CD workflow failed, skipping release"
+          fi
+
+  detect-changes:
+    permissions:
+      contents: read
+    needs: check-ci-status
+    if: needs.check-ci-status.outputs.should-release == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.find-changed-packages.outputs.packages }}
+      has-changes: ${{ steps.find-changed-packages.outputs.has-changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for change detection
+
+      - name: Find changed MCP packages
+        id: find-changed-packages
+        run: |
+          # Get the previous commit to compare against
+          PREV_COMMIT=$(git rev-parse HEAD~1)
+
+          # Find all package directories
+          ALL_PACKAGES=$(find src -name package.json -not -path "*/node_modules/*" -exec dirname {} \; | sed -E 's|^src/||')
+
+          # Check which packages have changes
+          CHANGED_PACKAGES=()
+
+          for package in $ALL_PACKAGES; do
+            if git diff --quiet "$PREV_COMMIT" HEAD -- "src/$package/"; then
+              echo "No changes in package: $package"
+            else
+              echo "Changes detected in package: $package"
+              CHANGED_PACKAGES+=("$package")
+            fi
+          done
+
+          # Convert to JSON array
+          if [ ${#CHANGED_PACKAGES[@]} -eq 0 ]; then
+            echo "packages=[]" >> "$GITHUB_OUTPUT"
+            echo "has-changes=false" >> "$GITHUB_OUTPUT"
+            echo "No packages have changes, skipping release"
+          else
+            PACKAGES_JSON=$(printf '%s\n' "${CHANGED_PACKAGES[@]}" | jq -R -s -c 'split("\n")[:-1]')
+            echo "packages=$PACKAGES_JSON" >> "$GITHUB_OUTPUT"
+            echo "has-changes=true" >> "$GITHUB_OUTPUT"
+            echo "Changed packages: ${CHANGED_PACKAGES[*]}"
+          fi
+
+  release:
+    permissions:
+      contents: write
+      packages: write
+    needs: [check-ci-status, detect-changes]
+    if: needs.detect-changes.outputs.has-changes == 'true'
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.detect-changes.outputs.packages) }}
+    name: Release ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: oven-sh/setup-bun@22457c87c1b161cf7dde222c3e82b2b5f8d2bed2 # v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Install dependencies
+        working-directory: src/${{ matrix.package }}
+        run: bun install
+
+      - name: Get current version
+        id: current-version
+        working-directory: src/${{ matrix.package }}
+        run: |
+          CURRENT_VERSION=$(jq -r '.version' package.json)
+          echo "current-version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Determine version bump type
+        id: version-bump
+        working-directory: src/${{ matrix.package }}
+        run: |
+          # Analyze commit messages to determine version bump type
+          PREV_COMMIT=$(git rev-parse HEAD~1)
+          COMMIT_MESSAGES=$(git log --pretty=format:"%s" "$PREV_COMMIT"..HEAD -- .)
+
+          # Check for breaking changes
+          if echo "$COMMIT_MESSAGES" | grep -qiE "(BREAKING CHANGE|breaking:|major:)"; then
+            BUMP_TYPE="major"
+          # Check for new features
+          elif echo "$COMMIT_MESSAGES" | grep -qiE "(feat:|feature:|minor:)"; then
+            BUMP_TYPE="minor"
+          # Default to patch for bug fixes and other changes
+          else
+            BUMP_TYPE="patch"
+          fi
+
+          echo "bump-type=$BUMP_TYPE" >> "$GITHUB_OUTPUT"
+          echo "Version bump type: $BUMP_TYPE"
+
+      - name: Calculate new version
+        id: new-version
+        run: |
+          CURRENT="${{ steps.current-version.outputs.current-version }}"
+          BUMP_TYPE="${{ steps.version-bump.outputs.bump-type }}"
+
+          # Parse semantic version
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+          # Remove any pre-release or build metadata
+          PATCH=$(echo "$PATCH" | sed 's/[^0-9].*//')
+
+          # Increment version based on bump type
+          case $BUMP_TYPE in
+            "major")
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            "minor")
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            "patch")
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "new-version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "New version: $NEW_VERSION"
+
+      - name: Update package version
+        working-directory: src/${{ matrix.package }}
+        run: |
+          NEW_VERSION="${{ steps.new-version.outputs.new-version }}"
+
+          # Update package.json version
+          jq ".version = \"$NEW_VERSION\"" package.json > package.json.tmp
+          mv package.json.tmp package.json
+
+          echo "Updated package.json version to $NEW_VERSION"
+
+      - name: Generate changelog
+        id: changelog
+        working-directory: src/${{ matrix.package }}
+        run: |
+          PREV_COMMIT=$(git rev-parse HEAD~1)
+          PACKAGE_NAME="${{ matrix.package }}"
+          NEW_VERSION="${{ steps.new-version.outputs.new-version }}"
+
+          # Generate changelog from commit messages
+          CHANGELOG_CONTENT="## Changes in v$NEW_VERSION\n\n"
+
+          # Get commits that affected this package
+          COMMITS=$(git log --pretty=format:"%h %s" "$PREV_COMMIT"..HEAD -- .)
+
+          if [ -n "$COMMITS" ]; then
+            while IFS= read -r commit; do
+              CHANGELOG_CONTENT="$CHANGELOG_CONTENT- $commit\n"
+            done <<< "$COMMITS"
+          else
+            CHANGELOG_CONTENT="$CHANGELOG_CONTENT- Internal improvements and maintenance\n"
+          fi
+
+          # Save changelog to file
+          echo -e "$CHANGELOG_CONTENT" > RELEASE_NOTES.md
+
+          # Also save for GitHub output (escape newlines)
+          CHANGELOG_ESCAPED=$(echo -e "$CHANGELOG_CONTENT" | sed ':a;N;$!ba;s/\n/\\n/g')
+          echo "changelog=$CHANGELOG_ESCAPED" >> "$GITHUB_OUTPUT"
+
+      - name: Build package
+        working-directory: src/${{ matrix.package }}
+        run: |
+          # Ensure build script exists
+          if jq -e '.scripts.build' package.json >/dev/null; then
+            bun run build
+          else
+            echo "No build script found, skipping build step"
+          fi
+
+      - name: Create package tarball
+        working-directory: src/${{ matrix.package }}
+        run: |
+          # Create a tarball of the package
+          PACKAGE_NAME=$(jq -r '.name' package.json | sed 's/@//g' | sed 's/\//-/g')
+          NEW_VERSION="${{ steps.new-version.outputs.new-version }}"
+
+          tar -czf "${PACKAGE_NAME}-${NEW_VERSION}.tgz" \
+            --exclude=node_modules \
+            --exclude=.git \
+            --exclude='*.test.*' \
+            --exclude=tests \
+            .
+
+          echo "Created package tarball: ${PACKAGE_NAME}-${NEW_VERSION}.tgz"
+
+      - name: Commit version bump
+        run: |
+          PACKAGE_NAME="${{ matrix.package }}"
+          NEW_VERSION="${{ steps.new-version.outputs.new-version }}"
+
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          git add "src/$PACKAGE_NAME/package.json"
+          git commit -m "chore($PACKAGE_NAME): bump version to v$NEW_VERSION"
+          git push
+
+      - name: Create GitHub Release
+        id: create-release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "${{ matrix.package }}-v${{ steps.new-version.outputs.new-version }}"
+          name: "${{ matrix.package }} v${{ steps.new-version.outputs.new-version }}"
+          body_path: src/${{ matrix.package }}/RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+          files: |
+            src/${{ matrix.package }}/*.tgz
+
+  # Summary job to report release status
+  release-summary:
+    permissions:
+      contents: read
+    needs: [check-ci-status, detect-changes, release]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Release Summary
+        run: |
+          if [[ "${{ needs.check-ci-status.outputs.should-release }}" != "true" ]]; then
+            echo "❌ Release skipped: CI/CD workflow did not complete successfully"
+            exit 0
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.has-changes }}" != "true" ]]; then
+            echo "ℹ️ No packages had changes, no releases created"
+            exit 0
+          fi
+
+          if [[ "${{ needs.release.result }}" == "success" ]]; then
+            echo "✅ Successfully created releases for changed packages"
+            PACKAGES='${{ needs.detect-changes.outputs.packages }}'
+            echo "Released packages: $(echo $PACKAGES | jq -r '.[]' | tr '\n' ' ')"
+          else
+            echo "❌ Release process failed"
+            exit 1
+          fi
