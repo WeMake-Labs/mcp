@@ -13,7 +13,7 @@ We are finalizing our formal support policy. Interim commitment:
 - Supported versions: latest two minor releases of 1.x (rolling window)
 - Security updates: Critical/High for supported versions
 - EOL: 90 days after the next minor release
-- Full policy will be published by Q4 2025 (Tracking: <https://github.com/WeMake-AI/mcp/issues/32>)
+- Full policy will be published by Q4 2025 (Tracking: <https://github.com/wemake-ai/mcp/issues/32>)
 
 This Security Policy was last updated in August 2025 and applies to data subjects in the European Economic Area and
 Switzerland.

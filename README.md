@@ -67,7 +67,7 @@ scalability.
 
 ```sh
 # Clone the repository
-git clone https://github.com/WeMake-AI/mcp.git
+git clone https://github.com/wemake-ai/mcp.git
 cd mcp
 
 # Install dependencies with Bun
@@ -224,9 +224,7 @@ See also: [Security Policy](docs/SECURITY.md) • [Code of Conduct](docs/CODE_OF
 
 ### Community
 
-- **GitHub Discussions**: [Community Forum](https://github.com/WeMake-AI/mcp/discussions)
-- **Discord**: [WeMake AI Community](https://discord.gg/WeMake-AI)
-- **LinkedIn**: [WeMake AI](https://linkedin.com/company/WeMake-AI)
+- **LinkedIn**: [WeMake AI](https://linkedin.com/company/wemake-cx)
 
 ## 📜 License
 

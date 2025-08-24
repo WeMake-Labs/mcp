@@ -1,5 +1,5 @@
 {
-  "name": "@wemake-ai/analogical-reasoning",
+  "name": "@wemake-ai/testkitchen",
   "version": "0.1.4",
   "description": "MCP server for analogical reasoning: structured pattern mapping, domain-to-domain structure alignment, and explainable inference",
   "license": "MIT",
@@ -19,13 +19,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/WeMake-AI/mcp.git",
+    "url": "https://github.com/wemake-ai/mcp.git",
     "directory": "src/analogical-reasoning"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   },
-  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/analogical-reasoning",
+  "homepage": "https://github.com/wemake-ai/mcp/tree/main/src/analogical-reasoning",
   "author": "heyFlorentin",
   "keywords": [
     "mcp",
