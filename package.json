@@ -29,9 +29,8 @@
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest --watch",
-    "test:coverage": "vitest --coverage",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
     "deploy:production": "bun run --filter='./src/*' deploy:production",
     "deploy:enterprise": "bun run --filter='./src/*' deploy:enterprise"
   },
@@ -41,15 +40,12 @@
     "@types/bun": "^1.2.20",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
-    "@vitest/coverage-v8": "^3.2.4",
-    "@vitest/ui": "^3.2.4",
     "eslint": "^9.34.0",
     "markdownlint": "^0.38.0",
     "nx": "21.3.7",
     "prettier": "^3.6.2",
     "typescript": "^5.9.2",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4"
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "prettier": {
     "trailingComma": "none",

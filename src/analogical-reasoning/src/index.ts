@@ -10,6 +10,36 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import chalk from "chalk";
 
+/**
+ * Environment configuration for bounded storage with eviction.
+ * Provides sensible defaults for production use while allowing customization.
+ */
+let AR_MAX_HISTORY: number;
+let AR_TTL_MINUTES: number;
+let AR_MAX_DOMAINS: number;
+
+/**
+ * Validates environment configuration and parses values to ensure proper operation.
+ * Throws descriptive errors for invalid configurations.
+ */
+function validateEnvironmentConfig(): void {
+  AR_MAX_HISTORY = parseInt(process.env["AR_MAX_HISTORY"] || "100", 10);
+  AR_TTL_MINUTES = parseInt(process.env["AR_TTL_MINUTES"] || "1440", 10); // 24 hours default
+  AR_MAX_DOMAINS = parseInt(process.env["AR_MAX_DOMAINS"] || "50", 10);
+
+  if (AR_MAX_HISTORY <= 0) {
+    throw new Error(`AR_MAX_HISTORY must be positive, got: ${AR_MAX_HISTORY}`);
+  }
+  if (AR_TTL_MINUTES <= 0) {
+    throw new Error(`AR_TTL_MINUTES must be positive, got: ${AR_TTL_MINUTES}`);
+  }
+  if (AR_MAX_DOMAINS <= 0) {
+    throw new Error(`AR_MAX_DOMAINS must be positive, got: ${AR_MAX_DOMAINS}`);
+  }
+}
+
+// Environment configuration will be validated during server instantiation
+
 // Types
 interface DomainElement {
   id: string;
@@ -19,6 +49,7 @@ interface DomainElement {
 }
 
 interface AnalogicalMapping {
+  id?: string;
   sourceElement: string; // ID of source domain element
   targetElement: string; // ID of target domain element
   mappingStrength: number; // 0.0-1.0
@@ -60,6 +91,26 @@ interface AnalogicalReasoningData {
   >;
 }
 
+/**
+ * Timestamped wrapper for analogy history entries with LRU tracking.
+ * Enables efficient eviction based on both age and access patterns.
+ */
+interface TimestampedAnalogicalData {
+  data: AnalogicalReasoningData;
+  createdAt: number; // Unix timestamp in milliseconds
+  lastAccessedAt: number; // Unix timestamp for LRU eviction
+}
+
+/**
+ * Timestamped domain registry entry with last-seen tracking.
+ * Supports TTL-based cleanup and capacity management.
+ */
+interface TimestampedDomain {
+  name: string;
+  elements: DomainElement[];
+  lastSeenAt: number; // Unix timestamp in milliseconds
+}
+
 // Type guard for DomainElement type
 const allowedElementTypes = ["entity", "attribute", "relation", "process"] as const;
 type DomainElementType = (typeof allowedElementTypes)[number];
@@ -68,22 +119,117 @@ function isValidElementType(type: unknown): type is DomainElementType {
   return typeof type === "string" && allowedElementTypes.includes(type as DomainElementType);
 }
 
-class AnalogicalReasoningServer {
-  private analogyHistory: Record<string, AnalogicalReasoningData[]> = {};
-  private domainRegistry: Record<
-    string,
-    {
-      name: string;
-      elements: DomainElement[];
-    }
-  > = {};
+export class AnalogicalReasoningServer {
+  private analogyHistory: Record<string, TimestampedAnalogicalData[]> = {};
+  private domainRegistry: Record<string, TimestampedDomain> = {};
   private nextElementId = 1;
+  private readonly cleanupLock = new Set<string>(); // Thread-safe cleanup coordination
+
   /**
-   * Initialize server reference for potential future use.
+   * Initialize server reference and start periodic cleanup.
    * The field is intentionally referenced to satisfy strict noUnused rules.
    */
   constructor(private server: Server) {
+    // Validate environment configuration during instantiation
+    validateEnvironmentConfig();
     void this.server;
+    // Start periodic cleanup every 5 minutes
+    setInterval(() => this.performPeriodicCleanup(), 5 * 60 * 1000);
+  }
+
+  /**
+   * Public getter for testing access to analogy history.
+   * @returns The current analogy history with timestamps
+   */
+  public getAnalogicalHistory(): Record<string, TimestampedAnalogicalData[]> {
+    return this.analogyHistory;
+  }
+
+  /**
+   * Public getter for testing access to domain registry.
+   * @returns The current domain registry with timestamps
+   */
+  public getDomainRegistry(): Record<string, TimestampedDomain> {
+    return this.domainRegistry;
+  }
+
+  /**
+   * Public method for testing periodic cleanup functionality.
+   * Triggers cleanup of expired entries based on TTL.
+   */
+  public triggerPeriodicCleanup(): void {
+    this.performPeriodicCleanup();
+  }
+
+  /**
+   * Thread-safe periodic cleanup of expired entries.
+   * Removes entries older than AR_TTL_MINUTES from both history and domains.
+   */
+  private performPeriodicCleanup(): void {
+    const now = Date.now();
+    const ttlMs = AR_TTL_MINUTES * 60 * 1000;
+    const cutoffTime = now - ttlMs;
+
+    // Cleanup analogy history
+    for (const analogyId of Object.keys(this.analogyHistory)) {
+      if (this.cleanupLock.has(analogyId)) continue;
+
+      this.cleanupLock.add(analogyId);
+      try {
+        const entries = this.analogyHistory[analogyId];
+        if (!entries) continue;
+
+        const validEntries = entries.filter((entry) => entry.createdAt > cutoffTime);
+
+        if (validEntries.length === 0) {
+          delete this.analogyHistory[analogyId];
+        } else if (validEntries.length !== entries.length) {
+          this.analogyHistory[analogyId] = validEntries;
+        }
+      } finally {
+        this.cleanupLock.delete(analogyId);
+      }
+    }
+
+    // Cleanup domain registry
+    for (const [domainName, domain] of Object.entries(this.domainRegistry)) {
+      if (domain.lastSeenAt < cutoffTime) {
+        delete this.domainRegistry[domainName];
+      }
+    }
+  }
+
+  /**
+   * Evicts oldest entries from analogy history when exceeding AR_MAX_HISTORY limit.
+   * Implements LRU eviction by sorting on lastAccessedAt timestamp.
+   */
+  private evictOldestHistoryEntries(analogyId: string): void {
+    const entries = this.analogyHistory[analogyId];
+    if (!entries || entries.length <= AR_MAX_HISTORY) return;
+
+    // Sort by lastAccessedAt (oldest first) and keep only the most recent AR_MAX_HISTORY entries
+    entries.sort((a, b) => b.lastAccessedAt - a.lastAccessedAt);
+    this.analogyHistory[analogyId] = entries.slice(0, AR_MAX_HISTORY);
+  }
+
+  /**
+   * Evicts least recently used domains when exceeding AR_MAX_DOMAINS limit.
+   * Maintains domain registry size within configured bounds.
+   */
+  private evictOldestDomains(): void {
+    const domainNames = Object.keys(this.domainRegistry);
+    if (domainNames.length <= AR_MAX_DOMAINS) return;
+
+    // Sort domains by lastSeenAt (oldest first)
+    const sortedDomains = domainNames
+      .map((name) => ({ name, lastSeenAt: this.domainRegistry[name]?.lastSeenAt || 0 }))
+      .sort((a, b) => a.lastSeenAt - b.lastSeenAt);
+
+    // Remove oldest domains to get back to limit
+    const domainsToRemove = sortedDomains.slice(0, domainNames.length - AR_MAX_DOMAINS);
+    for (const domain of domainsToRemove) {
+      delete this.domainRegistry[domain.name];
+    }
   }
 
   private validateAnalogicalReasoningData(input: unknown): AnalogicalReasoningData {
@@ -205,50 +351,55 @@ class AnalogicalReasoningServer {
       });
     }
 
-    // Validate mappings
+    // Validate mappings - must be present and must be an array
+    if (!data["mappings"]) {
+      throw new Error("Invalid mappings: mappings field is required");
+    }
+    if (!Array.isArray(data["mappings"])) {
+      throw new Error("Invalid mappings: must be an array");
+    }
+
     const mappings: AnalogicalMapping[] = [];
-    if (Array.isArray(data["mappings"])) {
-      // Ensure mappings only reference known element IDs
-      const sourceIds = new Set(sourceElements.map((e) => e.id));
-      const targetIds = new Set(targetElements.map((e) => e.id));
+    // Ensure mappings only reference known element IDs
+    const sourceIds = new Set(sourceElements.map((e) => e.id));
+    const targetIds = new Set(targetElements.map((e) => e.id));
 
-      for (const mapping of data["mappings"] as Array<Record<string, unknown>>) {
-        if (!mapping["sourceElement"] || typeof mapping["sourceElement"] !== "string") {
-          throw new Error("Invalid mapping sourceElement: must be a string");
-        }
-        if (!mapping["targetElement"] || typeof mapping["targetElement"] !== "string") {
-          throw new Error("Invalid mapping targetElement: must be a string");
-        }
-        if (!sourceIds.has(mapping["sourceElement"] as string)) {
-          throw new Error(`Mapping references unknown sourceElement id: ${mapping["sourceElement"] as string}`);
-        }
-        if (!targetIds.has(mapping["targetElement"] as string)) {
-          throw new Error(`Mapping references unknown targetElement id: ${mapping["targetElement"] as string}`);
-        }
-
-        if (
-          typeof mapping["mappingStrength"] !== "number" ||
-          mapping["mappingStrength"] < 0 ||
-          mapping["mappingStrength"] > 1
-        ) {
-          throw new Error("Invalid mappingStrength: must be a number between 0 and 1");
-        }
-
-        if (!mapping["justification"] || typeof mapping["justification"] !== "string") {
-          throw new Error("Invalid mapping justification: must be a string");
-        }
-
-        const mappingData: AnalogicalMapping = {
-          sourceElement: mapping["sourceElement"] as string,
-          targetElement: mapping["targetElement"] as string,
-          mappingStrength: mapping["mappingStrength"] as number,
-          justification: mapping["justification"] as string
-        };
-        if (Array.isArray(mapping["limitations"]) && (mapping["limitations"] as unknown[]).length > 0) {
-          mappingData.limitations = mapping["limitations"] as string[];
-        }
-        mappings.push(mappingData);
+    for (const mapping of data["mappings"] as Array<Record<string, unknown>>) {
+      if (!mapping["sourceElement"] || typeof mapping["sourceElement"] !== "string") {
+        throw new Error("Invalid mapping sourceElement: must be a string");
       }
+      if (!mapping["targetElement"] || typeof mapping["targetElement"] !== "string") {
+        throw new Error("Invalid mapping targetElement: must be a string");
+      }
+      if (!sourceIds.has(mapping["sourceElement"] as string)) {
+        throw new Error(`Mapping references unknown sourceElement id: ${mapping["sourceElement"] as string}`);
+      }
+      if (!targetIds.has(mapping["targetElement"] as string)) {
+        throw new Error(`Mapping references unknown targetElement id: ${mapping["targetElement"] as string}`);
+      }
+
+      if (
+        typeof mapping["mappingStrength"] !== "number" ||
+        mapping["mappingStrength"] < 0 ||
+        mapping["mappingStrength"] > 1
+      ) {
+        throw new Error("Invalid mappingStrength: must be a number between 0 and 1");
+      }
+
+      if (!mapping["justification"] || typeof mapping["justification"] !== "string") {
+        throw new Error("Invalid mapping justification: must be a string");
+      }
+
+      const mappingData: AnalogicalMapping = {
+        sourceElement: mapping["sourceElement"] as string,
+        targetElement: mapping["targetElement"] as string,
+        mappingStrength: mapping["mappingStrength"] as number,
+        justification: mapping["justification"] as string
+      };
+      if (Array.isArray(mapping["limitations"]) && (mapping["limitations"] as unknown[]).length > 0) {
+        mappingData.limitations = mapping["limitations"] as string[];
+      }
+      mappings.push(mappingData);
     }
 
     const validated: AnalogicalReasoningData = {
@@ -299,9 +450,16 @@ class AnalogicalReasoningServer {
    * Merge provided domain's elements into the registry, deduplicating by id.
    */
   private updateDomainRegistry(domain: { name: string; elements: DomainElement[] }): void {
+    const now = Date.now();
     let existing = this.domainRegistry[domain.name];
     if (!existing) {
-      existing = this.domainRegistry[domain.name] = { name: domain.name, elements: [] };
+      existing = this.domainRegistry[domain.name] = {
+        name: domain.name,
+        elements: [],
+        lastSeenAt: now
+      };
+    } else {
+      existing.lastSeenAt = now;
     }
 
     const existingIds = new Set(existing.elements.map((e) => e.id));
@@ -312,17 +470,30 @@ class AnalogicalReasoningServer {
         existingIds.add(element.id);
       }
     }
+
+    // Evict old domains if we exceed the limit
+    this.evictOldestDomains();
   }
 
   private updateAnalogicalReasoning(data: AnalogicalReasoningData): void {
-    let historyEntry = this.analogyHistory[data.analogyId]; // Get potential entry
+    const now = Date.now();
+    let historyEntry = this.analogyHistory[data.analogyId];
     if (!historyEntry) {
-      // Check if it exists
-      historyEntry = []; // Create new array if not
-      this.analogyHistory[data.analogyId] = historyEntry; // Assign it back to the object
+      historyEntry = [];
+      this.analogyHistory[data.analogyId] = historyEntry;
     }
-    // Now, historyEntry is guaranteed to be AnalogicalReasoningData[]
-    historyEntry.push(data);
+
+    // Create timestamped entry
+    const timestampedData: TimestampedAnalogicalData = {
+      data,
+      createdAt: now,
+      lastAccessedAt: now
+    };
+
+    historyEntry.push(timestampedData);
+
+    // Evict old entries if we exceed the limit
+    this.evictOldestHistoryEntries(data.analogyId);
 
     // Update domain registry
     this.updateDomainRegistry(data.sourceDomain);
@@ -499,7 +670,7 @@ class AnalogicalReasoningServer {
       // Generate visualization
       const visualization = this.visualizeMapping(validatedInput);
       if (!process.env["AR_SILENT"]) {
-        console.error(visualization);
+        console.error("[analogical-reasoning]", visualization);
       }
 
       let samplingSummary: string | undefined;
@@ -508,7 +679,7 @@ class AnalogicalReasoningServer {
         samplingSummary = this.createLocalSamplingSummary(validatedInput);
       } catch (e) {
         if (!process.env["AR_SILENT"]) {
-          console.error("Sampling failed", e);
+          console.error("[analogical-reasoning] Sampling failed", e);
         }
       }
 
@@ -562,7 +733,7 @@ class AnalogicalReasoningServer {
 const server = new Server(
   {
     name: "analogical-reasoning",
-    version: "0.1.3"
+    version: "0.1.8"
   },
   {
     capabilities: {
@@ -597,7 +768,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     type: { type: "string", enum: ["entity", "attribute", "relation", "process"] },
                     description: { type: "string" }
                   },
-                  required: ["name", "type", "description"]
+                  required: ["id", "name", "type", "description"]
                 }
               }
             },
@@ -619,7 +790,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     type: { type: "string", enum: ["entity", "attribute", "relation", "process"] },
                     description: { type: "string" }
                   },
-                  required: ["name", "type", "description"]
+                  required: ["id", "name", "type", "description"]
                 }
               }
             },
