@@ -1,6 +1,6 @@
 {
   "name": "@wemake-testkitchen/analogical-reasoning",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "MCP server for analogical reasoning: structured pattern mapping, domain-to-domain structure alignment, and explainable inference",
   "license": "MIT",
   "type": "module",

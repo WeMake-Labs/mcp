@@ -24,7 +24,7 @@
     "dev": "bun run --filter='./src/*' dev",
     "start": "bun run --filter='./src/*' start",
     "build": "bun run --filter='./src/*' prepare",
-    "release": "bun run --filter='./src/*' release",
+    "publish": "bun run --filter='./src/*' release",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
