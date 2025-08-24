@@ -90,34 +90,34 @@ class AnalogicalReasoningServer {
     const data = input as Record<string, unknown>;
 
     // Validate required fields
-    if (!data.analogyId || typeof data.analogyId !== "string") {
+    if (!data["analogyId"] || typeof data["analogyId"] !== "string") {
       throw new Error("Invalid analogyId: must be a string");
     }
 
     const allowedPurpose = ["explanation", "prediction", "problem-solving", "creative-generation"] as const;
     if (
-      !data.purpose ||
-      typeof data.purpose !== "string" ||
-      !allowedPurpose.includes(data.purpose as (typeof allowedPurpose)[number])
+      !data["purpose"] ||
+      typeof data["purpose"] !== "string" ||
+      !allowedPurpose.includes(data["purpose"] as (typeof allowedPurpose)[number])
     ) {
       throw new Error(`Invalid purpose: must be one of ${allowedPurpose.join(", ")}`);
     }
 
-    if (typeof data.confidence !== "number" || data.confidence < 0 || data.confidence > 1) {
+    if (typeof data["confidence"] !== "number" || data["confidence"] < 0 || data["confidence"] > 1) {
       throw new Error("Invalid confidence: must be a number between 0 and 1");
     }
 
-    if (typeof data.iteration !== "number" || !Number.isInteger(data.iteration) || data.iteration < 0) {
+    if (typeof data["iteration"] !== "number" || !Number.isInteger(data["iteration"]) || data["iteration"] < 0) {
       throw new Error("Invalid iteration: iteration must be an integer");
     }
 
-    if (typeof data.nextOperationNeeded !== "boolean") {
+    if (typeof data["nextOperationNeeded"] !== "boolean") {
       throw new Error("Invalid nextOperationNeeded: must be a boolean");
     }
 
     // Validate domains
-    const sourceDomain = data.sourceDomain as Record<string, unknown>;
-    const targetDomain = data.targetDomain as Record<string, unknown>;
+    const sourceDomain = data["sourceDomain"] as Record<string, unknown>;
+    const targetDomain = data["targetDomain"] as Record<string, unknown>;
 
     if (!sourceDomain || typeof sourceDomain !== "object") {
       throw new Error("Invalid sourceDomain: must be an object");
@@ -127,121 +127,125 @@ class AnalogicalReasoningServer {
       throw new Error("Invalid targetDomain: must be an object");
     }
 
-    if (!sourceDomain.name || typeof sourceDomain.name !== "string") {
+    if (!sourceDomain["name"] || typeof sourceDomain["name"] !== "string") {
       throw new Error("Invalid sourceDomain.name: must be a string");
     }
 
-    if (!targetDomain.name || typeof targetDomain.name !== "string") {
+    if (!targetDomain["name"] || typeof targetDomain["name"] !== "string") {
       throw new Error("Invalid targetDomain.name: must be a string");
     }
 
-    if (!Array.isArray(sourceDomain.elements)) {
+    if (!Array.isArray(sourceDomain["elements"])) {
       throw new Error("Invalid sourceDomain.elements: must be an array");
     }
 
-    if (!Array.isArray(targetDomain.elements)) {
+    if (!Array.isArray(targetDomain["elements"])) {
       throw new Error("Invalid targetDomain.elements: must be an array");
     }
 
     // Validate elements
     const sourceElements: DomainElement[] = [];
-    for (const element of sourceDomain.elements as Array<Record<string, unknown>>) {
+    for (const element of sourceDomain["elements"] as Array<Record<string, unknown>>) {
       // Derive the ID locally rather than mutating the input object
-      const id = typeof element.id === "string" ? element.id : `elem-${this.nextElementId++}`;
+      const id = typeof element["id"] === "string" ? element["id"] : `elem-${this.nextElementId++}`;
 
-      if (!element.name || typeof element.name !== "string") {
-        throw new Error(`Invalid element name for element ${element.id}: must be a string`);
+      if (!element["name"] || typeof element["name"] !== "string") {
+        throw new Error(`Invalid element name for element ${element["id"]}: must be a string`);
       }
 
-      if (!element.type || typeof element.type !== "string") {
-        throw new Error(`Invalid element type for element ${element.id}: must be a string`);
+      if (!element["type"] || typeof element["type"] !== "string") {
+        throw new Error(`Invalid element type for element ${element["id"]}: must be a string`);
       }
 
-      if (!isValidElementType(element.type)) {
+      if (!isValidElementType(element["type"])) {
         throw new Error(
-          `Invalid element type for element ${element.id}: must be one of ${allowedElementTypes.join(", ")}`
+          `Invalid element type for element ${element["id"]}: must be one of ${allowedElementTypes.join(", ")}`
         );
       }
 
-      if (!element.description || typeof element.description !== "string") {
-        throw new Error(`Invalid element description for element ${element.id}: must be a string`);
+      if (!element["description"] || typeof element["description"] !== "string") {
+        throw new Error(`Invalid element description for element ${element["id"]}: must be a string`);
       }
 
       sourceElements.push({
         id,
-        name: element.name as string,
-        type: element.type,
-        description: element.description as string
+        name: element["name"] as string,
+        type: element["type"],
+        description: element["description"] as string
       });
     }
 
     const targetElements: DomainElement[] = [];
-    for (const element of targetDomain.elements as Array<Record<string, unknown>>) {
-      const id = typeof element.id === "string" ? element.id : `elem-${this.nextElementId++}`;
+    for (const element of targetDomain["elements"] as Array<Record<string, unknown>>) {
+      const id = typeof element["id"] === "string" ? element["id"] : `elem-${this.nextElementId++}`;
 
-      if (!element.name || typeof element.name !== "string") {
-        throw new Error(`Invalid element name for element ${element.id}: must be a string`);
+      if (!element["name"] || typeof element["name"] !== "string") {
+        throw new Error(`Invalid element name for element ${element["id"]}: must be a string`);
       }
 
-      if (!element.type || typeof element.type !== "string") {
-        throw new Error(`Invalid element type for element ${element.id}: must be a string`);
+      if (!element["type"] || typeof element["type"] !== "string") {
+        throw new Error(`Invalid element type for element ${element["id"]}: must be a string`);
       }
 
-      if (!isValidElementType(element.type)) {
+      if (!isValidElementType(element["type"])) {
         throw new Error(
-          `Invalid element type for element ${element.id}: must be one of ${allowedElementTypes.join(", ")}`
+          `Invalid element type for element ${element["id"]}: must be one of ${allowedElementTypes.join(", ")}`
         );
       }
 
-      if (!element.description || typeof element.description !== "string") {
-        throw new Error(`Invalid element description for element ${element.id}: must be a string`);
+      if (!element["description"] || typeof element["description"] !== "string") {
+        throw new Error(`Invalid element description for element ${element["id"]}: must be a string`);
       }
 
       targetElements.push({
         id,
-        name: element.name as string,
-        type: element.type,
-        description: element.description as string
+        name: element["name"] as string,
+        type: element["type"],
+        description: element["description"] as string
       });
     }
 
     // Validate mappings
     const mappings: AnalogicalMapping[] = [];
-    if (Array.isArray(data.mappings)) {
+    if (Array.isArray(data["mappings"])) {
       // Ensure mappings only reference known element IDs
       const sourceIds = new Set(sourceElements.map((e) => e.id));
       const targetIds = new Set(targetElements.map((e) => e.id));
 
-      for (const mapping of data.mappings as Array<Record<string, unknown>>) {
-        if (!mapping.sourceElement || typeof mapping.sourceElement !== "string") {
+      for (const mapping of data["mappings"] as Array<Record<string, unknown>>) {
+        if (!mapping["sourceElement"] || typeof mapping["sourceElement"] !== "string") {
           throw new Error("Invalid mapping sourceElement: must be a string");
         }
-        if (!mapping.targetElement || typeof mapping.targetElement !== "string") {
+        if (!mapping["targetElement"] || typeof mapping["targetElement"] !== "string") {
           throw new Error("Invalid mapping targetElement: must be a string");
         }
-        if (!sourceIds.has(mapping.sourceElement as string)) {
-          throw new Error(`Mapping references unknown sourceElement id: ${mapping.sourceElement as string}`);
+        if (!sourceIds.has(mapping["sourceElement"] as string)) {
+          throw new Error(`Mapping references unknown sourceElement id: ${mapping["sourceElement"] as string}`);
         }
-        if (!targetIds.has(mapping.targetElement as string)) {
-          throw new Error(`Mapping references unknown targetElement id: ${mapping.targetElement as string}`);
+        if (!targetIds.has(mapping["targetElement"] as string)) {
+          throw new Error(`Mapping references unknown targetElement id: ${mapping["targetElement"] as string}`);
         }
 
-        if (typeof mapping.mappingStrength !== "number" || mapping.mappingStrength < 0 || mapping.mappingStrength > 1) {
+        if (
+          typeof mapping["mappingStrength"] !== "number" ||
+          mapping["mappingStrength"] < 0 ||
+          mapping["mappingStrength"] > 1
+        ) {
           throw new Error("Invalid mappingStrength: must be a number between 0 and 1");
         }
 
-        if (!mapping.justification || typeof mapping.justification !== "string") {
+        if (!mapping["justification"] || typeof mapping["justification"] !== "string") {
           throw new Error("Invalid mapping justification: must be a string");
         }
 
         const mappingData: AnalogicalMapping = {
-          sourceElement: mapping.sourceElement as string,
-          targetElement: mapping.targetElement as string,
-          mappingStrength: mapping.mappingStrength as number,
-          justification: mapping.justification as string
+          sourceElement: mapping["sourceElement"] as string,
+          targetElement: mapping["targetElement"] as string,
+          mappingStrength: mapping["mappingStrength"] as number,
+          justification: mapping["justification"] as string
         };
-        if (Array.isArray(mapping.limitations) && (mapping.limitations as unknown[]).length > 0) {
-          mappingData.limitations = mapping.limitations as string[];
+        if (Array.isArray(mapping["limitations"]) && (mapping["limitations"] as unknown[]).length > 0) {
+          mappingData.limitations = mapping["limitations"] as string[];
         }
         mappings.push(mappingData);
       }
@@ -249,42 +253,42 @@ class AnalogicalReasoningServer {
 
     const validated: AnalogicalReasoningData = {
       sourceDomain: {
-        name: sourceDomain.name as string,
+        name: sourceDomain["name"] as string,
         elements: sourceElements
       },
       targetDomain: {
-        name: targetDomain.name as string,
+        name: targetDomain["name"] as string,
         elements: targetElements
       },
       mappings,
-      analogyId: data.analogyId as string,
-      purpose: data.purpose as AnalogicalReasoningData["purpose"],
-      confidence: data.confidence as number,
-      iteration: data.iteration as number,
-      strengths: Array.isArray(data.strengths) ? (data.strengths as string[]) : [],
-      limitations: Array.isArray(data.limitations) ? (data.limitations as string[]) : [],
-      inferences: Array.isArray(data.inferences)
-        ? (data.inferences as Array<Record<string, unknown>>).map((inf, i) => {
-            if (typeof inf.statement !== "string" || inf.statement.length === 0) {
+      analogyId: data["analogyId"] as string,
+      purpose: data["purpose"] as AnalogicalReasoningData["purpose"],
+      confidence: data["confidence"] as number,
+      iteration: data["iteration"] as number,
+      strengths: Array.isArray(data["strengths"]) ? (data["strengths"] as string[]) : [],
+      limitations: Array.isArray(data["limitations"]) ? (data["limitations"] as string[]) : [],
+      inferences: Array.isArray(data["inferences"])
+        ? (data["inferences"] as Array<Record<string, unknown>>).map((inf, i) => {
+            if (typeof inf["statement"] !== "string" || inf["statement"].length === 0) {
               throw new Error(`Invalid inferences[${i}].statement: must be a non-empty string`);
             }
-            if (typeof inf.confidence !== "number" || inf.confidence < 0 || inf.confidence > 1) {
+            if (typeof inf["confidence"] !== "number" || inf["confidence"] < 0 || inf["confidence"] > 1) {
               throw new Error(`Invalid inferences[${i}].confidence: must be a number between 0 and 1`);
             }
-            if (!Array.isArray(inf.basedOnMappings) || inf.basedOnMappings.some((v) => typeof v !== "string")) {
+            if (!Array.isArray(inf["basedOnMappings"]) || inf["basedOnMappings"].some((v) => typeof v !== "string")) {
               throw new Error(`Invalid inferences[${i}].basedOnMappings: must be string[]`);
             }
             return {
-              statement: inf.statement,
-              confidence: inf.confidence,
-              basedOnMappings: inf.basedOnMappings as string[]
+              statement: inf["statement"],
+              confidence: inf["confidence"],
+              basedOnMappings: inf["basedOnMappings"] as string[]
             };
           })
         : [],
-      nextOperationNeeded: data.nextOperationNeeded as boolean
+      nextOperationNeeded: data["nextOperationNeeded"] as boolean
     };
-    if (Array.isArray(data.suggestedOperations)) {
-      validated.suggestedOperations = data.suggestedOperations as Array<
+    if (Array.isArray(data["suggestedOperations"])) {
+      validated.suggestedOperations = data["suggestedOperations"] as Array<
         "add-mapping" | "revise-mapping" | "draw-inference" | "evaluate-limitation" | "try-new-source"
       >;
     }
@@ -494,7 +498,7 @@ class AnalogicalReasoningServer {
 
       // Generate visualization
       const visualization = this.visualizeMapping(validatedInput);
-      if (!process.env.AR_SILENT) {
+      if (!process.env["AR_SILENT"]) {
         console.error(visualization);
       }
 
@@ -503,7 +507,7 @@ class AnalogicalReasoningServer {
         // Fallback local summary instead of calling a non-existent server method.
         samplingSummary = this.createLocalSamplingSummary(validatedInput);
       } catch (e) {
-        if (!process.env.AR_SILENT) {
+        if (!process.env["AR_SILENT"]) {
           console.error("Sampling failed", e);
         }
       }

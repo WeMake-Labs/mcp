@@ -23,7 +23,7 @@
   "scripts": {
     "dev": "bun run --filter='./src/*' dev",
     "start": "bun run --filter='./src/*' start",
-    "build": "bun run --filter='./src/*' build",
+    "build": "bun run --filter='./src/*' prepare",
     "release": "bun run --filter='./src/*' release",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
