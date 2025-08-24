@@ -224,16 +224,29 @@ jobs:
       - name: Create package tarball
         working-directory: src/${{ matrix.package }}
         run: |
-          # Create a tarball of the package
+          # Create a tarball of the package using temporary directory to prevent file changes during archiving
           PACKAGE_NAME=$(jq -r '.name' package.json | sed 's/@//g' | sed 's/\//-/g')
           NEW_VERSION="${{ steps.new-version.outputs.new-version }}"
 
-          tar -czf "${PACKAGE_NAME}-${NEW_VERSION}.tgz" \
+          # Create temporary directory for atomic operation
+          TMPDIR=$(mktemp -d)
+
+          # Copy files to temporary directory with exclusions
+          rsync -a \
             --exclude=node_modules \
             --exclude=.git \
             --exclude='*.test.*' \
             --exclude=tests \
-            .
+            . "$TMPDIR/"
+
+          # Create tarball from temporary directory
+          (cd "$TMPDIR" && tar -czf "../${PACKAGE_NAME}-${NEW_VERSION}.tgz" .)
+
+          # Move tarball to working directory
+          mv "${PACKAGE_NAME}-${NEW_VERSION}.tgz" .
+
+          # Clean up temporary directory
+          rm -rf "$TMPDIR"
 
           echo "Created package tarball: ${PACKAGE_NAME}-${NEW_VERSION}.tgz"
 
