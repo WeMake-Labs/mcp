@@ -18,8 +18,8 @@
       },
     },
     "src/analogical-reasoning": {
-      "name": "@wemake-testkitchen/analogical-reasoning",
-      "version": "0.1.9",
+      "name": "@wemake.cx/analogical-reasoning",
+      "version": "0.1.0",
       "bin": {
         "mcp-server-analogical-reasoning": "dist/index.js",
       },
@@ -453,7 +453,7 @@
 
     "@typescript-eslint/visitor-keys": ["@typescript-eslint/visitor-keys@8.40.0", "", { "dependencies": { "@typescript-eslint/types": "8.40.0", "eslint-visitor-keys": "^4.2.1" } }, "sha512-8CZ47QwalyRjsypfwnbI3hKy5gJDPmrkLjkgMxhi0+DZZ2QNx2naS6/hWoVYUHU7LU2zleF68V9miaVZvhFfTA=="],
 
-    "@wemake-testkitchen/analogical-reasoning": ["@wemake-testkitchen/analogical-reasoning@workspace:src/analogical-reasoning"],
+    "@wemake.cx/analogical-reasoning": ["@wemake.cx/analogical-reasoning@workspace:src/analogical-reasoning"],
 
     "@yarnpkg/lockfile": ["@yarnpkg/lockfile@1.1.0", "", {}, "sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ=="],
 
