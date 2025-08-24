@@ -732,7 +732,7 @@ export class AnalogicalReasoningServer {
 const server = new Server(
   {
     name: "analogical-reasoning",
-    version: "0.1.2"
+    version: "0.1.3"
   },
   {
     capabilities: {

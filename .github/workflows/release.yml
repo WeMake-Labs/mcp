@@ -228,8 +228,19 @@ jobs:
           PACKAGE_NAME=$(jq -r '.name' package.json | sed 's/@//g' | sed 's/\//-/g')
           NEW_VERSION="${{ steps.new-version.outputs.new-version }}"
 
+          # Validate required variables
+          if [ -z "$PACKAGE_NAME" ] || [ -z "$NEW_VERSION" ]; then
+            echo "❌ Missing required variables:"
+            echo "Package name: '$PACKAGE_NAME'"
+            echo "New version: '$NEW_VERSION'"
+            exit 1
+          fi
+
+          echo "📦 Creating tarball for: $PACKAGE_NAME v$NEW_VERSION"
+
           # Create temporary directory for atomic operation
           TMPDIR=$(mktemp -d)
+          TARBALL_NAME="${PACKAGE_NAME}-${NEW_VERSION}.tgz"
 
           # Copy files to temporary directory with exclusions
           rsync -a \
@@ -239,16 +250,39 @@ jobs:
             --exclude=tests \
             . "$TMPDIR/"
 
-          # Create tarball from temporary directory
-          (cd "$TMPDIR" && tar -czf "../${PACKAGE_NAME}-${NEW_VERSION}.tgz" .)
+          # Create tarball from temporary directory with explicit path
+          echo "🔧 Creating tarball: $TARBALL_NAME"
+          (cd "$TMPDIR" && tar -czf "$TARBALL_NAME" .)
+
+          # Verify tarball was created in temp directory
+          if [ ! -f "$TMPDIR/$TARBALL_NAME" ]; then
+            echo "❌ Tarball creation failed in temp directory"
+            echo "Expected: $TMPDIR/$TARBALL_NAME"
+            echo "Contents of temp directory:"
+            ls -la "$TMPDIR/"
+            rm -rf "$TMPDIR"
+            exit 1
+          fi
 
           # Move tarball to working directory
-          mv "${PACKAGE_NAME}-${NEW_VERSION}.tgz" .
+          mv "$TMPDIR/$TARBALL_NAME" .
+
+          # Verify tarball exists in working directory
+          if [ ! -f "$TARBALL_NAME" ]; then
+            echo "❌ Tarball move failed"
+            echo "Expected: $TARBALL_NAME"
+            echo "Contents of working directory:"
+            ls -la .
+            rm -rf "$TMPDIR"
+            exit 1
+          fi
 
           # Clean up temporary directory
           rm -rf "$TMPDIR"
 
-          echo "Created package tarball: ${PACKAGE_NAME}-${NEW_VERSION}.tgz"
+          # Final verification and size report
+          TARBALL_SIZE=$(du -h "$TARBALL_NAME" | cut -f1)
+          echo "✅ Created package tarball: $TARBALL_NAME ($TARBALL_SIZE)"
 
       - name: Commit version bump
         run: |
