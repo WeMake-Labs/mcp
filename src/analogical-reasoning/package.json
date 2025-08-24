@@ -1,6 +1,6 @@
 {
-  "name": "@wemake-ai/testkitchen",
-  "version": "0.1.4",
+  "name": "@wemake.cx/analogical-reasoning",
+  "version": "0.1.5",
   "description": "MCP server for analogical reasoning: structured pattern mapping, domain-to-domain structure alignment, and explainable inference",
   "license": "MIT",
   "type": "module",
@@ -45,7 +45,7 @@
     "build": "bun build --entrypoints ./src/index.ts --outdir ./dist --format esm --target=bun --sourcemap && shx chmod +x dist/*.js",
     "types": "bun tsc",
     "prepare": "bun run types && bun run build",
-    "publish": "bun publish",
+    "release": "bun publish",
     "watch": "bun tsc --watch"
   },
   "dependencies": {
