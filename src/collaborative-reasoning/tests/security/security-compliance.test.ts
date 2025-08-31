@@ -4,8 +4,8 @@
  */
 
 import { describe, test, expect, beforeEach } from "bun:test";
-import { CollaborativeReasoningServer } from "../../index.ts";
-import { mockCollaborativeReasoningData, TestHelpers } from "../utils/test-data.ts";
+import { CollaborativeReasoningServer } from "../../index.js";
+import { mockCollaborativeReasoningData, TestHelpers } from "../utils/test-data.js";
 
 /**
  * Robust security validators for sensitive data detection
@@ -13,23 +13,23 @@ import { mockCollaborativeReasoningData, TestHelpers } from "../utils/test-data.
 class SecurityValidators {
   // Robust email pattern (RFC-5322 inspired, simplified for practical use)
   static emailPattern =
-    /\b[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\b/gi;
+    /\b[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\b/iu;
 
   // E.164 aware phone pattern with common formats
   static phonePattern =
     /(?:\+?1[-\s.]?)?(?:\(?[0-9]{3}\)?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4})|(?:\+[1-9]\d{1,14})|(?:\(?\d{3}\)?[-\s.]?\d{3}[-\s.]?\d{4})/g;
 
-  // Enhanced SSN pattern with optional delimiters and leading zeros
+  // Canonical US SSN pattern with valid ranges (area 001-899 excluding 666, group 01-99, serial 0001-9999)
   static ssnPattern =
-    /\b(?:0{0,2}[1-9]|[1-9]\d{0,2})[-\s]?(?:0[1-9]|[1-9]\d)[-\s]?(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|[1-9]\d{3})\b/g;
+    /\b(?:00[1-9]|0[1-9]\d|[1-5]\d{2}|6(?:[0-5]\d|6[0-5])|7(?:[0-6]\d|7[0-2])|8\d{2})[-\s]?(?:0[1-9]|[1-9]\d)[-\s]?(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|[1-9]\d{3})\b/iu;
 
   /**
    * Validates credit card numbers using Luhn algorithm and common BIN ranges
    */
   static validateCreditCard(text: string): boolean {
-    // Enhanced credit card pattern matching common BIN ranges and spacing variations
+    // Enhanced credit card pattern matching 13-19 digits with optional separators
     const cardPattern =
-      /\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3[0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b/g;
+      /\b(?=(?:[\d\s-]*\d){13,19}\b)\d+(?:[\s-]?\d+)*\b/g;
     const matches = text.match(cardPattern);
 
     if (!matches) return false;
@@ -37,7 +37,7 @@ class SecurityValidators {
     // Check each potential card number with Luhn algorithm
     return matches.some((card) => {
       const digits = card.replace(/\D/g, "");
-      return this.luhnCheck(digits);
+      return digits.length >= 13 && digits.length <= 19 && this.luhnCheck(digits);
     });
   }
 
