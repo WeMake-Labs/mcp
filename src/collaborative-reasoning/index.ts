@@ -2,7 +2,7 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema, ListToolsRequestSchema, Tool } from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema, type Tool } from "@modelcontextprotocol/sdk/types.js";
 import chalk from "chalk";
 
 // Types
@@ -72,135 +72,138 @@ class CollaborativeReasoningServer {
   private contributionHistory: Record<string, Contribution[]> = {};
   private disagreementTracker: Record<string, Disagreement[]> = {};
   private sessionHistory: Record<string, CollaborativeReasoningData[]> = {};
-  private nextContributionId = 1;
 
   private validateCollaborativeReasoningData(input: unknown): CollaborativeReasoningData {
     const data = input as Record<string, unknown>;
 
     // Validate required fields
-    if (!data.topic || typeof data.topic !== "string") {
+    if (!data["topic"] || typeof data["topic"] !== "string") {
       throw new Error("Invalid topic: must be a string");
     }
 
-    if (!Array.isArray(data.personas)) {
+    if (!Array.isArray(data["personas"])) {
       throw new Error("Invalid personas: must be an array");
     }
 
-    if (!Array.isArray(data.contributions)) {
+    if (!Array.isArray(data["contributions"])) {
       throw new Error("Invalid contributions: must be an array");
     }
 
-    if (!data.stage || typeof data.stage !== "string") {
+    if (!data["stage"] || typeof data["stage"] !== "string") {
       throw new Error("Invalid stage: must be a string");
     }
 
-    if (!data.activePersonaId || typeof data.activePersonaId !== "string") {
+    if (!data["activePersonaId"] || typeof data["activePersonaId"] !== "string") {
       throw new Error("Invalid activePersonaId: must be a string");
     }
 
-    if (!data.sessionId || typeof data.sessionId !== "string") {
+    if (!data["sessionId"] || typeof data["sessionId"] !== "string") {
       throw new Error("Invalid sessionId: must be a string");
     }
 
-    if (typeof data.iteration !== "number" || data.iteration < 0) {
+    if (typeof data["iteration"] !== "number" || data["iteration"] < 0) {
       throw new Error("Invalid iteration: must be a non-negative number");
     }
 
-    if (typeof data.nextContributionNeeded !== "boolean") {
+    if (typeof data["nextContributionNeeded"] !== "boolean") {
       throw new Error("Invalid nextContributionNeeded: must be a boolean");
     }
 
     // Validate personas
     const personas: Persona[] = [];
-    for (const persona of data.personas as Array<Record<string, unknown>>) {
-      if (!persona.id || typeof persona.id !== "string") {
+    for (const persona of data["personas"] as Array<Record<string, unknown>>) {
+      if (!persona["id"] || typeof persona["id"] !== "string") {
         throw new Error("Invalid persona id: must be a string");
       }
 
-      if (!persona.name || typeof persona.name !== "string") {
+      if (!persona["name"] || typeof persona["name"] !== "string") {
         throw new Error("Invalid persona name: must be a string");
       }
 
-      if (!Array.isArray(persona.expertise)) {
+      if (!Array.isArray(persona["expertise"])) {
         throw new Error("Invalid persona expertise: must be an array");
       }
 
-      if (!persona.background || typeof persona.background !== "string") {
+      if (!persona["background"] || typeof persona["background"] !== "string") {
         throw new Error("Invalid persona background: must be a string");
       }
 
-      if (!persona.perspective || typeof persona.perspective !== "string") {
+      if (!persona["perspective"] || typeof persona["perspective"] !== "string") {
         throw new Error("Invalid persona perspective: must be a string");
       }
 
-      if (!Array.isArray(persona.biases)) {
+      if (!Array.isArray(persona["biases"])) {
         throw new Error("Invalid persona biases: must be an array");
       }
 
-      if (!persona.communication || typeof persona.communication !== "object") {
+      if (!persona["communication"] || typeof persona["communication"] !== "object") {
         throw new Error("Invalid persona communication: must be an object");
       }
 
-      const communication = persona.communication as Record<string, unknown>;
+      const communication = persona["communication"] as Record<string, unknown>;
 
-      if (!communication.style || typeof communication.style !== "string") {
+      if (!communication["style"] || typeof communication["style"] !== "string") {
         throw new Error("Invalid persona communication style: must be a string");
       }
 
-      if (!communication.tone || typeof communication.tone !== "string") {
+      if (!communication["tone"] || typeof communication["tone"] !== "string") {
         throw new Error("Invalid persona communication tone: must be a string");
       }
 
       const expertise: string[] = [];
-      for (const exp of persona.expertise) {
+      for (const exp of persona["expertise"]) {
         if (typeof exp === "string") {
           expertise.push(exp);
         }
       }
 
       const biases: string[] = [];
-      for (const bias of persona.biases) {
+      for (const bias of persona["biases"]) {
         if (typeof bias === "string") {
           biases.push(bias);
         }
       }
 
       personas.push({
-        id: persona.id as string,
-        name: persona.name as string,
+        id: persona["id"] as string,
+        name: persona["name"] as string,
         expertise,
-        background: persona.background as string,
-        perspective: persona.perspective as string,
+        background: persona["background"] as string,
+        perspective: persona["perspective"] as string,
         biases,
         communication: {
-          style: communication.style as string,
-          tone: communication.tone as string
+          style: communication["style"] as string,
+          tone: communication["tone"] as string
         }
       });
     }
 
     // Validate contributions
     const contributions: Contribution[] = [];
-    for (const contribution of data.contributions as Array<Record<string, unknown>>) {
-      if (!contribution.personaId || typeof contribution.personaId !== "string") {
+    for (const contribution of data["contributions"] as Array<Record<string, unknown>>) {
+      if (!contribution["personaId"] || typeof contribution["personaId"] !== "string") {
         throw new Error("Invalid contribution personaId: must be a string");
       }
 
-      if (!contribution.content || typeof contribution.content !== "string") {
+      if (!contribution["content"] || typeof contribution["content"] !== "string") {
         throw new Error("Invalid contribution content: must be a string");
       }
 
-      if (!contribution.type || typeof contribution.type !== "string") {
+      if (!contribution["type"] || typeof contribution["type"] !== "string") {
         throw new Error("Invalid contribution type: must be a string");
       }
 
-      if (typeof contribution.confidence !== "number" || contribution.confidence < 0 || contribution.confidence > 1) {
+      if (
+        typeof contribution["confidence"] !== "number" ||
+        contribution["confidence"] < 0 ||
+        contribution["confidence"] > 1
+      ) {
         throw new Error("Invalid contribution confidence: must be a number between 0 and 1");
       }
 
       const referenceIds: string[] = [];
-      if (Array.isArray(contribution.referenceIds)) {
-        for (const refId of contribution.referenceIds) {
+      if (Array.isArray(contribution["referenceIds"])) {
+        for (const refId of contribution["referenceIds"]) {
           if (typeof refId === "string") {
             referenceIds.push(refId);
           }
@@ -208,10 +211,10 @@ class CollaborativeReasoningServer {
       }
 
       const contributionData: Contribution = {
-        personaId: contribution.personaId as string,
-        content: contribution.content as string,
-        type: contribution.type as Contribution["type"],
-        confidence: contribution.confidence as number
+        personaId: contribution["personaId"] as string,
+        content: contribution["content"] as string,
+        type: contribution["type"] as Contribution["type"],
+        confidence: contribution["confidence"] as number
       };
       if (referenceIds.length > 0) {
         contributionData.referenceIds = referenceIds;
@@ -221,40 +224,40 @@ class CollaborativeReasoningServer {
 
     // Validate disagreements
     const disagreements: Disagreement[] = [];
-    if (Array.isArray(data.disagreements)) {
-      for (const disagreement of data.disagreements as Array<Record<string, unknown>>) {
-        if (!disagreement.topic || typeof disagreement.topic !== "string") {
+    if (Array.isArray(data["disagreements"])) {
+      for (const disagreement of data["disagreements"] as Array<Record<string, unknown>>) {
+        if (!disagreement["topic"] || typeof disagreement["topic"] !== "string") {
           throw new Error("Invalid disagreement topic: must be a string");
         }
 
-        if (!Array.isArray(disagreement.positions)) {
+        if (!Array.isArray(disagreement["positions"])) {
           throw new Error("Invalid disagreement positions: must be an array");
         }
 
         const positions: Disagreement["positions"] = [];
-        for (const position of disagreement.positions as Array<Record<string, unknown>>) {
-          if (!position.personaId || typeof position.personaId !== "string") {
+        for (const position of disagreement["positions"] as Array<Record<string, unknown>>) {
+          if (!position["personaId"] || typeof position["personaId"] !== "string") {
             throw new Error("Invalid position personaId: must be a string");
           }
 
-          if (!position.position || typeof position.position !== "string") {
+          if (!position["position"] || typeof position["position"] !== "string") {
             throw new Error("Invalid position statement: must be a string");
           }
 
-          if (!Array.isArray(position.arguments)) {
+          if (!Array.isArray(position["arguments"])) {
             throw new Error("Invalid position arguments: must be an array");
           }
 
           const args: string[] = [];
-          for (const arg of position.arguments) {
+          for (const arg of position["arguments"]) {
             if (typeof arg === "string") {
               args.push(arg);
             }
           }
 
           positions.push({
-            personaId: position.personaId as string,
-            position: position.position as string,
+            personaId: position["personaId"] as string,
+            position: position["position"] as string,
             arguments: args
           });
         }
@@ -262,23 +265,23 @@ class CollaborativeReasoningServer {
         let resolution: Disagreement["resolution"] | undefined = undefined;
         // Explicit, detailed type guard for disagreement.resolution
         if (
-          disagreement.resolution &&
-          typeof disagreement.resolution === "object" &&
-          "type" in disagreement.resolution &&
-          typeof disagreement.resolution.type === "string" &&
-          ["consensus", "compromise", "integration", "tabled"].includes(disagreement.resolution.type) &&
-          "description" in disagreement.resolution &&
-          typeof disagreement.resolution.description === "string"
+          disagreement["resolution"] &&
+          typeof disagreement["resolution"] === "object" &&
+          "type" in disagreement["resolution"] &&
+          typeof disagreement["resolution"].type === "string" &&
+          ["consensus", "compromise", "integration", "tabled"].includes(disagreement["resolution"].type) &&
+          "description" in disagreement["resolution"] &&
+          typeof disagreement["resolution"].description === "string"
         ) {
           // Now TS knows the exact shape, inner checks are redundant
           resolution = {
-            type: disagreement.resolution!.type as NonNullable<Disagreement["resolution"]>["type"],
-            description: disagreement.resolution!.description
+            type: disagreement["resolution"]!.type as NonNullable<Disagreement["resolution"]>["type"],
+            description: disagreement["resolution"]!.description
           };
         }
 
         const disagreementData: Disagreement = {
-          topic: disagreement.topic as string,
+          topic: disagreement["topic"] as string,
           positions
         };
         if (resolution) {
@@ -290,8 +293,8 @@ class CollaborativeReasoningServer {
 
     // Validate optional array fields
     const keyInsights: string[] = [];
-    if (Array.isArray(data.keyInsights)) {
-      for (const insight of data.keyInsights) {
+    if (Array.isArray(data["keyInsights"])) {
+      for (const insight of data["keyInsights"]) {
         if (typeof insight === "string") {
           keyInsights.push(insight);
         }
@@ -299,8 +302,8 @@ class CollaborativeReasoningServer {
     }
 
     const consensusPoints: string[] = [];
-    if (Array.isArray(data.consensusPoints)) {
-      for (const point of data.consensusPoints) {
+    if (Array.isArray(data["consensusPoints"])) {
+      for (const point of data["consensusPoints"]) {
         if (typeof point === "string") {
           consensusPoints.push(point);
         }
@@ -308,8 +311,8 @@ class CollaborativeReasoningServer {
     }
 
     const openQuestions: string[] = [];
-    if (Array.isArray(data.openQuestions)) {
-      for (const question of data.openQuestions) {
+    if (Array.isArray(data["openQuestions"])) {
+      for (const question of data["openQuestions"]) {
         if (typeof question === "string") {
           openQuestions.push(question);
         }
@@ -317,8 +320,8 @@ class CollaborativeReasoningServer {
     }
 
     const suggestedContributionTypes: string[] = [];
-    if (Array.isArray(data.suggestedContributionTypes)) {
-      for (const type of data.suggestedContributionTypes) {
+    if (Array.isArray(data["suggestedContributionTypes"])) {
+      for (const type of data["suggestedContributionTypes"]) {
         if (typeof type === "string") {
           suggestedContributionTypes.push(type);
         }
@@ -327,22 +330,22 @@ class CollaborativeReasoningServer {
 
     // Create validated data object
     const validatedData: CollaborativeReasoningData = {
-      topic: data.topic as string,
+      topic: data["topic"] as string,
       personas,
       contributions,
-      stage: data.stage as CollaborativeReasoningData["stage"],
-      activePersonaId: data.activePersonaId as string,
-      sessionId: data.sessionId as string,
-      iteration: data.iteration as number,
-      nextContributionNeeded: data.nextContributionNeeded as boolean
+      stage: data["stage"] as CollaborativeReasoningData["stage"],
+      activePersonaId: data["activePersonaId"] as string,
+      sessionId: data["sessionId"] as string,
+      iteration: data["iteration"] as number,
+      nextContributionNeeded: data["nextContributionNeeded"] as boolean
     };
 
     // Conditionally add optional properties
     if (disagreements.length > 0) {
       validatedData.disagreements = disagreements;
     }
-    if (typeof data.nextPersonaId === "string") {
-      validatedData.nextPersonaId = data.nextPersonaId;
+    if (typeof data["nextPersonaId"] === "string") {
+      validatedData.nextPersonaId = data["nextPersonaId"];
     }
     if (keyInsights.length > 0) {
       validatedData.keyInsights = keyInsights;
@@ -353,8 +356,8 @@ class CollaborativeReasoningServer {
     if (openQuestions.length > 0) {
       validatedData.openQuestions = openQuestions;
     }
-    if (data.finalRecommendation && typeof data.finalRecommendation === "string") {
-      validatedData.finalRecommendation = data.finalRecommendation;
+    if (data["finalRecommendation"] && typeof data["finalRecommendation"] === "string") {
+      validatedData.finalRecommendation = data["finalRecommendation"];
     }
     if (suggestedContributionTypes.length > 0) {
       validatedData.suggestedContributionTypes = suggestedContributionTypes;
