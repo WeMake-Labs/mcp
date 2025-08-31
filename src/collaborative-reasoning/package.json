@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/collaborative-reasoning",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "MCP server for diagrammatic thinking and spatial representation",
   "license": "MIT",
   "type": "module",
@@ -10,7 +10,8 @@
     "directory": "src/collaborative-reasoning"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "alpha"
   },
   "homepage": "https://github.com/wemake-ai/mcp/tree/main/src/collaborative-reasoning",
   "author": "heyFlorentin",
