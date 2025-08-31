@@ -290,8 +290,7 @@ The server uses standard MCP protocol configuration:
 ### Development Dependencies
 
 - `@types/node`: ^22 - Node.js type definitions
-- `@types/yargs`: ^17.0.32 - Yargs type definitions
-- `shx`: ^0.3.4 - Cross-platform shell commands
+
 - `typescript`: Latest - TypeScript compiler
 
 ## Testing

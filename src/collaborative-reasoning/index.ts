@@ -3,7 +3,40 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, type Tool } from "@modelcontextprotocol/sdk/types.js";
-import chalk from "chalk";
+
+// ANSI color codes for terminal styling (replacing chalk)
+const ANSI = {
+  reset: "\x1b[0m",
+  bold: "\x1b[1m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
+  white: "\x1b[37m",
+  bgGreen: "\x1b[42m",
+  black: "\x1b[30m"
+} as const;
+
+/**
+ * Type guard for Disagreement resolution objects
+ * Validates that an object conforms to the Disagreement["resolution"] type
+ * @param obj - Object to validate
+ * @returns True if obj is a valid resolution object
+ */
+function isResolution(obj: unknown): obj is NonNullable<Disagreement["resolution"]> {
+  return (
+    obj !== null &&
+    obj !== undefined &&
+    typeof obj === "object" &&
+    "type" in obj &&
+    typeof (obj as Record<string, unknown>)["type"] === "string" &&
+    ["consensus", "compromise", "integration", "tabled"].includes((obj as Record<string, unknown>)["type"] as string) &&
+    "description" in obj &&
+    typeof (obj as Record<string, unknown>)["description"] === "string"
+  );
+}
 
 // Types
 export interface Persona {
@@ -418,20 +451,12 @@ export class CollaborativeReasoningServer {
         }
 
         let resolution: Disagreement["resolution"] | undefined = undefined;
-        // Explicit, detailed type guard for disagreement.resolution
-        if (
-          disagreement["resolution"] &&
-          typeof disagreement["resolution"] === "object" &&
-          "type" in disagreement["resolution"] &&
-          typeof disagreement["resolution"].type === "string" &&
-          ["consensus", "compromise", "integration", "tabled"].includes(disagreement["resolution"].type) &&
-          "description" in disagreement["resolution"] &&
-          typeof disagreement["resolution"].description === "string"
-        ) {
-          // Now TS knows the exact shape, inner checks are redundant
+        // Use extracted type guard helper function
+        const resolutionCandidate = disagreement["resolution"];
+        if (isResolution(resolutionCandidate)) {
           resolution = {
-            type: disagreement["resolution"]!.type as NonNullable<Disagreement["resolution"]>["type"],
-            description: disagreement["resolution"]!.description
+            type: resolutionCandidate.type,
+            description: resolutionCandidate.description
           };
         }
 
@@ -604,7 +629,14 @@ export class CollaborativeReasoningServer {
   }
 
   private getPersonaColor(index: number): (text: string) => string {
-    const colors = [chalk.blue, chalk.green, chalk.yellow, chalk.magenta, chalk.cyan, chalk.red];
+    const colors = [
+      (text: string) => `${ANSI.blue}${text}${ANSI.reset}`,
+      (text: string) => `${ANSI.green}${text}${ANSI.reset}`,
+      (text: string) => `${ANSI.yellow}${text}${ANSI.reset}`,
+      (text: string) => `${ANSI.magenta}${text}${ANSI.reset}`,
+      (text: string) => `${ANSI.cyan}${text}${ANSI.reset}`,
+      (text: string) => `${ANSI.red}${text}${ANSI.reset}`
+    ];
 
     // Use non-null assertion as logic guarantees a valid index
     return colors[index % colors.length]!;
@@ -613,21 +645,21 @@ export class CollaborativeReasoningServer {
   private getContributionTypeColor(type: string): (text: string) => string {
     switch (type) {
       case "observation":
-        return chalk.blue;
+        return (text: string) => `${ANSI.blue}${text}${ANSI.reset}`;
       case "question":
-        return chalk.cyan;
+        return (text: string) => `${ANSI.cyan}${text}${ANSI.reset}`;
       case "insight":
-        return chalk.green;
+        return (text: string) => `${ANSI.green}${text}${ANSI.reset}`;
       case "concern":
-        return chalk.yellow;
+        return (text: string) => `${ANSI.yellow}${text}${ANSI.reset}`;
       case "suggestion":
-        return chalk.magenta;
+        return (text: string) => `${ANSI.magenta}${text}${ANSI.reset}`;
       case "challenge":
-        return chalk.red;
+        return (text: string) => `${ANSI.red}${text}${ANSI.reset}`;
       case "synthesis":
-        return chalk.white;
+        return (text: string) => `${ANSI.white}${text}${ANSI.reset}`;
       default:
-        return chalk.white;
+        return (text: string) => `${ANSI.white}${text}${ANSI.reset}`;
     }
   }
 
@@ -641,11 +673,11 @@ export class CollaborativeReasoningServer {
     // Choose color based on confidence level
     let color: (text: string) => string;
     if (confidence >= 0.8) {
-      color = chalk.green;
+      color = (text: string) => `${ANSI.green}${text}${ANSI.reset}`;
     } else if (confidence >= 0.5) {
-      color = chalk.yellow;
+      color = (text: string) => `${ANSI.yellow}${text}${ANSI.reset}`;
     } else {
-      color = chalk.red;
+      color = (text: string) => `${ANSI.red}${text}${ANSI.reset}`;
     }
 
     bar += color("=".repeat(filledLength));
@@ -656,14 +688,14 @@ export class CollaborativeReasoningServer {
   }
 
   private visualizeCollaborativeReasoning(data: CollaborativeReasoningData): string {
-    let output = `\n${chalk.bold(`COLLABORATIVE REASONING: ${data.topic}`)} (ID: ${data.sessionId})\n\n`;
+    let output = `\n${ANSI.bold}COLLABORATIVE REASONING: ${data.topic}${ANSI.reset} (ID: ${data.sessionId})\n\n`;
 
     // Stage and iteration
-    output += `${chalk.cyan("Stage:")} ${data.stage}\n`;
-    output += `${chalk.cyan("Iteration:")} ${data.iteration}\n\n`;
+    output += `${ANSI.cyan}Stage:${ANSI.reset} ${data.stage}\n`;
+    output += `${ANSI.cyan}Iteration:${ANSI.reset} ${data.iteration}\n\n`;
 
     // Personas
-    output += `${chalk.bold("PERSONAS:")}\n`;
+    output += `${ANSI.bold}PERSONAS:${ANSI.reset}\n`;
     for (let i = 0; i < data.personas.length; i++) {
       const persona = data.personas[i];
       const color = this.getPersonaColor(i);
@@ -675,7 +707,7 @@ export class CollaborativeReasoningServer {
 
       // Highlight active persona
       if (persona?.id === data.activePersonaId) {
-        output += `  ${chalk.bgGreen(chalk.black(" ACTIVE "))}\n`;
+        output += `  ${ANSI.bgGreen}${ANSI.black} ACTIVE ${ANSI.reset}\n`;
       }
 
       output += "\n";
@@ -683,7 +715,7 @@ export class CollaborativeReasoningServer {
 
     // Contributions
     if (data.contributions.length > 0) {
-      output += `${chalk.bold("CONTRIBUTIONS:")}\n\n`;
+      output += `${ANSI.bold}CONTRIBUTIONS:${ANSI.reset}\n\n`;
 
       for (const contribution of data.contributions) {
         // Find persona
@@ -711,10 +743,10 @@ export class CollaborativeReasoningServer {
 
     // Disagreements
     if (data.disagreements && data.disagreements.length > 0) {
-      output += `${chalk.bold("DISAGREEMENTS:")}\n\n`;
+      output += `${ANSI.bold}DISAGREEMENTS:${ANSI.reset}\n\n`;
 
       for (const disagreement of data.disagreements) {
-        output += `${chalk.red("Topic:")} ${disagreement.topic}\n\n`;
+        output += `${ANSI.red}Topic:${ANSI.reset} ${disagreement.topic}\n\n`;
 
         for (const position of disagreement.positions) {
           // Find persona
@@ -734,17 +766,17 @@ export class CollaborativeReasoningServer {
         }
 
         if (disagreement.resolution) {
-          output += `${chalk.green("Resolution:")} ${disagreement.resolution.type}\n`;
+          output += `${ANSI.green}Resolution:${ANSI.reset} ${disagreement.resolution.type}\n`;
           output += `${disagreement.resolution.description}\n\n`;
         } else {
-          output += `${chalk.yellow("Status:")} Unresolved\n\n`;
+          output += `${ANSI.yellow}Status:${ANSI.reset} Unresolved\n\n`;
         }
       }
     }
 
     // Collaboration output
     if (data.keyInsights && data.keyInsights.length > 0) {
-      output += `${chalk.bold("KEY INSIGHTS:")}\n`;
+      output += `${ANSI.bold}KEY INSIGHTS:${ANSI.reset}\n`;
       for (const insight of data.keyInsights) {
         output += `  - ${insight}\n`;
       }
@@ -752,7 +784,7 @@ export class CollaborativeReasoningServer {
     }
 
     if (data.consensusPoints && data.consensusPoints.length > 0) {
-      output += `${chalk.bold("CONSENSUS POINTS:")}\n`;
+      output += `${ANSI.bold}CONSENSUS POINTS:${ANSI.reset}\n`;
       for (const point of data.consensusPoints) {
         output += `  - ${point}\n`;
       }
@@ -760,7 +792,7 @@ export class CollaborativeReasoningServer {
     }
 
     if (data.openQuestions && data.openQuestions.length > 0) {
-      output += `${chalk.bold("OPEN QUESTIONS:")}\n`;
+      output += `${ANSI.bold}OPEN QUESTIONS:${ANSI.reset}\n`;
       for (const question of data.openQuestions) {
         output += `  - ${question}\n`;
       }
@@ -768,7 +800,7 @@ export class CollaborativeReasoningServer {
     }
 
     if (data.finalRecommendation) {
-      output += `${chalk.bold("FINAL RECOMMENDATION:")}\n`;
+      output += `${ANSI.bold}FINAL RECOMMENDATION:${ANSI.reset}\n`;
       output += `${data.finalRecommendation}\n\n`;
     }
 
@@ -778,7 +810,7 @@ export class CollaborativeReasoningServer {
       const nextPersona = data.personas.find((p) => p.id === nextPersonaId);
 
       if (nextPersona) {
-        output += `${chalk.blue("NEXT CONTRIBUTION:")}\n`;
+        output += `${ANSI.blue}NEXT CONTRIBUTION:${ANSI.reset}\n`;
         output += `  Next persona: ${nextPersona.name}\n`;
 
         if (data.suggestedContributionTypes && data.suggestedContributionTypes.length > 0) {
