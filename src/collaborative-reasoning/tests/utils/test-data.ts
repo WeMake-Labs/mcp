@@ -38,10 +38,36 @@ export const TestEnvironment = {
   }
 };
 
-// Declare Bun global for TypeScript
-declare const Bun: {
-  randomUUIDv7(): string;
-};
+/**
+ * Centralized contribution types for consistent usage across all tests
+ */
+export const CONTRIBUTION_TYPES = ["observation", "question", "insight", "concern", "suggestion", "challenge", "synthesis"] as const;
+
+/**
+ * Type alias for contribution types derived from the centralized constant
+ */
+export type ContributionType = typeof CONTRIBUTION_TYPES[number];
+
+/**
+ * Runtime feature-detection wrapper for UUID generation
+ * Checks for Bun's randomUUIDv7, falls back to crypto.randomUUID, or throws error
+ */
+export function generateUUID(): string {
+  // Check for Bun's UUID v7 implementation
+  const globalThis_ = globalThis as { Bun?: { randomUUIDv7?: () => string }; crypto?: { randomUUID?: () => string } };
+  
+  if (typeof globalThis_.Bun?.randomUUIDv7 === "function") {
+    return globalThis_.Bun.randomUUIDv7();
+  }
+  
+  // Fall back to standard crypto.randomUUID
+  if (typeof globalThis_.crypto?.randomUUID === "function") {
+    return globalThis_.crypto.randomUUID();
+  }
+  
+  // If neither is available, throw an error
+  throw new Error("No UUID generation method available. Please ensure you're running in Bun or a modern browser/Node.js environment.");
+}
 
 // Mock Personas
 export const mockPersonas: Persona[] = [
@@ -199,18 +225,19 @@ export class TestHelpers {
    * Creates a deep copy of test data to prevent mutation between tests
    */
   static cloneTestData<T>(data: T): T {
-    if (typeof structuredClone === "function") {
-      return structuredClone(data);
+    const globalThis_ = globalThis as { structuredClone?: <U>(value: U) => U };
+    if (typeof globalThis_.structuredClone === "function") {
+      return globalThis_.structuredClone(data);
     } else {
       return JSON.parse(JSON.stringify(data));
     }
   }
 
   /**
-   * Generates a unique session ID for testing using Bun's native UUID generation
+   * Generates a unique session ID for testing using the shared UUID utility
    */
   static generateSessionId(): string {
-    return `test-session-${Bun.randomUUIDv7()}`;
+    return `test-session-${generateUUID()}`;
   }
 
   /**
@@ -266,8 +293,6 @@ export class TestHelpers {
 }
 
 // Performance test data
-const contributionTypes = ["observation", "question", "insight", "concern", "suggestion"] as const;
-
 export const performanceTestData = {
   largePersonaSet: Array.from({ length: 50 }, (_, i) => ({
     id: `persona-${i}`,
@@ -285,7 +310,7 @@ export const performanceTestData = {
   largeContributionSet: Array.from({ length: 200 }, (_, i) => ({
     personaId: `persona-${i % 50}`,
     content: `Contribution content ${i}`,
-    type: contributionTypes[i % contributionTypes.length],
+    type: CONTRIBUTION_TYPES[i % CONTRIBUTION_TYPES.length],
     confidence: Math.random()
   }))
 };

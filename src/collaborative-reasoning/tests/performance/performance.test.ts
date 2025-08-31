@@ -337,25 +337,24 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
       const concurrentRequests = 20;
       const testData = TestHelpers.createMinimalValidData();
 
-      const startTime = Date.now();
+      const startTime = performance.now();
 
       // Create concurrent requests as promises
       const promises = Array.from({ length: concurrentRequests }, () => server.processCollaborativeReasoning(testData));
 
       // Await all concurrent operations
       const results = await Promise.all(promises);
-      const endTime = Date.now();
+      const endTime = performance.now();
 
       performanceMetrics.operations = concurrentRequests;
-      performanceMetrics.endTime = endTime;
+      // Don't overwrite endTime here to avoid conflict with afterEach hook
 
-      const elapsedMs = endTime - startTime; // Use consistent Date.now() timing
-      const wallTime = endTime - startTime; // Same as elapsedMs for consistency
+      const elapsedMs = endTime - startTime;
 
       expect(results.every((r) => r)).toBe(true);
-      // Ensure elapsed time and wall time are positive and reasonable
+      // Ensure elapsed time is positive and reasonable
       expect(elapsedMs).toBeGreaterThan(0);
-      expect(wallTime).toBeGreaterThan(0);
+      expect(elapsedMs).toBeLessThan(10000); // Should complete within 10 seconds
     });
   });
 });

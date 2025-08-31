@@ -5,7 +5,7 @@
 
 import { describe, test, expect, beforeEach } from "bun:test";
 import { CollaborativeReasoningServer } from "../../index.js";
-import { mockCollaborativeReasoningData, TestHelpers, TestEnvironment } from "../utils/test-data.js";
+import { mockCollaborativeReasoningData, TestHelpers, TestEnvironment, CONTRIBUTION_TYPES } from "../utils/test-data.js";
 
 describe("MCP Protocol Integration", () => {
   let collaborativeReasoningServer: CollaborativeReasoningServer;
@@ -240,14 +240,7 @@ describe("MCP Protocol Integration", () => {
         }
       }));
 
-      const contributionTypes = [
-        "observation",
-        "question",
-        "insight",
-        "concern",
-        "suggestion",
-        "challenge",
-        "synthesis"
+      const contributionTypes = [...CONTRIBUTION_TYPES, "challenge", "synthesis"
       ] as const;
       testData.contributions = Array.from({ length: 50 }, (_, i) => ({
         personaId: `persona-${i % 20}`,

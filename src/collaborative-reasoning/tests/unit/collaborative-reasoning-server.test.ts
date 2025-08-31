@@ -5,7 +5,7 @@
 
 import { describe, test, expect, beforeEach, afterEach } from "bun:test";
 import { CollaborativeReasoningServer } from "../../index.js";
-import { mockCollaborativeReasoningData, invalidTestData, TestHelpers } from "../utils/test-data.js";
+import { mockCollaborativeReasoningData, invalidTestData, TestHelpers, CONTRIBUTION_TYPES } from "../utils/test-data.js";
 
 describe("CollaborativeReasoningServer", () => {
   let server: CollaborativeReasoningServer;
@@ -109,15 +109,7 @@ describe("CollaborativeReasoningServer", () => {
     });
 
     test("should handle different contribution types", () => {
-      const contributionTypes = [
-        "observation",
-        "question",
-        "insight",
-        "concern",
-        "suggestion",
-        "challenge",
-        "synthesis"
-      ] as const;
+      const contributionTypes = [...CONTRIBUTION_TYPES, "challenge", "synthesis"] as const;
 
       contributionTypes.forEach((type) => {
         const testData = TestHelpers.cloneTestData(mockCollaborativeReasoningData);
@@ -299,11 +291,10 @@ describe("CollaborativeReasoningServer", () => {
         }
       }));
 
-      const contributionTypes = ["observation", "question", "insight", "concern", "suggestion"] as const;
       testData.contributions = Array.from({ length: 50 }, (_, i) => ({
         personaId: `persona-${i % 20}`,
         content: `Contribution ${i}`,
-        type: contributionTypes[i % contributionTypes.length] as
+        type: CONTRIBUTION_TYPES[i % CONTRIBUTION_TYPES.length] as
           | "observation"
           | "question"
           | "insight"

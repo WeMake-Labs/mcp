@@ -5,7 +5,7 @@
 
 import { describe, test, expect, beforeEach } from "bun:test";
 import { CollaborativeReasoningServer } from "../../index.js";
-import { mockCollaborativeReasoningData, TestHelpers, TestEnvironment } from "../utils/test-data.js";
+import { mockCollaborativeReasoningData, TestHelpers, TestEnvironment, CONTRIBUTION_TYPES } from "../utils/test-data.js";
 import type { CollaborativeReasoningData, Contribution } from "../../index.js";
 
 describe("Collaborative Reasoning E2E Tests", () => {
@@ -709,15 +709,7 @@ describe("Collaborative Reasoning E2E Tests", () => {
       const longSessionData = TestHelpers.cloneTestData(mockCollaborativeReasoningData);
 
       // Add many contributions to simulate large dataset
-      const contributionTypes = [
-        "observation",
-        "question",
-        "insight",
-        "concern",
-        "suggestion",
-        "challenge",
-        "synthesis"
-      ] as const;
+      const contributionTypes = [...CONTRIBUTION_TYPES, "challenge", "synthesis"] as const;
       longSessionData.contributions = Array.from({ length: 50 }, (_, i) => ({
         personaId: longSessionData.personas?.[i % (longSessionData.personas?.length || 1)]?.id || "default-persona",
         content: `Large dataset contribution ${i}: This is a detailed analysis with substantial content.`,
@@ -820,14 +812,7 @@ describe("Collaborative Reasoning E2E Tests", () => {
           }
         })),
         contributions: Array.from({ length: 20 }, (_, i) => {
-          const contributionTypes = [
-            "observation",
-            "question",
-            "insight",
-            "concern",
-            "suggestion",
-            "challenge",
-            "synthesis"
+          const contributionTypes = [...CONTRIBUTION_TYPES, "challenge", "synthesis"
           ] as const;
           return {
             personaId: `persona-${i % 8}`,
