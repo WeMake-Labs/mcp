@@ -12,27 +12,31 @@ import { mockCollaborativeReasoningData, TestHelpers } from "../utils/test-data.
  */
 class SecurityValidators {
   // Robust email pattern (RFC-5322 inspired, simplified for practical use)
-  static emailPattern = /\b[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\b/gi;
+  static emailPattern =
+    /\b[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\b/gi;
 
   // E.164 aware phone pattern with common formats
-  static phonePattern = /(?:\+?1[-\s.]?)?(?:\(?[0-9]{3}\)?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4})|(?:\+[1-9]\d{1,14})|(?:\(?\d{3}\)?[-\s.]?\d{3}[-\s.]?\d{4})/g;
+  static phonePattern =
+    /(?:\+?1[-\s.]?)?(?:\(?[0-9]{3}\)?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4})|(?:\+[1-9]\d{1,14})|(?:\(?\d{3}\)?[-\s.]?\d{3}[-\s.]?\d{4})/g;
 
   // Enhanced SSN pattern with optional delimiters and leading zeros
-  static ssnPattern = /\b(?:0{0,2}[1-9]|[1-9]\d{0,2})[-\s]?(?:0[1-9]|[1-9]\d)[-\s]?(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|[1-9]\d{3})\b/g;
+  static ssnPattern =
+    /\b(?:0{0,2}[1-9]|[1-9]\d{0,2})[-\s]?(?:0[1-9]|[1-9]\d)[-\s]?(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|[1-9]\d{3})\b/g;
 
   /**
    * Validates credit card numbers using Luhn algorithm and common BIN ranges
    */
   static validateCreditCard(text: string): boolean {
     // Enhanced credit card pattern matching common BIN ranges and spacing variations
-    const cardPattern = /\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3[0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b/g;
+    const cardPattern =
+      /\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3[0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b/g;
     const matches = text.match(cardPattern);
-    
+
     if (!matches) return false;
-    
+
     // Check each potential card number with Luhn algorithm
-    return matches.some(card => {
-      const digits = card.replace(/\D/g, '');
+    return matches.some((card) => {
+      const digits = card.replace(/\D/g, "");
       return this.luhnCheck(digits);
     });
   }
@@ -43,22 +47,22 @@ class SecurityValidators {
   private static luhnCheck(cardNumber: string): boolean {
     let sum = 0;
     let alternate = false;
-    
+
     for (let i = cardNumber.length - 1; i >= 0; i--) {
       let n = parseInt(cardNumber.charAt(i), 10);
-      
+
       if (alternate) {
         n *= 2;
         if (n > 9) {
           n = (n % 10) + 1;
         }
       }
-      
+
       sum += n;
       alternate = !alternate;
     }
-    
-    return (sum % 10) === 0;
+
+    return sum % 10 === 0;
   }
 }
 

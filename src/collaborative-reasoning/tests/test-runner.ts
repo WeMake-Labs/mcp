@@ -45,7 +45,7 @@ class CollaborativeReasoningTestRunner {
   private testEnvironment: TestEnvironment;
   private options: TestRunnerOptions;
   private results: TestResult[] = [];
-  private activeProcesses: Set<import('child_process').ChildProcess> = new Set();
+  private activeProcesses: Set<import("child_process").ChildProcess> = new Set();
   private concurrencyLimit: number = 5; // Configurable max concurrent children
   private processTimeout: number = 300000; // 5 minutes default timeout
 
@@ -150,7 +150,7 @@ class CollaborativeReasoningTestRunner {
   private async executeBunTests(pattern: string, config: Partial<TestConfig>) {
     // Wait for available slot if at concurrency limit
     while (this.activeProcesses.size >= this.concurrencyLimit) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
     const { spawn } = await import("child_process");
@@ -204,16 +204,16 @@ class CollaborativeReasoningTestRunner {
         this.activeProcesses.delete(bunProcess);
 
         // Remove signal handlers
-        signalHandlers.forEach(handler => handler());
+        signalHandlers.forEach((handler) => handler());
         signalHandlers = [];
 
         // Kill process group if still running
         if (!bunProcess.killed) {
           try {
-            process.kill(-bunProcess.pid!, 'SIGTERM');
+            process.kill(-bunProcess.pid!, "SIGTERM");
             setTimeout(() => {
               if (!bunProcess.killed) {
-                process.kill(-bunProcess.pid!, 'SIGKILL');
+                process.kill(-bunProcess.pid!, "SIGKILL");
               }
             }, 5000);
           } catch {
@@ -239,15 +239,15 @@ class CollaborativeReasoningTestRunner {
         signalHandlers.push(() => process.removeListener(signal, handler));
       };
 
-      setupSignalHandler('SIGINT');
-      setupSignalHandler('SIGTERM');
+      setupSignalHandler("SIGINT");
+      setupSignalHandler("SIGTERM");
 
       // Set up exit handler
       const exitHandler = () => {
         cleanup();
       };
-      process.once('exit', exitHandler);
-      signalHandlers.push(() => process.removeListener('exit', exitHandler));
+      process.once("exit", exitHandler);
+      signalHandlers.push(() => process.removeListener("exit", exitHandler));
 
       bunProcess.stdout?.on("data", (data: Buffer) => {
         stdout += data.toString();

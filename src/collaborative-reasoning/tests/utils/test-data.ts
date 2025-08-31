@@ -166,7 +166,7 @@ export class TestHelpers {
    * Creates a deep copy of test data to prevent mutation between tests
    */
   static cloneTestData<T>(data: T): T {
-    if (typeof structuredClone === 'function') {
+    if (typeof structuredClone === "function") {
       return structuredClone(data);
     } else {
       return JSON.parse(JSON.stringify(data));
