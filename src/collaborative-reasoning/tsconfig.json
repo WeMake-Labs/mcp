@@ -1,6 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "docs": "https://bun.sh/docs/typescript",
   "extends": "../../tsconfig.json",
 
   "compilerOptions": {
@@ -17,6 +16,6 @@
     "noEmit": false
   },
 
-  "include": ["*.ts", "tests/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["*.ts"],
+  "exclude": ["tests", "dist", "node_modules"]
 }
