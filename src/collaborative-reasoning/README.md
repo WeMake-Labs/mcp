@@ -234,11 +234,11 @@ The server is built with enterprise-grade TypeScript and Bun runtime:
 ### Installation
 
 ```sh
-# Install via npm
-npm install @wemake.cx/collaborative-reasoning
-
 # Install via bun (recommended)
 bun add @wemake.cx/collaborative-reasoning
+
+# Install via npm
+npm install @wemake.cx/collaborative-reasoning
 
 # Install via yarn
 yarn add @wemake.cx/collaborative-reasoning
@@ -284,8 +284,8 @@ The server uses standard MCP protocol configuration:
 ### Runtime Dependencies
 
 - `@modelcontextprotocol/sdk`: ^1.10.2 - MCP protocol implementation
-- `chalk`: ^5.3.0 - Terminal styling and colors
-- `yargs`: ^17.7.2 - Command-line argument parsing
+
+*Note: Terminal styling and command-line argument parsing are handled by Bun's built-in APIs, eliminating the need for external dependencies.*
 
 ### Development Dependencies
 
