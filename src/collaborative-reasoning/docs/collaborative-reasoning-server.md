@@ -115,11 +115,11 @@ The `CollaborativeReasoningServer` class provides enterprise-grade functionality
 
 - **Input Sanitization**: Comprehensive `sanitizeInput()` method with:
   - Script tag removal and JavaScript URL filtering
-  - Sensitive data redaction (passwords, tokens, emails, phone numbers)
-  - Path traversal protection
-  - Medical information privacy protection
-  - Personal name redaction
-- **GDPR Compliance**: Privacy-first data handling with automatic PII detection
+  - Targeted sensitive data redaction (passwords, tokens, emails, phone numbers) - *pending verification*
+  - Planned path traversal protection - *implementation pending*
+  - Intended medical information privacy protection - *verification required*
+  - Targeted personal name redaction - *testing in progress*
+- **GDPR Compliance**: Privacy-first data handling with planned automatic PII detection - *implementation pending*
 - **Input Validation**: Strict type checking and schema validation
 - **Length Limits**: Configurable input length restrictions (max 10,000 characters)
 
@@ -304,13 +304,13 @@ The server provides rich console visualization:
 
 ```sh
 # Development mode
-bun run index.ts
+bun index.ts
 
 # Production mode (after build)
-bun run dist/index.js
+bun dist/index.js
 
 # With custom configuration
-bun run index.ts --config custom-config.json
+bun index.ts --config custom-config.json
 ```
 
 ### MCP Integration
@@ -359,10 +359,12 @@ Comprehensive error handling with:
 
 ### Benchmarks
 
-- **Startup Time**: < 100ms cold start
-- **Processing Latency**: < 50ms per contribution
-- **Memory Usage**: < 50MB for typical sessions
-- **Concurrent Sessions**: Supports 100+ simultaneous collaborations
+- **Startup Time target**: < 100ms cold start
+- **Processing Latency target**: < 50ms per contribution
+- **Memory Usage target**: < 50MB for typical sessions
+- **Concurrent Sessions target**: Supports 100+ simultaneous collaborations
+
+*Note: Performance targets are based on initial design goals. Actual benchmarks with detailed methodology, test hardware specifications, workload characteristics, and measurement results are pending comprehensive performance testing.*
 
 ### Scalability
 
