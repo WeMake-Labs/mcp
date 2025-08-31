@@ -13,7 +13,7 @@
 import { TestEnvironment, TestSuite, TestConfigUtils, type TestConfig } from "./test.config.ts";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
-import { GlobResolver, isGlobPattern } from "./utils/glob-resolver.ts";
+import { GlobResolver, isGlobPattern } from "./utils/glob-resolver.js";
 
 interface TestResult {
   suite: TestSuite;
@@ -214,11 +214,10 @@ class CollaborativeReasoningTestRunner {
       let resolvedPattern = pattern;
       if (isGlobPattern(pattern)) {
         const resolver = new GlobResolver({ baseDir: process.cwd() });
-        const result = resolver.resolve(pattern, { absolute: false });
-        if (result.hasMatches) {
-          // Use the first directory or file found, or fall back to the base directory
-          resolvedPattern =
-            result.directories[0] || result.files[0] || pattern.split("/**")[0] || pattern.split("/*")[0] || pattern;
+        const files = resolver.resolveSync(pattern);
+        if (files.length > 0) {
+          // Use the first file found, or fall back to the base directory
+          resolvedPattern = files[0] || pattern.split("/**")[0] || pattern.split("/*")[0] || pattern;
         } else {
           // If no matches found, use the base directory
           resolvedPattern = pattern.split("/**")[0] || pattern.split("/*")[0] || pattern;

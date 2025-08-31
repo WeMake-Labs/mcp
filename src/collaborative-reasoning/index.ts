@@ -136,19 +136,19 @@ export class CollaborativeReasoningServer {
 
     // Context-aware secret detection - only match when adjacent to key/value separators
     // Match patterns like "password: value", "secret=value", "token-value", etc.
-    sanitized = sanitized.replace(/(password|secret|token|api[-_]?key|key)\s*[:=\-]\s*[^\s\n]+/gi, "$1: [REDACTED]");
+    sanitized = sanitized.replace(/(password|secret|token|api[_-]?key|key)\s*[:=-]\s*[^\s\n]+/gi, "$1: [REDACTED]");
 
     // Context-aware header matching - match "Authorization: Bearer token" patterns
     sanitized = sanitized.replace(/(authorization|bearer|x-api-key)\s*:\s*[^\s\n]+/gi, "$1: [REDACTED]");
 
     // High-entropy token detection - alphanumeric strings with punctuation (likely tokens/keys)
     // Match strings with mixed case, numbers, and special chars that are 16+ characters
-    sanitized = sanitized.replace(/\b[A-Za-z0-9+\/=_-]{16,}\b/g, (match) => {
+    sanitized = sanitized.replace(/\b[A-Za-z0-9+/=_-]{16,}\b/g, (match) => {
       // Calculate entropy - check for mixed case, numbers, and special characters
       const hasLower = /[a-z]/.test(match);
       const hasUpper = /[A-Z]/.test(match);
       const hasNumber = /[0-9]/.test(match);
-      const hasSpecial = /[+\/=_-]/.test(match);
+      const hasSpecial = /[+/=_-]/.test(match);
 
       // High entropy if it has at least 3 of the 4 character types
       const entropyScore = [hasLower, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
@@ -163,12 +163,12 @@ export class CollaborativeReasoningServer {
     // International format: +1-234-567-8900 or +1 (234) 567-8900
     sanitized = sanitized.replace(/\+\d{1,3}[-\s]?\(?\d{3}\)?[-\s]?\d{3}[-\s]?\d{4}/g, "[PHONE_REDACTED]");
     // US format: (234) 567-8900, 234-567-8900, 234.567.8900
-    sanitized = sanitized.replace(/\(?\d{3}\)?[-\s\.]\d{3}[-\s\.]\d{4}/g, "[PHONE_REDACTED]");
+    sanitized = sanitized.replace(/\(?\d{3}\)?[-\s.]\d{3}[-\s.]\d{4}/g, "[PHONE_REDACTED]");
     // Simple format: 234 567 8900
     sanitized = sanitized.replace(/\b\d{3}\s\d{3}\s\d{4}\b/g, "[PHONE_REDACTED]");
 
     // Remove path traversal attempts
-    sanitized = sanitized.replace(/\.\.\/+/g, "[PATH_REDACTED]/");
+    sanitized = sanitized.replace(/\.\.\//g, "[PATH_REDACTED]/");
     sanitized = sanitized.replace(/\/etc\/passwd/gi, "[SYSTEM_PATH_REDACTED]");
     sanitized = sanitized.replace(/\/etc\/shadow/gi, "[SYSTEM_PATH_REDACTED]");
     sanitized = sanitized.replace(/\/proc\/[\w/]+/gi, "[SYSTEM_PATH_REDACTED]");
@@ -552,7 +552,7 @@ export class CollaborativeReasoningServer {
         "synthesis"
       ] as const;
       for (const type of data["suggestedContributionTypes"]) {
-        if (typeof type === "string" && validTypes.includes(type as any)) {
+        if (typeof type === "string" && validTypes.includes(type as Contribution["type"])) {
           suggestedContributionTypes.push(type as Contribution["type"]);
         }
       }

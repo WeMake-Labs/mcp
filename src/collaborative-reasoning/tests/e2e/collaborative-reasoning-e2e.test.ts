@@ -5,12 +5,7 @@
 
 import { describe, test, expect, beforeEach } from "bun:test";
 import { CollaborativeReasoningServer } from "../../index.js";
-import {
-  mockCollaborativeReasoningData,
-  TestHelpers,
-  TestEnvironment,
-  CONTRIBUTION_TYPES
-} from "../utils/test-data.js";
+import { mockCollaborativeReasoningData, TestHelpers, CONTRIBUTION_TYPES } from "../utils/test-data.js";
 import type { CollaborativeReasoningData, Contribution } from "../../index.js";
 
 describe("Collaborative Reasoning E2E Tests", () => {
