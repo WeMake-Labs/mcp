@@ -1,5 +1,6 @@
 {
   "name": "@wemake.cx/mcp",
+  "version": "0.1.3",
   "author": "WeMake (https://wemake.cx)",
   "repository": {
     "type": "git",
