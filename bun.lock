@@ -45,11 +45,11 @@
         "mcp-server-collaborative-reasoning": "dist/index.js",
       },
       "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.0.4",
+        "@modelcontextprotocol/sdk": "^1.17.4",
       },
       "devDependencies": {
-        "@types/node": "^22.10.2",
-        "typescript": "^5.7.2",
+        "@types/node": "^22.17.2",
+        "typescript": "^5.9.2",
       },
     },
   },

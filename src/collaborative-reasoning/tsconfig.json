@@ -6,6 +6,7 @@
     "outDir": "./dist",
     "rootDir": ".",
     "strict": true,
+    "lib": ["ESNext", "DOM"],
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -17,5 +18,5 @@
   },
 
   "include": ["*.ts", "tests/**/*.ts"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules", "build", "coverage"]
 }
