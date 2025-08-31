@@ -97,7 +97,7 @@ export interface CollaborativeReasoningData {
 
   // Next steps
   nextContributionNeeded: boolean;
-  suggestedContributionTypes?: string[];
+  suggestedContributionTypes?: Array<Contribution["type"]>;
 }
 
 export class CollaborativeReasoningServer {
@@ -106,6 +106,10 @@ export class CollaborativeReasoningServer {
   private disagreementTracker: Record<string, Disagreement[]> = {};
   private sessionHistory: Record<string, CollaborativeReasoningData[]> = {};
 
+  /**
+   * Sanitizes input with context-aware matching and high-entropy token detection.
+   * Implements tightened patterns to reduce false positives while maintaining security.
+   */
   private sanitizeInput(input: string): string {
     if (!input || typeof input !== "string") {
       return "";
@@ -130,23 +134,38 @@ export class CollaborativeReasoningServer {
     sanitized = sanitized.replace(/document\./gi, "");
     sanitized = sanitized.replace(/window\./gi, "");
 
-    // Remove sensitive data patterns
-    sanitized = sanitized.replace(/password\w*/gi, "[REDACTED]");
-    sanitized = sanitized.replace(/secret[\w-]*/gi, "[REDACTED]");
-    sanitized = sanitized.replace(/token[\w-]*/gi, "[REDACTED]");
-    sanitized = sanitized.replace(/key[\w-]*/gi, "[REDACTED]");
-    sanitized = sanitized.replace(/api[\w-]*key/gi, "[REDACTED]");
-    sanitized = sanitized.replace(/\b\w*pass\w*\b/gi, "[REDACTED]");
-    sanitized = sanitized.replace(/\b\w*auth\w*\b/gi, "[REDACTED]");
+    // Context-aware secret detection - only match when adjacent to key/value separators
+    // Match patterns like "password: value", "secret=value", "token-value", etc.
+    sanitized = sanitized.replace(/(password|secret|token|api[-_]?key|key)\s*[:=\-]\s*[^\s\n]+/gi, "$1: [REDACTED]");
+
+    // Context-aware header matching - match "Authorization: Bearer token" patterns
+    sanitized = sanitized.replace(/(authorization|bearer|x-api-key)\s*:\s*[^\s\n]+/gi, "$1: [REDACTED]");
+
+    // High-entropy token detection - alphanumeric strings with punctuation (likely tokens/keys)
+    // Match strings with mixed case, numbers, and special chars that are 16+ characters
+    sanitized = sanitized.replace(/\b[A-Za-z0-9+\/=_-]{16,}\b/g, (match) => {
+      // Calculate entropy - check for mixed case, numbers, and special characters
+      const hasLower = /[a-z]/.test(match);
+      const hasUpper = /[A-Z]/.test(match);
+      const hasNumber = /[0-9]/.test(match);
+      const hasSpecial = /[+\/=_-]/.test(match);
+
+      // High entropy if it has at least 3 of the 4 character types
+      const entropyScore = [hasLower, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
+
+      return entropyScore >= 3 ? "[HIGH_ENTROPY_TOKEN_REDACTED]" : match;
+    });
 
     // Remove email addresses
     sanitized = sanitized.replace(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/g, "[EMAIL_REDACTED]");
 
-    // Remove phone numbers (more specific patterns to avoid false positives)
-    sanitized = sanitized.replace(/\+?[1-9]\d{1,14}(?=\s|$|[^\d%])/g, "[PHONE_REDACTED]");
-    sanitized = sanitized.replace(/\(?\d{3}\)?[-.]\d{3}[-.]\d{4}/g, "[PHONE_REDACTED]");
-    sanitized = sanitized.replace(/\d{3}-\d{3}-\d{4}/g, "[PHONE_REDACTED]");
-    sanitized = sanitized.replace(/\d{3}\.\d{3}\.\d{4}/g, "[PHONE_REDACTED]");
+    // Tightened phone number patterns - explicit formats with optional country codes
+    // International format: +1-234-567-8900 or +1 (234) 567-8900
+    sanitized = sanitized.replace(/\+\d{1,3}[-\s]?\(?\d{3}\)?[-\s]?\d{3}[-\s]?\d{4}/g, "[PHONE_REDACTED]");
+    // US format: (234) 567-8900, 234-567-8900, 234.567.8900
+    sanitized = sanitized.replace(/\(?\d{3}\)?[-\s\.]\d{3}[-\s\.]\d{4}/g, "[PHONE_REDACTED]");
+    // Simple format: 234 567 8900
+    sanitized = sanitized.replace(/\b\d{3}\s\d{3}\s\d{4}\b/g, "[PHONE_REDACTED]");
 
     // Remove path traversal attempts
     sanitized = sanitized.replace(/\.\.\/+/g, "[PATH_REDACTED]/");
@@ -213,7 +232,7 @@ export class CollaborativeReasoningServer {
       ...(data.finalRecommendation && { finalRecommendation: this.sanitizeInput(data.finalRecommendation) }),
       sessionId: this.sanitizeInput(data.sessionId),
       ...(data.suggestedContributionTypes && {
-        suggestedContributionTypes: data.suggestedContributionTypes.map((type) => this.sanitizeInput(type))
+        suggestedContributionTypes: data.suggestedContributionTypes
       })
     };
 
@@ -410,6 +429,13 @@ export class CollaborativeReasoningServer {
       throw new Error(`Invalid activePersonaId: persona '${data["activePersonaId"]}' not found in personas array`);
     }
 
+    // Validate that nextPersonaId references an existing persona (if provided)
+    if (data["nextPersonaId"] && typeof data["nextPersonaId"] === "string") {
+      if (!personaIds.includes(data["nextPersonaId"] as string)) {
+        throw new Error(`Invalid nextPersonaId: persona '${data["nextPersonaId"]}' not found in personas array`);
+      }
+    }
+
     // Validate disagreements
     const disagreements: Disagreement[] = [];
     if (Array.isArray(data["disagreements"])) {
@@ -423,17 +449,32 @@ export class CollaborativeReasoningServer {
         }
 
         const positions: Disagreement["positions"] = [];
-        for (const position of disagreement["positions"] as Array<Record<string, unknown>>) {
-          if (!position["personaId"] || typeof position["personaId"] !== "string") {
-            throw new Error("Invalid position personaId: must be a string");
+        const positionsArray = disagreement["positions"] as Array<Record<string, unknown>>;
+        for (let positionIndex = 0; positionIndex < positionsArray.length; positionIndex++) {
+          const position = positionsArray[positionIndex];
+          if (!position || !position["personaId"] || typeof position["personaId"] !== "string") {
+            throw new Error(
+              `Invalid position personaId at disagreement index ${disagreements.length}, position index ${positionIndex}: must be a string`
+            );
+          }
+
+          // Validate that position personaId references an existing persona
+          if (!personaIds.includes(position["personaId"] as string)) {
+            throw new Error(
+              `Invalid position personaId at disagreement index ${disagreements.length}, position index ${positionIndex}: persona '${position["personaId"]}' not found in personas array`
+            );
           }
 
           if (!position["position"] || typeof position["position"] !== "string") {
-            throw new Error("Invalid position statement: must be a string");
+            throw new Error(
+              `Invalid position statement at disagreement index ${disagreements.length}, position index ${positionIndex}: must be a string`
+            );
           }
 
           if (!Array.isArray(position["arguments"])) {
-            throw new Error("Invalid position arguments: must be an array");
+            throw new Error(
+              `Invalid position arguments at disagreement index ${disagreements.length}, position index ${positionIndex}: must be an array`
+            );
           }
 
           const args: string[] = [];
@@ -499,11 +540,20 @@ export class CollaborativeReasoningServer {
       }
     }
 
-    const suggestedContributionTypes: string[] = [];
+    const suggestedContributionTypes: Array<Contribution["type"]> = [];
     if (Array.isArray(data["suggestedContributionTypes"])) {
+      const validTypes = [
+        "observation",
+        "question",
+        "insight",
+        "concern",
+        "suggestion",
+        "challenge",
+        "synthesis"
+      ] as const;
       for (const type of data["suggestedContributionTypes"]) {
-        if (typeof type === "string") {
-          suggestedContributionTypes.push(type);
+        if (typeof type === "string" && validTypes.includes(type as any)) {
+          suggestedContributionTypes.push(type as Contribution["type"]);
         }
       }
     }
@@ -842,7 +892,7 @@ export class CollaborativeReasoningServer {
 
       // Generate visualization (only in non-test environment)
       if (process.env.NODE_ENV !== "test") {
-        const visualization = this.visualizeCollaborativeReasoning(validatedInput);
+        const visualization = this.visualizeCollaborativeReasoning(sanitizedInput);
         console.error(visualization);
       }
 

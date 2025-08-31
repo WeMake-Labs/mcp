@@ -282,10 +282,10 @@ export class TestConfigUtils {
       coverage: {
         ...defaultTestConfig.coverage,
         threshold: {
-          statements: 85,
-          branches: 80,
-          functions: 85,
-          lines: 85
+          statements: 90,
+          branches: 90,
+          functions: 90,
+          lines: 90
         }
       }
     };

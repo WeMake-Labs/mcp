@@ -208,15 +208,15 @@ describe("MCP Protocol Integration", () => {
       TestHelpers.assertMCPResponse(result2);
     });
 
-    test("should handle concurrent sessions independently", () => {
+    test("should handle concurrent sessions independently", async () => {
       const sessions = Array.from({ length: 3 }, (_, i) => {
         const testData = TestHelpers.cloneTestData(mockCollaborativeReasoningData);
         testData.sessionId = `concurrent-session-${i}`;
         return testData;
       });
 
-      const results = sessions.map((sessionData) =>
-        collaborativeReasoningServer.processCollaborativeReasoning(sessionData)
+      const results = await Promise.all(
+        sessions.map((sessionData) => collaborativeReasoningServer.processCollaborativeReasoning(sessionData))
       );
 
       // All sessions should succeed independently

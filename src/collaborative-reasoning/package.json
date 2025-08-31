@@ -37,7 +37,7 @@
     "build": "bun build --entrypoints ./index.ts --outdir ./dist --format esm --target=bun --sourcemap && chmod +x dist/*.js",
     "types": "bun tsc",
     "prepare": "bun run types && bun run build",
-    "release": "bun publish",
+    "release": "bun publish --tag latest",
     "watch": "bun tsc --watch"
   },
   "dependencies": {

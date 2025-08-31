@@ -767,7 +767,7 @@ describe("Collaborative Reasoning E2E Tests", () => {
   });
 
   describe("Performance and Scalability", () => {
-    test("should handle concurrent session processing", () => {
+    test("should handle concurrent session processing", async () => {
       const concurrentSessions = Array.from({ length: 5 }, (_, i) => {
         const sessionData = TestHelpers.cloneTestData(mockCollaborativeReasoningData);
         sessionData.sessionId = `concurrent-session-${i}`;
@@ -777,17 +777,14 @@ describe("Collaborative Reasoning E2E Tests", () => {
       const startTime = Date.now();
 
       // Process all sessions concurrently
-      const results = concurrentSessions.map((sessionData) =>
-        collaborativeReasoningServer.processCollaborativeReasoning(sessionData)
+      const results = await Promise.all(
+        concurrentSessions.map((sessionData) => collaborativeReasoningServer.processCollaborativeReasoning(sessionData))
       );
 
       const endTime = Date.now();
 
-      // Performance assertion: CI-aware timing with runtime detection
-      if (!TestEnvironment.shouldSkipTimingAssertions) {
-        const timeThreshold = TestEnvironment.getThreshold(1500, 3000); // 1.5s for Bun, 3s for Node, 2x in CI
-        expect(endTime - startTime).toBeLessThan(timeThreshold);
-      }
+      // Should complete all sessions efficiently under Bun
+      expect(endTime - startTime).toBeLessThan(1500); // 1.5s budget
 
       // All sessions should succeed
       results.forEach((result) => {
