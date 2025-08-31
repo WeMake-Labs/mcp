@@ -115,11 +115,11 @@ The `CollaborativeReasoningServer` class provides enterprise-grade functionality
 
 - **Input Sanitization**: Comprehensive `sanitizeInput()` method with:
   - Script tag removal and JavaScript URL filtering
-  - Targeted sensitive data redaction (passwords, tokens, emails, phone numbers) - *pending verification*
-  - Planned path traversal protection - *implementation pending*
-  - Intended medical information privacy protection - *verification required*
-  - Targeted personal name redaction - *testing in progress*
-- **GDPR Compliance**: Privacy-first data handling with planned automatic PII detection - *implementation pending*
+  - Targeted sensitive data redaction (passwords, tokens, emails, phone numbers) - _pending verification_
+  - Planned path traversal protection - _implementation pending_
+  - Intended medical information privacy protection - _verification required_
+  - Targeted personal name redaction - _testing in progress_
+- **GDPR Compliance**: Privacy-first data handling with planned automatic PII detection - _implementation pending_
 - **Input Validation**: Strict type checking and schema validation
 - **Length Limits**: Configurable input length restrictions (max 10,000 characters)
 
@@ -364,7 +364,8 @@ Comprehensive error handling with:
 - **Memory Usage target**: < 50MB for typical sessions
 - **Concurrent Sessions target**: Supports 100+ simultaneous collaborations
 
-*Note: Performance targets are based on initial design goals. Actual benchmarks with detailed methodology, test hardware specifications, workload characteristics, and measurement results are pending comprehensive performance testing.*
+_Note: Performance targets are based on initial design goals. Actual benchmarks with detailed methodology, test hardware
+specifications, workload characteristics, and measurement results are pending comprehensive performance testing._
 
 ### Scalability
 

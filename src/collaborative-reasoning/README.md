@@ -285,7 +285,8 @@ The server uses standard MCP protocol configuration:
 
 - `@modelcontextprotocol/sdk`: ^1.10.2 - MCP protocol implementation
 
-*Note: Terminal styling and command-line argument parsing are handled by Bun's built-in APIs, eliminating the need for external dependencies.*
+_Note: Terminal styling and command-line argument parsing are handled by Bun's built-in APIs, eliminating the need for
+external dependencies._
 
 ### Development Dependencies
 

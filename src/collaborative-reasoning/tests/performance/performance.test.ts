@@ -116,14 +116,12 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
       const startTime = performance.now();
 
       // Create array of promise-returning calls for true concurrency
-      const promises = Array.from({ length: concurrentRequests }, () => 
-        server.processCollaborativeReasoning(testData)
-      );
+      const promises = Array.from({ length: concurrentRequests }, () => server.processCollaborativeReasoning(testData));
 
       // Await all promises concurrently
       const results = await Promise.all(promises);
       const endTime = performance.now();
-      
+
       performanceMetrics.operations = concurrentRequests;
 
       const totalTime = endTime - startTime;
@@ -216,21 +214,27 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
       // Check that latency doesn't grow exponentially
       expect(personaCounts.length).toBeGreaterThanOrEqual(2);
       expect(results.length).toBeGreaterThanOrEqual(2);
-      
+
       const firstResult = results[0];
       const lastResult = results[results.length - 1];
       const firstPersonaCount = personaCounts[0];
       const lastPersonaCount = personaCounts[personaCounts.length - 1];
 
-      if (firstResult && lastResult && firstResult.latency && lastResult.latency && 
-          firstPersonaCount && lastPersonaCount) {
+      if (
+        firstResult &&
+        lastResult &&
+        firstResult.latency &&
+        lastResult.latency &&
+        firstPersonaCount &&
+        lastPersonaCount
+      ) {
         const latencyGrowthRatio = lastResult.latency / firstResult.latency;
         const personaGrowthRatio = lastPersonaCount / firstPersonaCount;
 
         // Latency should grow no more than 2x the persona growth ratio
         expect(latencyGrowthRatio).toBeLessThan(personaGrowthRatio * 2);
       } else {
-        throw new Error('Required test data elements are missing or undefined');
+        throw new Error("Required test data elements are missing or undefined");
       }
     });
 
@@ -332,14 +336,12 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
       const startTime = process.hrtime.bigint();
 
       // Create concurrent requests as promises
-      const promises = Array.from({ length: concurrentRequests }, () => 
-        server.processCollaborativeReasoning(testData)
-      );
+      const promises = Array.from({ length: concurrentRequests }, () => server.processCollaborativeReasoning(testData));
 
       // Await all concurrent operations
       const results = await Promise.all(promises);
       const endTime = process.hrtime.bigint();
-      
+
       performanceMetrics.operations = concurrentRequests;
       performanceMetrics.endTime = Date.now();
 

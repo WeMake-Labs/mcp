@@ -287,7 +287,7 @@ describe("MCP Protocol Integration", () => {
       const maxDeviation = Math.max(...executionTimes.map((time) => Math.abs(time - avgTime)));
 
       // Apply stricter thresholds when running under Bun
-      const isBun = typeof globalThis.Bun !== 'undefined' || typeof process?.versions?.bun !== 'undefined';
+      const isBun = typeof globalThis.Bun !== "undefined" || typeof process?.versions?.bun !== "undefined";
       const maxDeviationThreshold = isBun ? 100 : 200;
       const avgTimeThreshold = isBun ? 300 : 500;
 
