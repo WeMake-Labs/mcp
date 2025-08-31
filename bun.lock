@@ -40,7 +40,7 @@
     },
     "src/collaborative-reasoning": {
       "name": "@wemake.cx/collaborative-reasoning",
-      "version": "0.0.5",
+      "version": "0.0.6",
       "bin": {
         "mcp-server-collaborative-reasoning": "dist/index.js",
       },
