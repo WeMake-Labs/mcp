@@ -286,9 +286,14 @@ describe("MCP Protocol Integration", () => {
       const avgTime = executionTimes.reduce((sum, time) => sum + time, 0) / executionTimes.length;
       const maxDeviation = Math.max(...executionTimes.map((time) => Math.abs(time - avgTime)));
 
-      // Execution times should be reasonably consistent (within 200ms of average)
-      expect(maxDeviation).toBeLessThan(200);
-      expect(avgTime).toBeLessThan(500); // Average should be under 500ms
+      // Apply stricter thresholds when running under Bun
+      const isBun = typeof globalThis.Bun !== 'undefined' || typeof process?.versions?.bun !== 'undefined';
+      const maxDeviationThreshold = isBun ? 100 : 200;
+      const avgTimeThreshold = isBun ? 300 : 500;
+
+      // Execution times should be reasonably consistent
+      expect(maxDeviation).toBeLessThan(maxDeviationThreshold);
+      expect(avgTime).toBeLessThan(avgTimeThreshold);
     });
   });
 

@@ -63,19 +63,20 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
       expect(latency).toBeLessThan(200); // < 200ms requirement
     });
 
-    test("should maintain low latency under concurrent load", () => {
+    test("should maintain low latency under concurrent load", async () => {
       const concurrentRequests = 50;
       const testData = TestHelpers.createMinimalValidData();
 
-      const results: Array<{ result: unknown; latency: number }> = [];
-
-      for (let i = 0; i < concurrentRequests; i++) {
+      // Create promises that capture start and end times inside each Promise
+      const promises = Array.from({ length: concurrentRequests }, async () => {
         const startTime = performance.now();
-        const result = server.processCollaborativeReasoning(testData);
+        const result = await server.processCollaborativeReasoning(testData);
         const endTime = performance.now();
-        results.push({ result, latency: endTime - startTime });
-      }
+        return { result, latency: endTime - startTime };
+      });
 
+      // Execute all requests concurrently
+      const results = await Promise.all(promises);
       performanceMetrics.operations = concurrentRequests;
 
       const avgLatency = results.reduce((sum, r) => sum + r.latency, 0) / results.length;
@@ -108,18 +109,21 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
       expect(throughput).toBeGreaterThan(10); // At least 10 RPS
     });
 
-    test("should handle concurrent processing", () => {
+    test("should handle concurrent processing", async () => {
       const concurrentRequests = 100;
       const testData = TestHelpers.createMinimalValidData();
 
       const startTime = performance.now();
 
-      const results = [];
-      for (let i = 0; i < concurrentRequests; i++) {
-        results.push(server.processCollaborativeReasoning(testData));
-      }
+      // Create array of promise-returning calls for true concurrency
+      const promises = Array.from({ length: concurrentRequests }, () => 
+        server.processCollaborativeReasoning(testData)
+      );
 
+      // Await all promises concurrently
+      const results = await Promise.all(promises);
       const endTime = performance.now();
+      
       performanceMetrics.operations = concurrentRequests;
 
       const totalTime = endTime - startTime;
@@ -210,15 +214,23 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
       performanceMetrics.operations = personaCounts.length;
 
       // Check that latency doesn't grow exponentially
+      expect(personaCounts.length).toBeGreaterThanOrEqual(2);
+      expect(results.length).toBeGreaterThanOrEqual(2);
+      
       const firstResult = results[0];
       const lastResult = results[results.length - 1];
+      const firstPersonaCount = personaCounts[0];
+      const lastPersonaCount = personaCounts[personaCounts.length - 1];
 
-      if (firstResult && lastResult && firstResult.latency && lastResult.latency) {
+      if (firstResult && lastResult && firstResult.latency && lastResult.latency && 
+          firstPersonaCount && lastPersonaCount) {
         const latencyGrowthRatio = lastResult.latency / firstResult.latency;
-        const personaGrowthRatio = personaCounts[personaCounts.length - 1]! / personaCounts[0]!;
+        const personaGrowthRatio = lastPersonaCount / firstPersonaCount;
 
         // Latency should grow no more than 2x the persona growth ratio
         expect(latencyGrowthRatio).toBeLessThan(personaGrowthRatio * 2);
+      } else {
+        throw new Error('Required test data elements are missing or undefined');
       }
     });
 
@@ -313,27 +325,31 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
   });
 
   describe("Resource Utilization Tests", () => {
-    test("should efficiently utilize CPU under load", () => {
+    test("should efficiently utilize resources under concurrent load", async () => {
       const concurrentRequests = 20;
       const testData = TestHelpers.createMinimalValidData();
 
       const startTime = process.hrtime.bigint();
 
-      const results = [];
-      for (let i = 0; i < concurrentRequests; i++) {
-        results.push(server.processCollaborativeReasoning(testData));
-      }
+      // Create concurrent requests as promises
+      const promises = Array.from({ length: concurrentRequests }, () => 
+        server.processCollaborativeReasoning(testData)
+      );
 
+      // Await all concurrent operations
+      const results = await Promise.all(promises);
       const endTime = process.hrtime.bigint();
+      
       performanceMetrics.operations = concurrentRequests;
+      performanceMetrics.endTime = Date.now();
 
-      const cpuTime = Number(endTime - startTime) / 1000000; // Convert to milliseconds
+      const elapsedMs = Number(endTime - startTime) / 1_000_000; // Convert to milliseconds
       const wallTime = performanceMetrics.endTime - performanceMetrics.startTime;
 
       expect(results.every((r) => r)).toBe(true);
-      // Ensure CPU time is positive and reasonable (allow for timing variations)
-      expect(cpuTime).toBeGreaterThan(0);
-      expect(Math.abs(wallTime)).toBeGreaterThan(0);
+      // Ensure elapsed time and wall time are positive and reasonable
+      expect(elapsedMs).toBeGreaterThan(0);
+      expect(wallTime).toBeGreaterThan(0);
     });
   });
 });

@@ -730,7 +730,7 @@ describe("Collaborative Reasoning E2E Tests", () => {
       const endTime = Date.now();
 
       expect(result).toBeDefined();
-      expect(endTime - startTime).toBeLessThan(5000); // Should complete within 5 seconds
+      expect(endTime - startTime).toBeLessThan(2000); // Should complete within 2 seconds under Bun
 
       if (!result.isError) {
         expect(result.content?.[0]?.text).toBeDefined();
@@ -786,8 +786,8 @@ describe("Collaborative Reasoning E2E Tests", () => {
 
       const endTime = Date.now();
 
-      // Should complete all sessions efficiently
-      expect(endTime - startTime).toBeLessThan(3000); // 3 seconds for 5 sessions
+      // Should complete all sessions efficiently under Bun
+      expect(endTime - startTime).toBeLessThan(1500); // 1.5 seconds for 5 concurrent sessions under Bun
 
       // All sessions should succeed
       results.forEach((result) => {
