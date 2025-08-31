@@ -16,7 +16,11 @@ export const TestEnvironment = {
 
   /** Detect if running in CI environment */
   get isCI(): boolean {
-    return process.env["CI"] === "true" || process.env["GITHUB_ACTIONS"] === "true" || process.env["CONTINUOUS_INTEGRATION"] === "true";
+    return (
+      process.env["CI"] === "true" ||
+      process.env["GITHUB_ACTIONS"] === "true" ||
+      process.env["CONTINUOUS_INTEGRATION"] === "true"
+    );
   },
 
   /**
@@ -41,12 +45,20 @@ export const TestEnvironment = {
 /**
  * Centralized contribution types for consistent usage across all tests
  */
-export const CONTRIBUTION_TYPES = ["observation", "question", "insight", "concern", "suggestion", "challenge", "synthesis"] as const;
+export const CONTRIBUTION_TYPES = [
+  "observation",
+  "question",
+  "insight",
+  "concern",
+  "suggestion",
+  "challenge",
+  "synthesis"
+] as const;
 
 /**
  * Type alias for contribution types derived from the centralized constant
  */
-export type ContributionType = typeof CONTRIBUTION_TYPES[number];
+export type ContributionType = (typeof CONTRIBUTION_TYPES)[number];
 
 /**
  * Runtime feature-detection wrapper for UUID generation
@@ -55,18 +67,20 @@ export type ContributionType = typeof CONTRIBUTION_TYPES[number];
 export function generateUUID(): string {
   // Check for Bun's UUID v7 implementation
   const globalThis_ = globalThis as { Bun?: { randomUUIDv7?: () => string }; crypto?: { randomUUID?: () => string } };
-  
+
   if (typeof globalThis_.Bun?.randomUUIDv7 === "function") {
     return globalThis_.Bun.randomUUIDv7();
   }
-  
+
   // Fall back to standard crypto.randomUUID
   if (typeof globalThis_.crypto?.randomUUID === "function") {
     return globalThis_.crypto.randomUUID();
   }
-  
+
   // If neither is available, throw an error
-  throw new Error("No UUID generation method available. Please ensure you're running in Bun or a modern browser/Node.js environment.");
+  throw new Error(
+    "No UUID generation method available. Please ensure you're running in Bun or a modern browser/Node.js environment."
+  );
 }
 
 // Mock Personas

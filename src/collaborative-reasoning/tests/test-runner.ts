@@ -56,9 +56,9 @@ class CollaborativeReasoningTestRunner {
   private parseConcurrencyLimit(options: TestRunnerOptions): number {
     const envLimit = process.env["CI_CONCURRENCY_LIMIT"];
     const optionsLimit = options.concurrencyLimit;
-    
+
     let limit = 5; // Default
-    
+
     if (optionsLimit !== undefined) {
       limit = optionsLimit;
     } else if (envLimit) {
@@ -67,7 +67,7 @@ class CollaborativeReasoningTestRunner {
         limit = parsed;
       }
     }
-    
+
     return Math.max(1, limit); // Ensure at least 1
   }
 
@@ -77,9 +77,9 @@ class CollaborativeReasoningTestRunner {
   private parseProcessTimeout(options: TestRunnerOptions): number {
     const envTimeout = process.env["CI_PROCESS_TIMEOUT"];
     const optionsTimeout = options.processTimeout;
-    
+
     let timeout = 300000; // Default 5 minutes
-    
+
     if (optionsTimeout !== undefined) {
       timeout = optionsTimeout;
     } else if (envTimeout) {
@@ -88,7 +88,7 @@ class CollaborativeReasoningTestRunner {
         timeout = parsed;
       }
     }
-    
+
     return Math.max(1000, timeout); // Ensure at least 1 second
   }
 
@@ -258,8 +258,8 @@ class CollaborativeReasoningTestRunner {
         if (!bunProcess.killed && bunProcess.pid) {
           try {
             if (process.platform === "win32") {
-               // Windows: Use taskkill to terminate process tree
-               const killProcess = spawn("taskkill", ["/PID", bunProcess.pid.toString(), "/T", "/F"], {
+              // Windows: Use taskkill to terminate process tree
+              const killProcess = spawn("taskkill", ["/PID", bunProcess.pid.toString(), "/T", "/F"], {
                 stdio: "ignore"
               });
               killProcess.on("error", () => {

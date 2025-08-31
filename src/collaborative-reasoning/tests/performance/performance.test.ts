@@ -70,8 +70,8 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
       // Create promises that capture start and end times inside each Promise with event loop yielding
       const promises = Array.from({ length: concurrentRequests }, async () => {
         // Yield event loop to ensure genuine concurrent overlap
-        await new Promise(resolve => setImmediate(resolve));
-        
+        await new Promise((resolve) => setImmediate(resolve));
+
         const startTime = performance.now();
         const result = await server.processCollaborativeReasoning(testData);
         const endTime = performance.now();

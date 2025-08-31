@@ -5,7 +5,12 @@
 
 import { describe, test, expect, beforeEach } from "bun:test";
 import { CollaborativeReasoningServer } from "../../index.js";
-import { mockCollaborativeReasoningData, TestHelpers, TestEnvironment, CONTRIBUTION_TYPES } from "../utils/test-data.js";
+import {
+  mockCollaborativeReasoningData,
+  TestHelpers,
+  TestEnvironment,
+  CONTRIBUTION_TYPES
+} from "../utils/test-data.js";
 import type { CollaborativeReasoningData, Contribution } from "../../index.js";
 
 describe("Collaborative Reasoning E2E Tests", () => {
@@ -812,8 +817,7 @@ describe("Collaborative Reasoning E2E Tests", () => {
           }
         })),
         contributions: Array.from({ length: 20 }, (_, i) => {
-          const contributionTypes = [...CONTRIBUTION_TYPES, "challenge", "synthesis"
-          ] as const;
+          const contributionTypes = [...CONTRIBUTION_TYPES, "challenge", "synthesis"] as const;
           return {
             personaId: `persona-${i % 8}`,
             content: `Contribution ${i}: This is a detailed analysis of the topic from perspective ${i % 8} with specific insights and recommendations.`,

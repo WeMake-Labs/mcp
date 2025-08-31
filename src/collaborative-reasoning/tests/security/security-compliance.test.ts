@@ -28,8 +28,7 @@ class SecurityValidators {
    */
   static validateCreditCard(text: string): boolean {
     // Enhanced credit card pattern matching 13-19 digits with optional separators
-    const cardPattern =
-      /\b(?=(?:[\d\s-]*\d){13,19}\b)\d+(?:[\s-]?\d+)*\b/g;
+    const cardPattern = /\b(?=(?:[\d\s-]*\d){13,19}\b)\d+(?:[\s-]?\d+)*\b/g;
     const matches = text.match(cardPattern);
 
     if (!matches) return false;

@@ -5,7 +5,12 @@
 
 import { describe, test, expect, beforeEach, afterEach } from "bun:test";
 import { CollaborativeReasoningServer } from "../../index.js";
-import { mockCollaborativeReasoningData, invalidTestData, TestHelpers, CONTRIBUTION_TYPES } from "../utils/test-data.js";
+import {
+  mockCollaborativeReasoningData,
+  invalidTestData,
+  TestHelpers,
+  CONTRIBUTION_TYPES
+} from "../utils/test-data.js";
 
 describe("CollaborativeReasoningServer", () => {
   let server: CollaborativeReasoningServer;
