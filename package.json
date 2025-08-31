@@ -13,7 +13,8 @@
   "license": "BUSL-1.1",
   "type": "module",
   "workspaces": [
-    "src/*"
+    "./src/analogical-reasoning",
+    "./src/collaborative-reasoning"
   ],
   "private": true,
   "engines": {
@@ -24,7 +25,9 @@
     "dev": "bun run --filter='./src/*' dev",
     "start": "bun run --filter='./src/*' start",
     "build": "bun run --filter='./src/*' build",
-    "publish": "bun run --filter='./src/*' release",
+    "publish": "bun run publish:analogical-reasoning && bun run publish:analogical-reasoning",
+    "publish:analogical-reasoning": "bun run --filter='./src/analogical-reasoning' release",
+    "publish:collaborative-reasoning": "bun run --filter='./src/collaborative-reasoning' release",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
