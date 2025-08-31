@@ -5,6 +5,11 @@
 
 import type { Persona, Contribution, Disagreement, CollaborativeReasoningData } from "../../index.js";
 
+// Declare Bun global for TypeScript
+declare const Bun: {
+  randomUUIDv7(): string;
+};
+
 // Mock Personas
 export const mockPersonas: Persona[] = [
   {
@@ -161,14 +166,18 @@ export class TestHelpers {
    * Creates a deep copy of test data to prevent mutation between tests
    */
   static cloneTestData<T>(data: T): T {
-    return JSON.parse(JSON.stringify(data));
+    if (typeof structuredClone === 'function') {
+      return structuredClone(data);
+    } else {
+      return JSON.parse(JSON.stringify(data));
+    }
   }
 
   /**
-   * Generates a unique session ID for testing
+   * Generates a unique session ID for testing using Bun's native UUID generation
    */
   static generateSessionId(): string {
-    return `test-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `test-session-${Bun.randomUUIDv7()}`;
   }
 
   /**
@@ -224,6 +233,8 @@ export class TestHelpers {
 }
 
 // Performance test data
+const contributionTypes = ["observation", "question", "insight", "concern", "suggestion"] as const;
+
 export const performanceTestData = {
   largePersonaSet: Array.from({ length: 50 }, (_, i) => ({
     id: `persona-${i}`,
@@ -241,7 +252,7 @@ export const performanceTestData = {
   largeContributionSet: Array.from({ length: 200 }, (_, i) => ({
     personaId: `persona-${i % 50}`,
     content: `Contribution content ${i}`,
-    type: (["observation", "question", "insight", "concern", "suggestion"] as const)[i % 5] as Contribution["type"],
+    type: contributionTypes[i % contributionTypes.length],
     confidence: Math.random()
   }))
 };

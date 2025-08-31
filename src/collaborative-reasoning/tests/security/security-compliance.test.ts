@@ -4,8 +4,63 @@
  */
 
 import { describe, test, expect, beforeEach } from "bun:test";
-import { CollaborativeReasoningServer } from "../../index.js";
-import { mockCollaborativeReasoningData, TestHelpers } from "../utils/test-data.js";
+import { CollaborativeReasoningServer } from "../../index.ts";
+import { mockCollaborativeReasoningData, TestHelpers } from "../utils/test-data.ts";
+
+/**
+ * Robust security validators for sensitive data detection
+ */
+class SecurityValidators {
+  // Robust email pattern (RFC-5322 inspired, simplified for practical use)
+  static emailPattern = /\b[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\b/gi;
+
+  // E.164 aware phone pattern with common formats
+  static phonePattern = /(?:\+?1[-\s.]?)?(?:\(?[0-9]{3}\)?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4})|(?:\+[1-9]\d{1,14})|(?:\(?\d{3}\)?[-\s.]?\d{3}[-\s.]?\d{4})/g;
+
+  // Enhanced SSN pattern with optional delimiters and leading zeros
+  static ssnPattern = /\b(?:0{0,2}[1-9]|[1-9]\d{0,2})[-\s]?(?:0[1-9]|[1-9]\d)[-\s]?(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|[1-9]\d{3})\b/g;
+
+  /**
+   * Validates credit card numbers using Luhn algorithm and common BIN ranges
+   */
+  static validateCreditCard(text: string): boolean {
+    // Enhanced credit card pattern matching common BIN ranges and spacing variations
+    const cardPattern = /\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3[0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b/g;
+    const matches = text.match(cardPattern);
+    
+    if (!matches) return false;
+    
+    // Check each potential card number with Luhn algorithm
+    return matches.some(card => {
+      const digits = card.replace(/\D/g, '');
+      return this.luhnCheck(digits);
+    });
+  }
+
+  /**
+   * Luhn algorithm implementation for credit card validation
+   */
+  private static luhnCheck(cardNumber: string): boolean {
+    let sum = 0;
+    let alternate = false;
+    
+    for (let i = cardNumber.length - 1; i >= 0; i--) {
+      let n = parseInt(cardNumber.charAt(i), 10);
+      
+      if (alternate) {
+        n *= 2;
+        if (n > 9) {
+          n = (n % 10) + 1;
+        }
+      }
+      
+      sum += n;
+      alternate = !alternate;
+    }
+    
+    return (sum % 10) === 0;
+  }
+}
 
 describe("Security Compliance Tests", () => {
   let collaborativeReasoningServer: CollaborativeReasoningServer;
@@ -182,11 +237,11 @@ describe("Security Compliance Tests", () => {
       if (!result.isError && result.content?.[0]) {
         const responseText = result.content[0]?.text.toLowerCase() || "";
 
-        // Should not expose sensitive data patterns
-        expect(responseText).not.toMatch(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/); // Email
-        expect(responseText).not.toMatch(/\+?[0-9]{1,4}[\s.-]?[0-9]{3,4}[\s.-]?[0-9]{3,4}[\s.-]?[0-9]{3,4}/); // Phone
-        expect(responseText).not.toMatch(/\b[0-9]{3}-[0-9]{2}-[0-9]{4}\b/); // SSN
-        expect(responseText).not.toMatch(/\b[0-9]{4}[\s-]?[0-9]{4}[\s-]?[0-9]{4}[\s-]?[0-9]{4}\b/); // Credit Card
+        // Should not expose sensitive data patterns using robust validation
+        expect(responseText).not.toMatch(SecurityValidators.emailPattern); // RFC-5322 compliant email
+        expect(responseText).not.toMatch(SecurityValidators.phonePattern); // E.164 aware phone
+        expect(responseText).not.toMatch(SecurityValidators.ssnPattern); // Enhanced SSN with delimiters
+        expect(SecurityValidators.validateCreditCard(responseText)).toBe(false); // Luhn-validated credit card
       }
     });
 

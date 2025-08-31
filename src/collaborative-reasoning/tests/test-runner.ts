@@ -10,7 +10,7 @@
  * - Detailed reporting
  */
 
-import { TestEnvironment, TestSuite, TestConfigUtils, type TestConfig } from "./test.config.js";
+import { TestEnvironment, TestSuite, TestConfigUtils, type TestConfig } from "./test.config.ts";
 import { performance } from "perf_hooks";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
@@ -45,6 +45,9 @@ class CollaborativeReasoningTestRunner {
   private testEnvironment: TestEnvironment;
   private options: TestRunnerOptions;
   private results: TestResult[] = [];
+  private activeProcesses: Set<import('child_process').ChildProcess> = new Set();
+  private concurrencyLimit: number = 5; // Configurable max concurrent children
+  private processTimeout: number = 300000; // 5 minutes default timeout
 
   constructor(options: TestRunnerOptions = {}) {
     this.options = {
@@ -142,9 +145,14 @@ class CollaborativeReasoningTestRunner {
   }
 
   /**
-   * Execute tests using Bun's test runner
+   * Execute tests using Bun's test runner with enhanced process management
    */
   private async executeBunTests(pattern: string, config: Partial<TestConfig>) {
+    // Wait for available slot if at concurrency limit
+    while (this.activeProcesses.size >= this.concurrencyLimit) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
     const { spawn } = await import("child_process");
 
     return new Promise<{
@@ -166,32 +174,110 @@ class CollaborativeReasoningTestRunner {
         args.push("--timeout", String(config.environment.testTimeout));
       }
 
+      // Spawn with process group for proper cleanup
       const bunProcess = spawn("bun", args, {
         stdio: ["pipe", "pipe", "pipe"],
-        cwd: process.cwd()
+        cwd: process.cwd(),
+        detached: true // Create new process group
       });
 
-      let stdout = "";
+      // Track active process
+      this.activeProcesses.add(bunProcess);
 
-      bunProcess.stdout.on("data", (data: Buffer) => {
+      let stdout = "";
+      let watchdogTimer: ReturnType<typeof setTimeout> | null = null;
+      let signalHandlers: Array<() => void> = [];
+      let isCleanedUp = false;
+
+      // Cleanup function
+      const cleanup = () => {
+        if (isCleanedUp) return;
+        isCleanedUp = true;
+
+        // Clear watchdog timer
+        if (watchdogTimer) {
+          clearTimeout(watchdogTimer);
+          watchdogTimer = null;
+        }
+
+        // Remove from active processes
+        this.activeProcesses.delete(bunProcess);
+
+        // Remove signal handlers
+        signalHandlers.forEach(handler => handler());
+        signalHandlers = [];
+
+        // Kill process group if still running
+        if (!bunProcess.killed) {
+          try {
+            process.kill(-bunProcess.pid!, 'SIGTERM');
+            setTimeout(() => {
+              if (!bunProcess.killed) {
+                process.kill(-bunProcess.pid!, 'SIGKILL');
+              }
+            }, 5000);
+          } catch {
+            // Process might already be dead
+          }
+        }
+      };
+
+      // Set up watchdog timeout
+      const timeoutMs = config.environment?.testTimeout || this.processTimeout;
+      watchdogTimer = setTimeout(() => {
+        cleanup();
+        reject(new Error(`Test process timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+
+      // Set up signal handlers for parent process
+      const setupSignalHandler = (signal: string) => {
+        const handler = () => {
+          cleanup();
+          reject(new Error(`Test process terminated by ${signal}`));
+        };
+        process.once(signal, handler);
+        signalHandlers.push(() => process.removeListener(signal, handler));
+      };
+
+      setupSignalHandler('SIGINT');
+      setupSignalHandler('SIGTERM');
+
+      // Set up exit handler
+      const exitHandler = () => {
+        cleanup();
+      };
+      process.once('exit', exitHandler);
+      signalHandlers.push(() => process.removeListener('exit', exitHandler));
+
+      bunProcess.stdout?.on("data", (data: Buffer) => {
         stdout += data.toString();
         if (this.options.verbose) {
           process.stdout.write(data);
         }
       });
 
-      bunProcess.stderr.on("data", (data: Buffer) => {
+      bunProcess.stderr?.on("data", (data: Buffer) => {
         if (this.options.verbose) {
           process.stderr.write(data);
         }
       });
 
-      bunProcess.on("close", () => {
-        const result = this.parseTestOutput(stdout);
-        resolve(result);
+      bunProcess.on("close", (code: number | null) => {
+        cleanup();
+        try {
+          const result = this.parseTestOutput(stdout);
+          if (code === 0) {
+            resolve(result);
+          } else {
+            reject(new Error(`Test process exited with code ${code}`));
+          }
+        } catch (error) {
+          reject(error);
+        }
       });
 
       bunProcess.on("error", (error: Error) => {
+        cleanup();
         reject(error);
       });
     });
