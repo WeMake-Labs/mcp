@@ -67,8 +67,11 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
       const concurrentRequests = 50;
       const testData = TestHelpers.createMinimalValidData();
 
-      // Create promises that capture start and end times inside each Promise
+      // Create promises that capture start and end times inside each Promise with event loop yielding
       const promises = Array.from({ length: concurrentRequests }, async () => {
+        // Yield event loop to ensure genuine concurrent overlap
+        await new Promise(resolve => setImmediate(resolve));
+        
         const startTime = performance.now();
         const result = await server.processCollaborativeReasoning(testData);
         const endTime = performance.now();
@@ -189,7 +192,7 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
   });
 
   describe("Scalability Tests", () => {
-    test("should scale linearly with persona count", () => {
+    test("should scale linearly with persona count", async () => {
       const personaCounts = [5, 10, 20, 50];
       const results: Array<{ personas: number; latency: number }> = [];
 
@@ -200,13 +203,14 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
         };
 
         const startTime = performance.now();
-        const result = server.processCollaborativeReasoning(testData);
+        const result = await server.processCollaborativeReasoning(testData);
         const endTime = performance.now();
 
         const latency = endTime - startTime;
         results.push({ personas: personaCount, latency });
 
         expect(result).toBeDefined();
+        expect(result.isError).toBeFalsy();
       }
 
       performanceMetrics.operations = personaCounts.length;
@@ -333,20 +337,20 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
       const concurrentRequests = 20;
       const testData = TestHelpers.createMinimalValidData();
 
-      const startTime = process.hrtime.bigint();
+      const startTime = Date.now();
 
       // Create concurrent requests as promises
       const promises = Array.from({ length: concurrentRequests }, () => server.processCollaborativeReasoning(testData));
 
       // Await all concurrent operations
       const results = await Promise.all(promises);
-      const endTime = process.hrtime.bigint();
+      const endTime = Date.now();
 
       performanceMetrics.operations = concurrentRequests;
-      performanceMetrics.endTime = Date.now();
+      performanceMetrics.endTime = endTime;
 
-      const elapsedMs = Number(endTime - startTime) / 1_000_000; // Convert to milliseconds
-      const wallTime = performanceMetrics.endTime - performanceMetrics.startTime;
+      const elapsedMs = endTime - startTime; // Use consistent Date.now() timing
+      const wallTime = endTime - startTime; // Same as elapsedMs for consistency
 
       expect(results.every((r) => r)).toBe(true);
       // Ensure elapsed time and wall time are positive and reasonable

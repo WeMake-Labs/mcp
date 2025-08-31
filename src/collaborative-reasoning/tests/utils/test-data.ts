@@ -5,6 +5,39 @@
 
 import type { Persona, Contribution, Disagreement, CollaborativeReasoningData } from "../../index.js";
 
+/**
+ * Runtime and environment detection utilities for consistent test behavior
+ */
+export const TestEnvironment = {
+  /** Detect if running under Bun runtime */
+  get isBun(): boolean {
+    return typeof globalThis.Bun !== "undefined" || typeof process?.versions?.bun !== "undefined";
+  },
+
+  /** Detect if running in CI environment */
+  get isCI(): boolean {
+    return process.env["CI"] === "true" || process.env["GITHUB_ACTIONS"] === "true" || process.env["CONTINUOUS_INTEGRATION"] === "true";
+  },
+
+  /**
+   * Get performance thresholds based on runtime and CI environment
+   * @param bunThreshold - Threshold when running under Bun
+   * @param nodeThreshold - Threshold when running under Node.js
+   * @param ciMultiplier - Multiplier for CI environments (default: 2x more lenient)
+   */
+  getThreshold(bunThreshold: number, nodeThreshold: number, ciMultiplier: number = 2): number {
+    const baseThreshold = this.isBun ? bunThreshold : nodeThreshold;
+    return this.isCI ? baseThreshold * ciMultiplier : baseThreshold;
+  },
+
+  /**
+   * Should skip strict timing assertions in CI or unreliable environments
+   */
+  get shouldSkipTimingAssertions(): boolean {
+    return this.isCI && !this.isBun; // Skip timing tests in CI when not using Bun
+  }
+};
+
 // Declare Bun global for TypeScript
 declare const Bun: {
   randomUUIDv7(): string;

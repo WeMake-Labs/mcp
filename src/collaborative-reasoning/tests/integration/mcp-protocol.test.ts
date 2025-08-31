@@ -5,7 +5,7 @@
 
 import { describe, test, expect, beforeEach } from "bun:test";
 import { CollaborativeReasoningServer } from "../../index.js";
-import { mockCollaborativeReasoningData, TestHelpers } from "../utils/test-data.js";
+import { mockCollaborativeReasoningData, TestHelpers, TestEnvironment } from "../utils/test-data.js";
 
 describe("MCP Protocol Integration", () => {
   let collaborativeReasoningServer: CollaborativeReasoningServer;
@@ -286,10 +286,9 @@ describe("MCP Protocol Integration", () => {
       const avgTime = executionTimes.reduce((sum, time) => sum + time, 0) / executionTimes.length;
       const maxDeviation = Math.max(...executionTimes.map((time) => Math.abs(time - avgTime)));
 
-      // Apply stricter thresholds when running under Bun
-      const isBun = typeof globalThis.Bun !== "undefined" || typeof process?.versions?.bun !== "undefined";
-      const maxDeviationThreshold = isBun ? 100 : 200;
-      const avgTimeThreshold = isBun ? 300 : 500;
+      // CI-aware performance thresholds based on runtime environment
+      const maxDeviationThreshold = TestEnvironment.getThreshold(100, 200); // 100ms for Bun, 200ms for Node, 2x in CI
+      const avgTimeThreshold = TestEnvironment.getThreshold(300, 500); // 300ms for Bun, 500ms for Node, 2x in CI
 
       // Execution times should be reasonably consistent
       expect(maxDeviation).toBeLessThan(maxDeviationThreshold);

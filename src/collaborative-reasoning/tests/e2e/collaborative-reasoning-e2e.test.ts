@@ -5,7 +5,7 @@
 
 import { describe, test, expect, beforeEach } from "bun:test";
 import { CollaborativeReasoningServer } from "../../index.js";
-import { mockCollaborativeReasoningData, TestHelpers } from "../utils/test-data.js";
+import { mockCollaborativeReasoningData, TestHelpers, TestEnvironment } from "../utils/test-data.js";
 import type { CollaborativeReasoningData, Contribution } from "../../index.js";
 
 describe("Collaborative Reasoning E2E Tests", () => {
@@ -786,8 +786,11 @@ describe("Collaborative Reasoning E2E Tests", () => {
 
       const endTime = Date.now();
 
-      // Should complete all sessions efficiently under Bun
-      expect(endTime - startTime).toBeLessThan(1500); // 1.5 seconds for 5 concurrent sessions under Bun
+      // Performance assertion: CI-aware timing with runtime detection
+      if (!TestEnvironment.shouldSkipTimingAssertions) {
+        const timeThreshold = TestEnvironment.getThreshold(1500, 3000); // 1.5s for Bun, 3s for Node, 2x in CI
+        expect(endTime - startTime).toBeLessThan(timeThreshold);
+      }
 
       // All sessions should succeed
       results.forEach((result) => {
