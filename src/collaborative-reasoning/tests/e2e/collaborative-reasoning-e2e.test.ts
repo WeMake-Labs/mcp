@@ -776,7 +776,7 @@ describe('Collaborative Reasoning E2E Tests', () => {
         stage: 'decision',
         iteration: 8,
         nextContributionNeeded: false,
-        activePersonaId: 'facilitator',
+        activePersonaId: 'persona-0',
         personas: Array.from({ length: 8 }, (_, i) => ({
           id: `persona-${i}`,
           name: `Expert ${i}`,
