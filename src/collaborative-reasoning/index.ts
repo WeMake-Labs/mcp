@@ -74,62 +74,62 @@ export class CollaborativeReasoningServer {
   private sessionHistory: Record<string, CollaborativeReasoningData[]> = {};
 
   private sanitizeInput(input: string): string {
-    if (!input || typeof input !== 'string') {
-      return '';
+    if (!input || typeof input !== "string") {
+      return "";
     }
 
     // Enforce input length limits (max 10,000 characters)
     if (input.length > 10000) {
-      input = input.substring(0, 10000) + '...[TRUNCATED]';
+      input = input.substring(0, 10000) + "...[TRUNCATED]";
     }
 
     // Remove script tags and their content
-    let sanitized = input.replace(/<script[^>]*>.*?<\/script>/gis, '');
-    
+    let sanitized = input.replace(/<script[^>]*>.*?<\/script>/gis, "");
+
     // Remove javascript: URLs
-    sanitized = sanitized.replace(/javascript:/gi, '');
-    
+    sanitized = sanitized.replace(/javascript:/gi, "");
+
     // Remove eval() calls
-    sanitized = sanitized.replace(/eval\s*\(/gi, '');
-    
+    sanitized = sanitized.replace(/eval\s*\(/gi, "");
+
     // Remove other potentially dangerous patterns
-    sanitized = sanitized.replace(/on\w+\s*=/gi, ''); // Remove event handlers
-    sanitized = sanitized.replace(/document\./gi, '');
-    sanitized = sanitized.replace(/window\./gi, '');
-    
+    sanitized = sanitized.replace(/on\w+\s*=/gi, ""); // Remove event handlers
+    sanitized = sanitized.replace(/document\./gi, "");
+    sanitized = sanitized.replace(/window\./gi, "");
+
     // Remove sensitive data patterns
-    sanitized = sanitized.replace(/password\w*/gi, '[REDACTED]');
-    sanitized = sanitized.replace(/secret[\w-]*/gi, '[REDACTED]');
-    sanitized = sanitized.replace(/token[\w-]*/gi, '[REDACTED]');
-    sanitized = sanitized.replace(/key[\w-]*/gi, '[REDACTED]');
-    sanitized = sanitized.replace(/api[\w-]*key/gi, '[REDACTED]');
-    sanitized = sanitized.replace(/\b\w*pass\w*\b/gi, '[REDACTED]');
-    sanitized = sanitized.replace(/\b\w*auth\w*\b/gi, '[REDACTED]');
-    
+    sanitized = sanitized.replace(/password\w*/gi, "[REDACTED]");
+    sanitized = sanitized.replace(/secret[\w-]*/gi, "[REDACTED]");
+    sanitized = sanitized.replace(/token[\w-]*/gi, "[REDACTED]");
+    sanitized = sanitized.replace(/key[\w-]*/gi, "[REDACTED]");
+    sanitized = sanitized.replace(/api[\w-]*key/gi, "[REDACTED]");
+    sanitized = sanitized.replace(/\b\w*pass\w*\b/gi, "[REDACTED]");
+    sanitized = sanitized.replace(/\b\w*auth\w*\b/gi, "[REDACTED]");
+
     // Remove email addresses
-    sanitized = sanitized.replace(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/g, '[EMAIL_REDACTED]');
-    
+    sanitized = sanitized.replace(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/g, "[EMAIL_REDACTED]");
+
     // Remove phone numbers (more specific patterns to avoid false positives)
-    sanitized = sanitized.replace(/\+?[1-9]\d{1,14}(?=\s|$|[^\d%])/g, '[PHONE_REDACTED]');
-    sanitized = sanitized.replace(/\(?\d{3}\)?[-.]\d{3}[-.]\d{4}/g, '[PHONE_REDACTED]');
-    sanitized = sanitized.replace(/\d{3}-\d{3}-\d{4}/g, '[PHONE_REDACTED]');
-    sanitized = sanitized.replace(/\d{3}\.\d{3}\.\d{4}/g, '[PHONE_REDACTED]');
-    
+    sanitized = sanitized.replace(/\+?[1-9]\d{1,14}(?=\s|$|[^\d%])/g, "[PHONE_REDACTED]");
+    sanitized = sanitized.replace(/\(?\d{3}\)?[-.]\d{3}[-.]\d{4}/g, "[PHONE_REDACTED]");
+    sanitized = sanitized.replace(/\d{3}-\d{3}-\d{4}/g, "[PHONE_REDACTED]");
+    sanitized = sanitized.replace(/\d{3}\.\d{3}\.\d{4}/g, "[PHONE_REDACTED]");
+
     // Remove path traversal attempts
-    sanitized = sanitized.replace(/\.\.\/+/g, '[PATH_REDACTED]/');
-    sanitized = sanitized.replace(/\/etc\/passwd/gi, '[SYSTEM_PATH_REDACTED]');
-    sanitized = sanitized.replace(/\/etc\/shadow/gi, '[SYSTEM_PATH_REDACTED]');
-    sanitized = sanitized.replace(/\/proc\/[\w/]+/gi, '[SYSTEM_PATH_REDACTED]');
-    
+    sanitized = sanitized.replace(/\.\.\/+/g, "[PATH_REDACTED]/");
+    sanitized = sanitized.replace(/\/etc\/passwd/gi, "[SYSTEM_PATH_REDACTED]");
+    sanitized = sanitized.replace(/\/etc\/shadow/gi, "[SYSTEM_PATH_REDACTED]");
+    sanitized = sanitized.replace(/\/proc\/[\w/]+/gi, "[SYSTEM_PATH_REDACTED]");
+
     // Remove personal names (common names used in test data)
-    sanitized = sanitized.replace(/Anna Schmidt/gi, '[NAME_REDACTED]');
-    sanitized = sanitized.replace(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g, '[NAME_REDACTED]');
-    
+    sanitized = sanitized.replace(/Anna Schmidt/gi, "[NAME_REDACTED]");
+    sanitized = sanitized.replace(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g, "[NAME_REDACTED]");
+
     // Remove medical conditions and health information
-    sanitized = sanitized.replace(/\bdiabetes(\s+type\s+[12])?\b/gi, '[MEDICAL_CONDITION_REDACTED]');
-    sanitized = sanitized.replace(/\bhigh blood pressure\b/gi, '[MEDICAL_CONDITION_REDACTED]');
-    sanitized = sanitized.replace(/\banxiety disorder\b/gi, '[MEDICAL_CONDITION_REDACTED]');
-    
+    sanitized = sanitized.replace(/\bdiabetes(\s+type\s+[12])?\b/gi, "[MEDICAL_CONDITION_REDACTED]");
+    sanitized = sanitized.replace(/\bhigh blood pressure\b/gi, "[MEDICAL_CONDITION_REDACTED]");
+    sanitized = sanitized.replace(/\banxiety disorder\b/gi, "[MEDICAL_CONDITION_REDACTED]");
+
     return sanitized.trim();
   }
 
@@ -138,31 +138,31 @@ export class CollaborativeReasoningServer {
     const sanitized: CollaborativeReasoningData = {
       ...data,
       topic: this.sanitizeInput(data.topic),
-      personas: data.personas.map(persona => ({
+      personas: data.personas.map((persona) => ({
         ...persona,
         name: this.sanitizeInput(persona.name),
-        expertise: persona.expertise.map(exp => this.sanitizeInput(exp)),
+        expertise: persona.expertise.map((exp) => this.sanitizeInput(exp)),
         background: this.sanitizeInput(persona.background),
         perspective: this.sanitizeInput(persona.perspective),
-        biases: persona.biases.map(bias => this.sanitizeInput(bias)),
+        biases: persona.biases.map((bias) => this.sanitizeInput(bias)),
         communication: {
           style: this.sanitizeInput(persona.communication.style),
           tone: this.sanitizeInput(persona.communication.tone)
         }
       })),
-      contributions: data.contributions.map(contrib => ({
+      contributions: data.contributions.map((contrib) => ({
         ...contrib,
         content: this.sanitizeInput(contrib.content),
-        ...(contrib.referenceIds && { referenceIds: contrib.referenceIds.map(id => this.sanitizeInput(id)) })
+        ...(contrib.referenceIds && { referenceIds: contrib.referenceIds.map((id) => this.sanitizeInput(id)) })
       })),
       ...(data.disagreements && {
-        disagreements: data.disagreements.map(disagreement => ({
+        disagreements: data.disagreements.map((disagreement) => ({
           ...disagreement,
           topic: this.sanitizeInput(disagreement.topic),
-          positions: disagreement.positions.map(pos => ({
+          positions: disagreement.positions.map((pos) => ({
             ...pos,
             position: this.sanitizeInput(pos.position),
-            arguments: pos.arguments.map(arg => this.sanitizeInput(arg))
+            arguments: pos.arguments.map((arg) => this.sanitizeInput(arg))
           })),
           ...(disagreement.resolution && {
             resolution: {
@@ -173,15 +173,17 @@ export class CollaborativeReasoningServer {
         }))
       }),
       activePersonaId: this.sanitizeInput(data.activePersonaId),
-       ...(data.nextPersonaId && { nextPersonaId: this.sanitizeInput(data.nextPersonaId) }),
-       ...(data.keyInsights && { keyInsights: data.keyInsights.map(insight => this.sanitizeInput(insight)) }),
-       ...(data.consensusPoints && { consensusPoints: data.consensusPoints.map(point => this.sanitizeInput(point)) }),
-       ...(data.openQuestions && { openQuestions: data.openQuestions.map(question => this.sanitizeInput(question)) }),
-       ...(data.finalRecommendation && { finalRecommendation: this.sanitizeInput(data.finalRecommendation) }),
-       sessionId: this.sanitizeInput(data.sessionId),
-       ...(data.suggestedContributionTypes && { suggestedContributionTypes: data.suggestedContributionTypes.map(type => this.sanitizeInput(type)) })
+      ...(data.nextPersonaId && { nextPersonaId: this.sanitizeInput(data.nextPersonaId) }),
+      ...(data.keyInsights && { keyInsights: data.keyInsights.map((insight) => this.sanitizeInput(insight)) }),
+      ...(data.consensusPoints && { consensusPoints: data.consensusPoints.map((point) => this.sanitizeInput(point)) }),
+      ...(data.openQuestions && { openQuestions: data.openQuestions.map((question) => this.sanitizeInput(question)) }),
+      ...(data.finalRecommendation && { finalRecommendation: this.sanitizeInput(data.finalRecommendation) }),
+      sessionId: this.sanitizeInput(data.sessionId),
+      ...(data.suggestedContributionTypes && {
+        suggestedContributionTypes: data.suggestedContributionTypes.map((type) => this.sanitizeInput(type))
+      })
     };
-    
+
     return sanitized;
   }
 
@@ -192,7 +194,7 @@ export class CollaborativeReasoningServer {
     if (!data["topic"] || typeof data["topic"] !== "string") {
       throw new Error("Invalid topic: must be a string");
     }
-    
+
     // Sanitize topic
     data["topic"] = this.sanitizeInput(data["topic"] as string);
 
@@ -239,7 +241,7 @@ export class CollaborativeReasoningServer {
       if (!persona["name"] || typeof persona["name"] !== "string") {
         throw new Error("Invalid persona name: must be a string");
       }
-      
+
       // Sanitize persona name
       persona["name"] = this.sanitizeInput(persona["name"] as string);
 
@@ -303,8 +305,8 @@ export class CollaborativeReasoningServer {
 
     // Validate contributions
     const contributions: Contribution[] = [];
-    const personaIds = personas.map(p => p.id);
-    
+    const personaIds = personas.map((p) => p.id);
+
     for (const contribution of data["contributions"] as Array<Record<string, unknown>>) {
       if (!contribution["personaId"] || typeof contribution["personaId"] !== "string") {
         throw new Error("Invalid contribution personaId: must be a string");
@@ -312,13 +314,15 @@ export class CollaborativeReasoningServer {
 
       // Validate that personaId references an existing persona
       if (!personaIds.includes(contribution["personaId"] as string)) {
-        throw new Error(`Invalid contribution personaId: persona '${contribution["personaId"]}' not found in personas array`);
+        throw new Error(
+          `Invalid contribution personaId: persona '${contribution["personaId"]}' not found in personas array`
+        );
       }
 
       if (!contribution["content"] || typeof contribution["content"] !== "string") {
         throw new Error("Invalid contribution content: must be a string");
       }
-      
+
       // Sanitize contribution content
       contribution["content"] = this.sanitizeInput(contribution["content"] as string);
 
@@ -326,7 +330,15 @@ export class CollaborativeReasoningServer {
         throw new Error("Invalid contribution type: must be a string");
       }
 
-      const validContributionTypes = ["observation", "question", "insight", "concern", "suggestion", "challenge", "synthesis"];
+      const validContributionTypes = [
+        "observation",
+        "question",
+        "insight",
+        "concern",
+        "suggestion",
+        "challenge",
+        "synthesis"
+      ];
       if (!validContributionTypes.includes(contribution["type"] as string)) {
         throw new Error(`Invalid contribution type: must be one of ${validContributionTypes.join(", ")}`);
       }
@@ -784,7 +796,7 @@ export class CollaborativeReasoningServer {
   } {
     try {
       const validatedInput = this.validateCollaborativeReasoningData(input);
-      
+
       // Sanitize all string content in the validated data
       const sanitizedInput = this.sanitizeCollaborativeReasoningData(validatedInput);
 
@@ -797,7 +809,7 @@ export class CollaborativeReasoningServer {
       this.updateSessionHistory(sanitizedInput);
 
       // Generate visualization (only in non-test environment)
-      if (process.env.NODE_ENV !== 'test') {
+      if (process.env.NODE_ENV !== "test") {
         const visualization = this.visualizeCollaborativeReasoning(validatedInput);
         console.error(visualization);
       }

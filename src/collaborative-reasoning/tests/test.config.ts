@@ -1,6 +1,6 @@
 /**
  * Test Configuration for Collaborative Reasoning Module
- * 
+ *
  * This configuration file sets up comprehensive testing with:
  * - Coverage reporting
  * - Test environment setup
@@ -49,13 +49,8 @@ export const defaultTestConfig: TestConfig = {
       functions: 90,
       lines: 90
     },
-    exclude: [
-      'tests/**/*',
-      '**/*.test.ts',
-      '**/*.spec.ts',
-      '**/test-data.ts'
-    ],
-    reporters: ['text', 'html', 'json']
+    exclude: ["tests/**/*", "**/*.test.ts", "**/*.spec.ts", "**/test-data.ts"],
+    reporters: ["text", "html", "json"]
   },
   performance: {
     enabled: true,
@@ -81,11 +76,11 @@ export const defaultTestConfig: TestConfig = {
  * Test Suite Categories
  */
 export enum TestSuite {
-  UNIT = 'unit',
-  INTEGRATION = 'integration',
-  E2E = 'e2e',
-  SECURITY = 'security',
-  PERFORMANCE = 'performance'
+  UNIT = "unit",
+  INTEGRATION = "integration",
+  E2E = "e2e",
+  SECURITY = "security",
+  PERFORMANCE = "performance"
 }
 
 /**
@@ -118,21 +113,21 @@ export class TestEnvironment {
    * Setup test environment before running tests
    */
   async setup(): Promise<void> {
-    console.log('Setting up test environment...');
-    
+    console.log("Setting up test environment...");
+
     // Setup coverage if enabled
     if (this.config.coverage.enabled) {
-      console.log('Coverage reporting enabled');
+      console.log("Coverage reporting enabled");
     }
 
     // Setup performance monitoring
     if (this.config.performance.enabled) {
-      console.log('Performance monitoring enabled');
+      console.log("Performance monitoring enabled");
     }
 
     // Setup security testing
     if (this.config.security.enabled) {
-      console.log('Security testing enabled');
+      console.log("Security testing enabled");
     }
   }
 
@@ -140,7 +135,7 @@ export class TestEnvironment {
    * Cleanup test environment after running tests
    */
   async cleanup(): Promise<void> {
-    console.log('Cleaning up test environment...');
+    console.log("Cleaning up test environment...");
   }
 
   /**
@@ -216,8 +211,8 @@ export class TestConfigUtils {
     const { coverage } = config;
     if (coverage.enabled) {
       const thresholds = Object.values(coverage.threshold);
-      if (thresholds.some(t => t < 0 || t > 100)) {
-        throw new Error('Coverage thresholds must be between 0 and 100');
+      if (thresholds.some((t) => t < 0 || t > 100)) {
+        throw new Error("Coverage thresholds must be between 0 and 100");
       }
     }
 
@@ -225,20 +220,20 @@ export class TestConfigUtils {
     const { performance } = config;
     if (performance.enabled) {
       if (performance.maxExecutionTime <= 0) {
-        throw new Error('Max execution time must be positive');
+        throw new Error("Max execution time must be positive");
       }
       if (performance.memoryThreshold <= 0) {
-        throw new Error('Memory threshold must be positive');
+        throw new Error("Memory threshold must be positive");
       }
     }
 
     // Validate environment settings
     const { environment } = config;
     if (environment.testTimeout <= 0) {
-      throw new Error('Test timeout must be positive');
+      throw new Error("Test timeout must be positive");
     }
     if (environment.retries < 0) {
-      throw new Error('Retries must be non-negative');
+      throw new Error("Retries must be non-negative");
     }
 
     return true;
@@ -249,20 +244,26 @@ export class TestConfigUtils {
    */
   static generateReportConfig(config: TestConfig) {
     return {
-      coverage: config.coverage.enabled ? {
-        reporters: config.coverage.reporters,
-        threshold: config.coverage.threshold,
-        exclude: config.coverage.exclude
-      } : null,
-      performance: config.performance.enabled ? {
-        maxExecutionTime: config.performance.maxExecutionTime,
-        memoryThreshold: config.performance.memoryThreshold
-      } : null,
-      security: config.security.enabled ? {
-        inputValidation: config.security.inputValidation,
-        rateLimiting: config.security.rateLimiting,
-        dataLeakage: config.security.dataLeakage
-      } : null
+      coverage: config.coverage.enabled
+        ? {
+            reporters: config.coverage.reporters,
+            threshold: config.coverage.threshold,
+            exclude: config.coverage.exclude
+          }
+        : null,
+      performance: config.performance.enabled
+        ? {
+            maxExecutionTime: config.performance.maxExecutionTime,
+            memoryThreshold: config.performance.memoryThreshold
+          }
+        : null,
+      security: config.security.enabled
+        ? {
+            inputValidation: config.security.inputValidation,
+            rateLimiting: config.security.rateLimiting,
+            dataLeakage: config.security.dataLeakage
+          }
+        : null
     };
   }
 

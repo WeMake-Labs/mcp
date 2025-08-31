@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * Comprehensive Test Runner for Collaborative Reasoning Module
- * 
+ *
  * This script provides:
  * - Test suite execution with configuration
  * - Coverage reporting
@@ -10,10 +10,10 @@
  * - Detailed reporting
  */
 
-import { TestEnvironment, TestSuite, TestConfigUtils, type TestConfig } from './test.config.js';
-import { performance } from 'perf_hooks';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { TestEnvironment, TestSuite, TestConfigUtils, type TestConfig } from "./test.config.js";
+import { performance } from "perf_hooks";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { join } from "path";
 
 interface TestResult {
   suite: TestSuite;
@@ -49,7 +49,7 @@ class CollaborativeReasoningTestRunner {
   constructor(options: TestRunnerOptions = {}) {
     this.options = {
       suites: [TestSuite.UNIT, TestSuite.INTEGRATION, TestSuite.E2E, TestSuite.SECURITY],
-      outputDir: './test-results',
+      outputDir: "./test-results",
       ci: false,
       watch: false,
       verbose: false,
@@ -57,10 +57,8 @@ class CollaborativeReasoningTestRunner {
     };
 
     // Initialize test environment with appropriate config
-    const config = options.ci 
-      ? TestConfigUtils.createCIConfig()
-      : TestConfigUtils.createDevConfig();
-    
+    const config = options.ci ? TestConfigUtils.createCIConfig() : TestConfigUtils.createDevConfig();
+
     this.testEnvironment = TestEnvironment.getInstance(options.config || config);
   }
 
@@ -68,12 +66,12 @@ class CollaborativeReasoningTestRunner {
    * Run all configured test suites
    */
   async runAll(): Promise<void> {
-    console.log('🚀 Starting Collaborative Reasoning Test Suite');
-    console.log('=' .repeat(60));
+    console.log("🚀 Starting Collaborative Reasoning Test Suite");
+    console.log("=".repeat(60));
 
     try {
       await this.testEnvironment.setup();
-      
+
       // Ensure output directory exists
       if (!existsSync(this.options.outputDir!)) {
         mkdirSync(this.options.outputDir!, { recursive: true });
@@ -86,18 +84,17 @@ class CollaborativeReasoningTestRunner {
 
       // Generate comprehensive report
       await this.generateReport();
-      
+
       // Check if all tests passed
       const totalFailed = this.results.reduce((sum, result) => sum + result.failed, 0);
       if (totalFailed > 0) {
         console.error(`\n❌ ${totalFailed} test(s) failed`);
         process.exit(1);
       } else {
-        console.log('\n✅ All tests passed!');
+        console.log("\n✅ All tests passed!");
       }
-
     } catch (error) {
-      console.error('Test runner failed:', error);
+      console.error("Test runner failed:", error);
       process.exit(1);
     } finally {
       await this.testEnvironment.cleanup();
@@ -114,10 +111,10 @@ class CollaborativeReasoningTestRunner {
     try {
       const suiteConfig = this.testEnvironment.getSuiteConfig(suite);
       const testPattern = this.getTestPattern(suite);
-      
+
       // Execute tests using Bun's test runner
       const result = await this.executeBunTests(testPattern, suiteConfig);
-      
+
       const duration = performance.now() - startTime;
       const testResult: TestResult = {
         suite,
@@ -131,7 +128,6 @@ class CollaborativeReasoningTestRunner {
 
       this.results.push(testResult);
       this.logSuiteResult(testResult);
-
     } catch (error) {
       console.error(`Failed to run ${suite} tests:`, error);
       this.results.push({
@@ -149,8 +145,8 @@ class CollaborativeReasoningTestRunner {
    * Execute tests using Bun's test runner
    */
   private async executeBunTests(pattern: string, config: Partial<TestConfig>) {
-    const { spawn } = await import('child_process');
-    
+    const { spawn } = await import("child_process");
+
     return new Promise<{
       passed: number;
       failed: number;
@@ -158,44 +154,44 @@ class CollaborativeReasoningTestRunner {
       errors: string[];
       coverage?: CoverageReport;
     }>((resolve, reject) => {
-      const args = ['test', pattern];
-      
+      const args = ["test", pattern];
+
       // Add coverage if enabled
       if (config.coverage?.enabled) {
-        args.push('--coverage');
-      }
-      
-      // Add timeout
-      if (config.environment?.testTimeout) {
-        args.push('--timeout', String(config.environment.testTimeout));
+        args.push("--coverage");
       }
 
-      const bunProcess = spawn('bun', args, {
-        stdio: ['pipe', 'pipe', 'pipe'],
+      // Add timeout
+      if (config.environment?.testTimeout) {
+        args.push("--timeout", String(config.environment.testTimeout));
+      }
+
+      const bunProcess = spawn("bun", args, {
+        stdio: ["pipe", "pipe", "pipe"],
         cwd: process.cwd()
       });
 
-      let stdout = '';
+      let stdout = "";
 
-      bunProcess.stdout.on('data', (data: Buffer) => {
+      bunProcess.stdout.on("data", (data: Buffer) => {
         stdout += data.toString();
         if (this.options.verbose) {
           process.stdout.write(data);
         }
       });
 
-      bunProcess.stderr.on('data', (data: Buffer) => {
+      bunProcess.stderr.on("data", (data: Buffer) => {
         if (this.options.verbose) {
           process.stderr.write(data);
         }
       });
 
-      bunProcess.on('close', () => {
+      bunProcess.on("close", () => {
         const result = this.parseTestOutput(stdout);
         resolve(result);
       });
 
-      bunProcess.on('error', (error: Error) => {
+      bunProcess.on("error", (error: Error) => {
         reject(error);
       });
     });
@@ -212,7 +208,7 @@ class CollaborativeReasoningTestRunner {
     coverage?: CoverageReport;
   } {
     // Simple parsing - in a real implementation, you'd parse Bun's test output format
-    const lines = stdout.split('\n');
+    const lines = stdout.split("\n");
     let passed = 0;
     let failed = 0;
     let skipped = 0;
@@ -220,17 +216,17 @@ class CollaborativeReasoningTestRunner {
 
     // Parse test results (simplified)
     for (const line of lines) {
-      if (line.includes('✓')) passed++;
-      if (line.includes('✗')) {
+      if (line.includes("✓")) passed++;
+      if (line.includes("✗")) {
         failed++;
         errors.push(line);
       }
-      if (line.includes('○')) skipped++;
+      if (line.includes("○")) skipped++;
     }
 
     // Parse coverage if available
     let coverage: CoverageReport | undefined;
-    if (stdout.includes('Coverage')) {
+    if (stdout.includes("Coverage")) {
       // Simplified coverage parsing
       coverage = {
         statements: { covered: 90, total: 100, percentage: 90 },
@@ -247,7 +243,7 @@ class CollaborativeReasoningTestRunner {
    * Get test pattern for specific suite
    */
   private getTestPattern(suite: TestSuite): string {
-    const basePath = 'src/collaborative-reasoning/tests';
+    const basePath = "src/collaborative-reasoning/tests";
     switch (suite) {
       case TestSuite.UNIT:
         return `${basePath}/unit/**/*.test.ts`;
@@ -270,15 +266,15 @@ class CollaborativeReasoningTestRunner {
   private logSuiteResult(result: TestResult): void {
     const { suite, passed, failed, skipped, duration } = result;
     const total = passed + failed + skipped;
-    const successRate = total > 0 ? ((passed / total) * 100).toFixed(1) : '0.0';
-    
+    const successRate = total > 0 ? ((passed / total) * 100).toFixed(1) : "0.0";
+
     console.log(`  📊 ${suite.toUpperCase()} Results:`);
     console.log(`     ✅ Passed: ${passed}`);
     console.log(`     ❌ Failed: ${failed}`);
     console.log(`     ⏭️  Skipped: ${skipped}`);
     console.log(`     ⏱️  Duration: ${(duration / 1000).toFixed(2)}s`);
     console.log(`     📈 Success Rate: ${successRate}%`);
-    
+
     if (result.coverage) {
       console.log(`     📋 Coverage:`);
       console.log(`        Statements: ${result.coverage.statements.percentage}%`);
@@ -289,7 +285,7 @@ class CollaborativeReasoningTestRunner {
 
     if (failed > 0 && result.errors.length > 0) {
       console.log(`     🚨 Errors:`);
-      result.errors.forEach(error => {
+      result.errors.forEach((error) => {
         console.log(`        ${error}`);
       });
     }
@@ -313,20 +309,20 @@ class CollaborativeReasoningTestRunner {
         failed: totalFailed,
         skipped: totalSkipped,
         duration: totalDuration,
-        successRate: total > 0 ? ((totalPassed / total) * 100).toFixed(1) : '0.0'
+        successRate: total > 0 ? ((totalPassed / total) * 100).toFixed(1) : "0.0"
       },
       suites: this.results,
       config: this.testEnvironment.getConfig()
     };
 
     // Write JSON report
-    const outputDir = this.options.outputDir || './test-results';
-    const reportPath = join(outputDir, 'test-report.json');
+    const outputDir = this.options.outputDir || "./test-results";
+    const reportPath = join(outputDir, "test-report.json");
     writeFileSync(reportPath, JSON.stringify(report, null, 2));
 
     // Write HTML report (simplified)
     const htmlReport = this.generateHTMLReport(report);
-    const htmlPath = join(outputDir, 'test-report.html');
+    const htmlPath = join(outputDir, "test-report.html");
     writeFileSync(htmlPath, htmlReport);
 
     console.log(`\n📄 Reports generated:`);
@@ -338,10 +334,10 @@ class CollaborativeReasoningTestRunner {
    * Generate HTML report
    */
   private generateHTMLReport(report: Record<string, unknown>): string {
-    const timestamp = report['timestamp'] || 'Unknown';
-    const summary = report['summary'] as Record<string, unknown> || {};
-    const suites = report['suites'] as TestResult[] || [];
-    
+    const timestamp = report["timestamp"] || "Unknown";
+    const summary = (report["summary"] as Record<string, unknown>) || {};
+    const suites = (report["suites"] as TestResult[]) || [];
+
     return `
 <!DOCTYPE html>
 <html>
@@ -363,23 +359,27 @@ class CollaborativeReasoningTestRunner {
     
     <div class="summary">
         <h2>Summary</h2>
-        <p><strong>Total Tests:</strong> ${summary['total'] || 0}</p>
-        <p class="passed"><strong>Passed:</strong> ${summary['passed'] || 0}</p>
-        <p class="failed"><strong>Failed:</strong> ${summary['failed'] || 0}</p>
-        <p class="skipped"><strong>Skipped:</strong> ${summary['skipped'] || 0}</p>
-        <p><strong>Duration:</strong> ${((summary['duration'] as number || 0) / 1000).toFixed(2)}s</p>
-        <p><strong>Success Rate:</strong> ${summary['successRate'] || '0.0'}%</p>
+        <p><strong>Total Tests:</strong> ${summary["total"] || 0}</p>
+        <p class="passed"><strong>Passed:</strong> ${summary["passed"] || 0}</p>
+        <p class="failed"><strong>Failed:</strong> ${summary["failed"] || 0}</p>
+        <p class="skipped"><strong>Skipped:</strong> ${summary["skipped"] || 0}</p>
+        <p><strong>Duration:</strong> ${(((summary["duration"] as number) || 0) / 1000).toFixed(2)}s</p>
+        <p><strong>Success Rate:</strong> ${summary["successRate"] || "0.0"}%</p>
     </div>
     
     <h2>Test Suites</h2>
-    ${suites.map((suite: TestResult) => `
+    ${suites
+      .map(
+        (suite: TestResult) => `
         <div class="suite">
             <h3>${suite.suite.toUpperCase()}</h3>
             <p class="passed">Passed: ${suite.passed}</p>
             <p class="failed">Failed: ${suite.failed}</p>
             <p class="skipped">Skipped: ${suite.skipped}</p>
             <p>Duration: ${(suite.duration / 1000).toFixed(2)}s</p>
-            ${suite.coverage ? `
+            ${
+              suite.coverage
+                ? `
                 <div class="coverage">
                     <h4>Coverage</h4>
                     <p>Statements: ${suite.coverage.statements.percentage}%</p>
@@ -387,17 +387,25 @@ class CollaborativeReasoningTestRunner {
                     <p>Functions: ${suite.coverage.functions.percentage}%</p>
                     <p>Lines: ${suite.coverage.lines.percentage}%</p>
                 </div>
-            ` : ''}
-            ${suite.errors.length > 0 ? `
+            `
+                : ""
+            }
+            ${
+              suite.errors.length > 0
+                ? `
                 <div class="errors">
                     <h4>Errors</h4>
                     <ul>
-                        ${suite.errors.map(error => `<li>${error}</li>`).join('')}
+                        ${suite.errors.map((error) => `<li>${error}</li>`).join("")}
                     </ul>
                 </div>
-            ` : ''}
+            `
+                : ""
+            }
         </div>
-    `).join('')}
+    `
+      )
+      .join("")}
 </body>
 </html>
     `;
@@ -412,22 +420,22 @@ if (import.meta.main) {
   // Parse command line arguments
   for (let i = 0; i < args.length; i++) {
     switch (args[i]) {
-      case '--ci':
+      case "--ci":
         options.ci = true;
         break;
-      case '--verbose':
+      case "--verbose":
         options.verbose = true;
         break;
-      case '--watch':
+      case "--watch":
         options.watch = true;
         break;
-      case '--suites':
+      case "--suites":
         if (args[i + 1]) {
-          options.suites = args[i + 1]!.split(',') as TestSuite[];
+          options.suites = args[i + 1]!.split(",") as TestSuite[];
           i++;
         }
         break;
-      case '--output':
+      case "--output":
         if (args[i + 1]) {
           options.outputDir = args[i + 1]!;
           i++;
