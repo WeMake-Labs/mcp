@@ -6,7 +6,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema, type Tool } from "@model
 import chalk from "chalk";
 
 // Types
-interface Persona {
+export interface Persona {
   id: string;
   name: string;
   expertise: string[];
@@ -19,7 +19,7 @@ interface Persona {
   };
 }
 
-interface Contribution {
+export interface Contribution {
   personaId: string;
   content: string;
   type: "observation" | "question" | "insight" | "concern" | "suggestion" | "challenge" | "synthesis";
@@ -27,7 +27,7 @@ interface Contribution {
   confidence: number; // 0.0-1.0
 }
 
-interface Disagreement {
+export interface Disagreement {
   topic: string;
   positions: Array<{
     personaId: string;
@@ -40,7 +40,7 @@ interface Disagreement {
   };
 }
 
-interface CollaborativeReasoningData {
+export interface CollaborativeReasoningData {
   // Core collaboration components
   topic: string;
   personas: Persona[];
@@ -67,7 +67,7 @@ interface CollaborativeReasoningData {
   suggestedContributionTypes?: string[];
 }
 
-class CollaborativeReasoningServer {
+export class CollaborativeReasoningServer {
   private personaRegistry: Record<string, Record<string, Persona>> = {};
   private contributionHistory: Record<string, Contribution[]> = {};
   private disagreementTracker: Record<string, Disagreement[]> = {};
