@@ -3,6 +3,7 @@
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": ["productionBuild"],
       "outputs": ["{projectRoot}/dist"],
       "cache": true
     },
@@ -23,5 +24,48 @@
       }
     }
   ],
-  "nxCloudId": "6884dd9e0fe8167c4795da5e"
+  "nxCloudId": "6884dd9e0fe8167c4795da5e",
+  "namedInputs": {
+    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"],
+    "default": [
+      "sharedGlobals",
+      "{projectRoot}/**/*",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/bunfig.toml",
+      "{workspaceRoot}/eslint.config.mjs"
+    ],
+    "source": [
+      "sharedGlobals",
+      "{projectRoot}/**/*",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/bunfig.toml",
+      "{workspaceRoot}/eslint.config.mjs",
+      "!{projectRoot}/**/*.md",
+      "!{projectRoot}/docs/**/*",
+      "!{projectRoot}/tests/**/*",
+      "!{projectRoot}/**/*.test.*",
+      "!{projectRoot}/**/*.spec.*"
+    ],
+    "productionBuild": [
+      "sharedGlobals",
+      "{projectRoot}/src/**/*",
+      "{projectRoot}/package.json",
+      "{projectRoot}/tsconfig.json",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/bunfig.toml",
+      "{workspaceRoot}/eslint.config.mjs",
+      "!{projectRoot}/**/*.test.{js,ts,jsx,tsx}",
+      "!{projectRoot}/**/*.spec.{js,ts,jsx,tsx}",
+      "!{projectRoot}/tests/**/*",
+      "!{projectRoot}/**/*.md",
+      "!{projectRoot}/docs/**/*",
+      "!{projectRoot}/README.md"
+    ]
+  }
 }

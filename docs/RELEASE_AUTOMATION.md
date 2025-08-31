@@ -73,7 +73,7 @@ The release system analyzes commit messages to determine version bump types:
 
 ### Examples
 
-```bash
+```sh
 # Major version bump (1.0.0 → 2.0.0)
 git commit -m "feat!: redesign API with new authentication system
 
@@ -128,7 +128,7 @@ git commit -m "fix: resolve memory leak in pattern matching"
 
 Before pushing to main, validate your package:
 
-```bash
+```sh
 # Validate package structure
 bun run .github/scripts/version-utils.ts validate src/your-package
 
@@ -189,7 +189,7 @@ bun run build
 
 ### Debugging Commands
 
-```bash
+```sh
 # Check workflow status
 gh run list --workflow=release.yml
 
@@ -276,7 +276,7 @@ bun run .github/scripts/version-utils.ts validate src/package-name
 
 ### Debug Commands
 
-```bash
+```sh
 # Validate release setup
 bun run .github/scripts/validate-release-setup.ts
 

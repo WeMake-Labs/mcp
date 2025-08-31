@@ -112,7 +112,7 @@ junit = "test-results.xml"
 
 ### Enterprise Test Commands
 
-```bash
+```sh
 # Run all tests
 bun test
 

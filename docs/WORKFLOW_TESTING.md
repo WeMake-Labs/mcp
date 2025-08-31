@@ -114,7 +114,7 @@ coverage = true
 
 The workflow supports the following monorepo structure:
 
-```bash
+```sh
 src/
 ├── analogical-reasoning/
 │   ├── package.json
@@ -132,7 +132,7 @@ src/
 
 To verify the workflow configuration locally:
 
-```bash
+```sh
 # Run all quality checks
 bun run lint
 bun run prettier
@@ -181,7 +181,7 @@ ls -la test-results.xml
 
 ### Debug Commands
 
-```bash
+```sh
 # Check package test script existence
 jq -e '.scripts.test' src/[package]/package.json
 
