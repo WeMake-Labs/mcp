@@ -11,7 +11,6 @@
  */
 
 import { TestEnvironment, TestSuite, TestConfigUtils, type TestConfig } from "./test.config.ts";
-import { performance } from "perf_hooks";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
@@ -39,6 +38,8 @@ interface TestRunnerOptions {
   ci?: boolean;
   watch?: boolean;
   verbose?: boolean;
+  concurrencyLimit?: number;
+  processTimeout?: number;
 }
 
 class CollaborativeReasoningTestRunner {
@@ -46,8 +47,50 @@ class CollaborativeReasoningTestRunner {
   private options: TestRunnerOptions;
   private results: TestResult[] = [];
   private activeProcesses: Set<import("child_process").ChildProcess> = new Set();
-  private concurrencyLimit: number = 5; // Configurable max concurrent children
-  private processTimeout: number = 300000; // 5 minutes default timeout
+  private concurrencyLimit: number;
+  private processTimeout: number;
+
+  /**
+   * Parse and validate concurrency limit from options or environment
+   */
+  private parseConcurrencyLimit(options: TestRunnerOptions): number {
+    const envLimit = process.env["CI_CONCURRENCY_LIMIT"];
+    const optionsLimit = options.concurrencyLimit;
+    
+    let limit = 5; // Default
+    
+    if (optionsLimit !== undefined) {
+      limit = optionsLimit;
+    } else if (envLimit) {
+      const parsed = parseInt(envLimit, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        limit = parsed;
+      }
+    }
+    
+    return Math.max(1, limit); // Ensure at least 1
+  }
+
+  /**
+   * Parse and validate process timeout from options or environment
+   */
+  private parseProcessTimeout(options: TestRunnerOptions): number {
+    const envTimeout = process.env["CI_PROCESS_TIMEOUT"];
+    const optionsTimeout = options.processTimeout;
+    
+    let timeout = 300000; // Default 5 minutes
+    
+    if (optionsTimeout !== undefined) {
+      timeout = optionsTimeout;
+    } else if (envTimeout) {
+      const parsed = parseInt(envTimeout, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        timeout = parsed;
+      }
+    }
+    
+    return Math.max(1000, timeout); // Ensure at least 1 second
+  }
 
   constructor(options: TestRunnerOptions = {}) {
     this.options = {
@@ -58,6 +101,10 @@ class CollaborativeReasoningTestRunner {
       verbose: false,
       ...options
     };
+
+    // Parse and set configurable limits
+    this.concurrencyLimit = this.parseConcurrencyLimit(options);
+    this.processTimeout = this.parseProcessTimeout(options);
 
     // Initialize test environment with appropriate config
     const config = options.ci ? TestConfigUtils.createCIConfig() : TestConfigUtils.createDevConfig();
@@ -207,17 +254,52 @@ class CollaborativeReasoningTestRunner {
         signalHandlers.forEach((handler) => handler());
         signalHandlers = [];
 
-        // Kill process group if still running
-        if (!bunProcess.killed) {
+        // Kill process group if still running - cross-platform approach
+        if (!bunProcess.killed && bunProcess.pid) {
           try {
-            process.kill(-bunProcess.pid!, "SIGTERM");
-            setTimeout(() => {
-              if (!bunProcess.killed) {
-                process.kill(-bunProcess.pid!, "SIGKILL");
-              }
-            }, 5000);
+            if (process.platform === "win32") {
+               // Windows: Use taskkill to terminate process tree
+               const killProcess = spawn("taskkill", ["/PID", bunProcess.pid.toString(), "/T", "/F"], {
+                stdio: "ignore"
+              });
+              killProcess.on("error", () => {
+                // Fallback to bunProcess.kill() if taskkill fails
+                try {
+                  bunProcess.kill("SIGTERM");
+                  setTimeout(() => {
+                    if (!bunProcess.killed) {
+                      bunProcess.kill("SIGKILL");
+                    }
+                  }, 5000);
+                } catch {
+                  // Process might already be dead
+                }
+              });
+            } else {
+              // POSIX: Use negative PID to kill process group
+              process.kill(-bunProcess.pid, "SIGTERM");
+              setTimeout(() => {
+                if (!bunProcess.killed) {
+                  try {
+                    process.kill(-bunProcess.pid!, "SIGKILL");
+                  } catch {
+                    // Process might already be dead
+                  }
+                }
+              }, 5000);
+            }
           } catch {
-            // Process might already be dead
+            // Fallback to direct process kill if group kill fails
+            try {
+              bunProcess.kill("SIGTERM");
+              setTimeout(() => {
+                if (!bunProcess.killed) {
+                  bunProcess.kill("SIGKILL");
+                }
+              }, 5000);
+            } catch {
+              // Process might already be dead
+            }
           }
         }
       };
@@ -262,16 +344,16 @@ class CollaborativeReasoningTestRunner {
         }
       });
 
-      bunProcess.on("close", (code: number | null) => {
+      bunProcess.on("close", () => {
         cleanup();
         try {
+          // Always parse test output to preserve failure details
           const result = this.parseTestOutput(stdout);
-          if (code === 0) {
-            resolve(result);
-          } else {
-            reject(new Error(`Test process exited with code ${code}`));
-          }
+          // Resolve with parsed results regardless of exit code
+          // This allows callers to access failure details for richer reporting
+          resolve(result);
         } catch (error) {
+          // Only reject on actual parse exceptions
           reject(error);
         }
       });
