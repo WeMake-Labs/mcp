@@ -3,6 +3,11 @@
   "workspaces": {
     "": {
       "name": "@wemake-ai/mcp",
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "1.17.4",
+        "@wemake.cx/analogical-reasoning": "*",
+        "@wemake.cx/collaborative-reasoning": "*",
+      },
       "devDependencies": {
         "@nx/eslint": "21.3.7",
         "@tsconfig/bun": "^1.0.8",
