@@ -29,6 +29,7 @@
     "publish:analogical-reasoning": "bun publish --cwd='./src/analogical-reasoning'",
     "publish:collaborative-reasoning": "bun publish --cwd='./src/collaborative-reasoning'",
     "publish:metacognitive-monitoring": "bun publish --cwd='./src/metacognitive-monitoring'",
+    "publish:focus-group": "bun publish --cwd='./src/focus-group'",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",

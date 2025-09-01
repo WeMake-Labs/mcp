@@ -1,0 +1,51 @@
+{
+  "name": "@wemake.cx/focus-group",
+  "version": "0.0.1",
+  "description": "MCP server for LLM focus groups to analyze and critique other MCP servers",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WeMake-AI/mcp.git",
+    "directory": "src/focus-group"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest"
+  },
+  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/focus-group",
+  "author": "heyFlorentin",
+  "engines": {
+    "bun": ">=1.2.0"
+  },
+  "packageManager": "bun@1.2.0",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "focus-group",
+    "server-analysis",
+    "llm-evaluation"
+  ],
+  "bin": {
+    "mcp-server-focus-group": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build --entrypoints ./index.ts --outdir ./dist --format esm --target=bun --sourcemap && (if ! head -1 dist/index.js | grep -q '^#!'; then echo '#!/usr/bin/env bun' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js; fi) && chmod +x dist/*.js",
+    "types": "bun tsc",
+    "prepare": "bun run types && bun run build",
+    "test": "bun test",
+    "test:ci": "bun test --reporter=junit --reporter-outfile=test-results.xml --coverage",
+    "release": "bun publish --tag latest",
+    "watch": "bun tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.17.2",
+    "typescript": "^5.9.2"
+  }
+}
