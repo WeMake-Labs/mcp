@@ -47,7 +47,7 @@ jobs:
       packages: ${{ steps.find-changed-packages.outputs.packages }}
       has-changes: ${{ steps.find-changed-packages.outputs.has-changes }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0 # Fetch full history for change detection
 
@@ -96,7 +96,7 @@ jobs:
     name: Release ${{ matrix.package }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -228,7 +228,7 @@ jobs:
           PACKAGE_NAME=$(jq -r '.name' package.json | sed 's/@//g' | sed 's/\//-/g')
           NEW_VERSION="${{ steps.new-version.outputs.new-version }}"
 
-          # Validate required variables
+           # validate required variables
           if [ -z "$PACKAGE_NAME" ] || [ -z "$NEW_VERSION" ]; then
             echo "❌ Missing required variables:"
             echo "Package name: '$PACKAGE_NAME'"
@@ -254,7 +254,7 @@ jobs:
           echo "🔧 Creating tarball: $TARBALL_NAME"
           (cd "$TMPDIR" && tar -czf "$TARBALL_NAME" .)
 
-          # Verify tarball was created in temp directory
+           # verify tarball was created in temp directory
           if [ ! -f "$TMPDIR/$TARBALL_NAME" ]; then
             echo "❌ Tarball creation failed in temp directory"
             echo "Expected: $TMPDIR/$TARBALL_NAME"
@@ -267,7 +267,7 @@ jobs:
           # Move tarball to working directory
           mv "$TMPDIR/$TARBALL_NAME" .
 
-          # Verify tarball exists in working directory
+           # verify tarball exists in working directory
           if [ ! -f "$TARBALL_NAME" ]; then
             echo "❌ Tarball move failed"
             echo "Expected: $TARBALL_NAME"

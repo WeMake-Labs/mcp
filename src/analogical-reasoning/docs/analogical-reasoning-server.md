@@ -287,7 +287,7 @@ export function validateAnalogicalReasoningPayload(payload: unknown) {
 - Export JSON Schema for external tools (optional). This uses zod-to-json-schema at build-time without adding runtime
   dependencies:
 
-```bash
+```sh
 bun add -D zod zod-to-json-schema
 ```
 

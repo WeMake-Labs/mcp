@@ -1,5 +1,6 @@
 {
   "name": "@wemake.cx/mcp",
+  "version": "0.1.4",
   "author": "WeMake (https://wemake.cx)",
   "repository": {
     "type": "git",
@@ -24,7 +25,9 @@
     "dev": "bun run --filter='./src/*' dev",
     "start": "bun run --filter='./src/*' start",
     "build": "bun run --filter='./src/*' build",
-    "publish": "bun run --filter='./src/*' release",
+    "publish": "bun run publish:analogical-reasoning && bun run publish:collaborative-reasoning",
+    "publish:analogical-reasoning": "bun publish --cwd='./src/analogical-reasoning'",
+    "publish:collaborative-reasoning": "bun publish --cwd='./src/collaborative-reasoning'",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
@@ -33,18 +36,31 @@
     "test:coverage": "bun test --coverage",
     "test:watch": "bun test --watch",
     "test:ci": "bun test --reporter=junit --reporter-outfile=test-results.xml --coverage",
+    "test:collaborative-reasoning": "bun test ./src/collaborative-reasoning/tests/",
+    "test:collaborative-reasoning:unit": "bun test ./src/collaborative-reasoning/tests/unit/",
+    "test:collaborative-reasoning:integration": "bun test ./src/collaborative-reasoning/tests/integration/",
+    "test:collaborative-reasoning:e2e": "bun test ./src/collaborative-reasoning/tests/e2e/",
+    "test:collaborative-reasoning:security": "bun test ./src/collaborative-reasoning/tests/security/",
+    "test:collaborative-reasoning:performance": "bun test ./src/collaborative-reasoning/tests/performance/",
+    "test:collaborative-reasoning:coverage": "bun test ./src/collaborative-reasoning/tests/ --coverage",
+    "test:collaborative-reasoning:ci": "bun test ./src/collaborative-reasoning/tests/ --reporter=junit --reporter-outfile=collaborative-reasoning-test-results.xml --coverage",
     "deploy:production": "bun run --filter='./src/*' deploy:production",
     "deploy:enterprise": "bun run --filter='./src/*' deploy:enterprise"
   },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.17.4",
+    "@wemake.cx/analogical-reasoning": "*",
+    "@wemake.cx/collaborative-reasoning": "*"
+  },
   "devDependencies": {
-    "@nx/eslint": "21.3.7",
+    "@nx/eslint": "21.4.1",
     "@tsconfig/bun": "^1.0.8",
     "@types/bun": "^1.2.20",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
     "eslint": "^9.34.0",
     "markdownlint": "^0.38.0",
-    "nx": "21.3.7",
+    "nx": "21.4.1",
     "prettier": "^3.6.2",
     "typescript": "^5.9.2",
     "vite-tsconfig-paths": "^5.1.4"
