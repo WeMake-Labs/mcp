@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -72,6 +72,19 @@ class MetacognitiveMonitoringServer {
     if (!data["stage"] || typeof data["stage"] !== "string") {
       throw new Error("Invalid stage: must be a string");
     }
+    const allowedStages = new Set<MetacognitiveMonitoringData["stage"]>([
+      "knowledge-assessment",
+      "planning",
+      "execution",
+      "monitoring",
+      "evaluation",
+      "reflection"
+    ]);
+    if (!allowedStages.has(data["stage"] as MetacognitiveMonitoringData["stage"])) {
+      throw new Error(
+        'Invalid stage: must be one of "knowledge-assessment" | "planning" | "execution" | "monitoring" | "evaluation" | "reflection"'
+      );
+    }
 
     if (
       typeof data["overallConfidence"] !== "number" ||
@@ -89,8 +102,8 @@ class MetacognitiveMonitoringServer {
       throw new Error("Invalid monitoringId: must be a string");
     }
 
-    if (typeof data["iteration"] !== "number" || data["iteration"] < 0) {
-      throw new Error("Invalid iteration: must be a non-negative number");
+    if (typeof data["iteration"] !== "number" || !Number.isInteger(data["iteration"]) || data["iteration"] < 0) {
+      throw new Error("Invalid iteration: must be a non-negative integer");
     }
 
     if (typeof data["nextAssessmentNeeded"] !== "boolean") {
@@ -513,10 +526,10 @@ class MetacognitiveMonitoringServer {
       const assessments = data.suggestedAssessments || [];
       if (assessments.length > 0) {
         for (const assessment of assessments) {
-          output += `  � ${assessment} assessment\n`;
+          output += `  - ${assessment} assessment\n`;
         }
       } else {
-        output += `  � Continue with current assessment\n`;
+        output += `  - Continue with current assessment\n`;
       }
     }
 
@@ -754,7 +767,7 @@ Key features:
         description: "Unique identifier for this monitoring session"
       },
       iteration: {
-        type: "number",
+        type: "integer",
         minimum: 0,
         description: "Current iteration of the monitoring process"
       },

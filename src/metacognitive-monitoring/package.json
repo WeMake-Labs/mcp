@@ -1,7 +1,7 @@
 {
   "name": "@wemake.cx/metacognitive-monitoring",
-  "version": "0.0.1",
-  "description": "MCP server for diagrammatic thinking and spatial representation",
+  "version": "0.0.2",
+  "description": "Metacognitive Monitoring MCP server",
   "license": "MIT",
   "type": "module",
   "repository": {

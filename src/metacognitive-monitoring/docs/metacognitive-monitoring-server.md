@@ -161,9 +161,9 @@ The server provides tools for handling uncertainty:
 
 The server visualizes metacognitive state:
 
-- Confidence heat maps for different claims
-- Knowledge boundary diagrams
-- Reasoning quality evaluations with identified weak points
+- Textual confidence bars per claim and overall assessment
+- Color-coded knowledge levels and claim statuses
+- Reasoning quality summaries with identified weak points
 
 ## Usage Examples
 
