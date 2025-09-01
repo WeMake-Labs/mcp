@@ -1,7 +1,7 @@
 {
   "name": "@wemake.cx/collaborative-reasoning",
   "version": "0.1.4",
-  "description": "MCP server for diagrammatic thinking and spatial representation",
+  "description": "MCP server for structured multi-persona collaborative reasoning",
   "license": "MIT",
   "type": "module",
   "repository": {

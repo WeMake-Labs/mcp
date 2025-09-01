@@ -39,7 +39,8 @@ describe("CollaborativeReasoningServer Performance Tests", () => {
 
     const duration = performanceMetrics.endTime - performanceMetrics.startTime;
     const memoryDelta = performanceMetrics.memoryEnd - performanceMetrics.memoryStart;
-    const avgLatency = duration / performanceMetrics.operations;
+    const ops = Math.max(1, performanceMetrics.operations);
+    const avgLatency = duration / ops;
 
     console.log(`Performance Metrics:`);
     console.log(`  Duration: ${duration.toFixed(2)}ms`);

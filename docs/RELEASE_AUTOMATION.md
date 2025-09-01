@@ -248,9 +248,9 @@ bun run .github/scripts/version-utils.ts validate src/package-name
 
 ## Troubleshooting
 
-### Common Issues
+### Common Troubleshooting Issues
 
-#### Release Workflow Not Triggering
+#### Troubleshooting Release Workflow Not Triggering
 
 - **Check CI/CD Status**: Ensure the main CI/CD workflow completed successfully
 - **Branch Protection**: Verify pushes are made to the `main` branch

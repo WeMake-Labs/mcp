@@ -272,8 +272,8 @@ The server uses standard MCP protocol configuration:
 {
   "mcpServers": {
     "collaborative-reasoning": {
-      "command": "bun",
-      "args": ["run", "@wemake.cx/collaborative-reasoning"]
+      "command": "bunx",
+      "args": ["mcp-server-collaborative-reasoning"]
     }
   }
 }
@@ -283,9 +283,9 @@ The server uses standard MCP protocol configuration:
 
 ### Runtime Dependencies
 
-- `@modelcontextprotocol/sdk`: ^1.10.2 - MCP protocol implementation
+`@modelcontextprotocol/sdk`: ^1.17.4 - MCP protocol implementation
 
-_Note: Terminal styling and command-line argument parsing are handled by Bun's built-in APIs, eliminating the need for
+_Note: Terminal styling and command-line argument parsing are handled by Bun's built-in APIs, eliminating the need for  
 external dependencies._
 
 ### Development Dependencies

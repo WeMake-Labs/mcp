@@ -14,8 +14,7 @@
   "license": "BUSL-1.1",
   "type": "module",
   "workspaces": [
-    "./src/analogical-reasoning",
-    "./src/collaborative-reasoning"
+    "src/*"
   ],
   "private": true,
   "engines": {

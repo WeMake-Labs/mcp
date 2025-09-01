@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           filter: tree:0
           fetch-depth: 0
@@ -33,12 +33,32 @@ jobs:
       # Learn more at https://nx.dev/ci/reference/nx-cloud-cli#npx-nxcloud-startcirun
       - run: bunx nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
 
-      - run: bun install --no-cache
-      - uses: nrwl/nx-set-shas@v4
+      - run: bun install --frozen-lockfile
+      - uses: nrwl/nx-set-shas@826660b82addbef3abff5fa871492ebad618c9e1 # v4.3.3
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: bun nx-cloud record -- echo Hello World
       - run: bun nx affected -t lint test build -- --coverage
+      - name: Upload test artifacts (if present)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nx-test-artifacts
+          path: |
+            **/test-results.xml  
+            **/coverage/**
+          retention-days: 7
+      - name: Enforce coverage threshold
+        if: always()
+        run: |
+          FILE=$(fd coverage-summary.json -a | head -n1 || true)  
+          if [[ -f "$FILE" ]]; then  
+            LINES=$(jq '.total.lines.pct' "$FILE")  
+            echo "Lines coverage: $LINES%"  
+            awk -v v="$LINES" 'BEGIN { if (v+0 < 90) exit 1 }'  
+          else  
+            echo "coverage-summary.json not found; skipping gate"  
+          fi
       # Nx Cloud recommends fixes for failures to help you get CI green faster. Learn more: https://nx.dev/ci/features/self-healing-ci
       - run: bun nx fix-ci
         if: always()

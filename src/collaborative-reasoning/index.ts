@@ -1210,7 +1210,7 @@ Key features:
 const server = new Server(
   {
     name: "collaborative-reasoning-server",
-    version: "0.1.2"
+    version: "0.1.4"
   },
   {
     capabilities: {

@@ -210,21 +210,20 @@ class CollaborativeReasoningTestRunner {
       errors: string[];
       coverage?: CoverageReport;
     }>((resolve, reject) => {
-      // Resolve glob patterns to concrete paths before passing to spawn
-      let resolvedPattern = pattern;
+      // Build arguments to pass all matching test files to Bun
+      const args = ["test"];
       if (isGlobPattern(pattern)) {
         const resolver = new GlobResolver({ baseDir: process.cwd() });
         const files = resolver.resolveSync(pattern);
         if (files.length > 0) {
-          // Use the first file found, or fall back to the base directory
-          resolvedPattern = files[0] || pattern.split("/**")[0] || pattern.split("/*")[0] || pattern;
+          args.push(...files);
         } else {
-          // If no matches found, use the base directory
-          resolvedPattern = pattern.split("/**")[0] || pattern.split("/*")[0] || pattern;
+          const base = pattern.split("/**")[0] || pattern.split("/*")[0] || pattern;
+          args.push(base);
         }
+      } else {
+        args.push(pattern);
       }
-
-      const args = ["test", resolvedPattern];
 
       // Add coverage if enabled
       if (config.coverage?.enabled) {
