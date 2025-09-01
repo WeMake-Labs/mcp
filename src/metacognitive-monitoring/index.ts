@@ -2,7 +2,7 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema, ListToolsRequestSchema, Tool } from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema, type Tool } from "@modelcontextprotocol/sdk/types.js";
 import chalk from "chalk";
 
 // Types
@@ -65,65 +65,69 @@ class MetacognitiveMonitoringServer {
     const data = input as Record<string, unknown>;
 
     // Validate required fields
-    if (!data.task || typeof data.task !== "string") {
+    if (!data["task"] || typeof data["task"] !== "string") {
       throw new Error("Invalid task: must be a string");
     }
 
-    if (!data.stage || typeof data.stage !== "string") {
+    if (!data["stage"] || typeof data["stage"] !== "string") {
       throw new Error("Invalid stage: must be a string");
     }
 
-    if (typeof data.overallConfidence !== "number" || data.overallConfidence < 0 || data.overallConfidence > 1) {
+    if (
+      typeof data["overallConfidence"] !== "number" ||
+      data["overallConfidence"] < 0 ||
+      data["overallConfidence"] > 1
+    ) {
       throw new Error("Invalid overallConfidence: must be a number between 0 and 1");
     }
 
-    if (!data.recommendedApproach || typeof data.recommendedApproach !== "string") {
+    if (!data["recommendedApproach"] || typeof data["recommendedApproach"] !== "string") {
       throw new Error("Invalid recommendedApproach: must be a string");
     }
 
-    if (!data.monitoringId || typeof data.monitoringId !== "string") {
+    if (!data["monitoringId"] || typeof data["monitoringId"] !== "string") {
       throw new Error("Invalid monitoringId: must be a string");
     }
 
-    if (typeof data.iteration !== "number" || data.iteration < 0) {
+    if (typeof data["iteration"] !== "number" || data["iteration"] < 0) {
       throw new Error("Invalid iteration: must be a non-negative number");
     }
 
-    if (typeof data.nextAssessmentNeeded !== "boolean") {
+    if (typeof data["nextAssessmentNeeded"] !== "boolean") {
       throw new Error("Invalid nextAssessmentNeeded: must be a boolean");
     }
 
-    if (!Array.isArray(data.uncertaintyAreas)) {
+    if (!Array.isArray(data["uncertaintyAreas"])) {
       throw new Error("Invalid uncertaintyAreas: must be an array");
     }
 
     // Validate knowledge assessment
     let knowledgeAssessment: KnowledgeAssessment | undefined = undefined;
-    if (data.knowledgeAssessment && typeof data.knowledgeAssessment === "object") {
-      const ka = data.knowledgeAssessment as Record<string, unknown>;
+    if (data["knowledgeAssessment"] && typeof data["knowledgeAssessment"] === "object") {
+      const ka = data["knowledgeAssessment"] as Record<string, unknown>;
 
-      if (!ka.domain || typeof ka.domain !== "string") {
+      if (!ka["domain"] || typeof ka["domain"] !== "string") {
         throw new Error("Invalid knowledgeAssessment.domain: must be a string");
       }
 
-      if (!ka.knowledgeLevel || typeof ka.knowledgeLevel !== "string") {
+      if (!ka["knowledgeLevel"] || typeof ka["knowledgeLevel"] !== "string") {
         throw new Error("Invalid knowledgeAssessment.knowledgeLevel: must be a string");
       }
 
-      if (typeof ka.confidenceScore !== "number" || ka.confidenceScore < 0 || ka.confidenceScore > 1) {
+      if (typeof ka["confidenceScore"] !== "number" || ka["confidenceScore"] < 0 || ka["confidenceScore"] > 1) {
         throw new Error("Invalid knowledgeAssessment.confidenceScore: must be a number between 0 and 1");
       }
 
-      if (!ka.supportingEvidence || typeof ka.supportingEvidence !== "string") {
+      if (!ka["supportingEvidence"] || typeof ka["supportingEvidence"] !== "string") {
         throw new Error("Invalid knowledgeAssessment.supportingEvidence: must be a string");
       }
 
-      if (!Array.isArray(ka.knownLimitations)) {
+      if (!Array.isArray(ka["knownLimitations"])) {
         throw new Error("Invalid knowledgeAssessment.knownLimitations: must be an array");
       }
 
       const knownLimitations: string[] = [];
-      for (const limitation of ka.knownLimitations) {
+      for (const limitation of ka["knownLimitations"]) {
         if (typeof limitation === "string") {
           knownLimitations.push(limitation);
         }
@@ -132,10 +136,10 @@ class MetacognitiveMonitoringServer {
       // Base object with required properties
       const baseAssessment: Omit<KnowledgeAssessment, "relevantTrainingCutoff"> &
         Partial<Pick<KnowledgeAssessment, "relevantTrainingCutoff">> = {
-        domain: ka.domain as string,
-        knowledgeLevel: ka.knowledgeLevel as KnowledgeAssessment["knowledgeLevel"],
-        confidenceScore: ka.confidenceScore as number,
-        supportingEvidence: ka.supportingEvidence as string,
+        domain: ka["domain"] as string,
+        knowledgeLevel: ka["knowledgeLevel"] as KnowledgeAssessment["knowledgeLevel"],
+        confidenceScore: ka["confidenceScore"] as number,
+        supportingEvidence: ka["supportingEvidence"] as string,
         knownLimitations
       };
 
@@ -144,8 +148,8 @@ class MetacognitiveMonitoringServer {
       // Instead, we create a base object with required properties and only add
       // optional properties if they have a valid value.
       // Conditionally add optional property
-      if (typeof ka.relevantTrainingCutoff === "string") {
-        baseAssessment.relevantTrainingCutoff = ka.relevantTrainingCutoff;
+      if (typeof ka["relevantTrainingCutoff"] === "string") {
+        baseAssessment.relevantTrainingCutoff = ka["relevantTrainingCutoff"];
       }
 
       knowledgeAssessment = baseAssessment as KnowledgeAssessment;
@@ -153,27 +157,31 @@ class MetacognitiveMonitoringServer {
 
     // Validate claims
     const claims: ClaimAssessment[] = [];
-    if (Array.isArray(data.claims)) {
-      for (const claim of data.claims as Array<Record<string, unknown>>) {
-        if (!claim.claim || typeof claim.claim !== "string") {
+    if (Array.isArray(data["claims"])) {
+      for (const claim of data["claims"] as Array<Record<string, unknown>>) {
+        if (!claim["claim"] || typeof claim["claim"] !== "string") {
           throw new Error("Invalid claim.claim: must be a string");
         }
 
-        if (!claim.status || typeof claim.status !== "string") {
+        if (!claim["status"] || typeof claim["status"] !== "string") {
           throw new Error("Invalid claim.status: must be a string");
         }
 
-        if (typeof claim.confidenceScore !== "number" || claim.confidenceScore < 0 || claim.confidenceScore > 1) {
+        if (
+          typeof claim["confidenceScore"] !== "number" ||
+          claim["confidenceScore"] < 0 ||
+          claim["confidenceScore"] > 1
+        ) {
           throw new Error("Invalid claim.confidenceScore: must be a number between 0 and 1");
         }
 
-        if (!claim.evidenceBasis || typeof claim.evidenceBasis !== "string") {
+        if (!claim["evidenceBasis"] || typeof claim["evidenceBasis"] !== "string") {
           throw new Error("Invalid claim.evidenceBasis: must be a string");
         }
 
         const alternativeInterpretations: string[] = [];
-        if (Array.isArray(claim.alternativeInterpretations)) {
-          for (const interpretation of claim.alternativeInterpretations) {
+        if (Array.isArray(claim["alternativeInterpretations"])) {
+          for (const interpretation of claim["alternativeInterpretations"]) {
             if (typeof interpretation === "string") {
               alternativeInterpretations.push(interpretation);
             }
@@ -183,10 +191,10 @@ class MetacognitiveMonitoringServer {
         // Base object with required properties
         const baseClaim: Omit<ClaimAssessment, "alternativeInterpretations" | "falsifiabilityCriteria"> &
           Partial<Pick<ClaimAssessment, "alternativeInterpretations" | "falsifiabilityCriteria">> = {
-          claim: claim.claim as string,
-          status: claim.status as ClaimAssessment["status"],
-          confidenceScore: claim.confidenceScore as number,
-          evidenceBasis: claim.evidenceBasis as string
+          claim: claim["claim"] as string,
+          status: claim["status"] as ClaimAssessment["status"],
+          confidenceScore: claim["confidenceScore"] as number,
+          evidenceBasis: claim["evidenceBasis"] as string
         };
 
         // NOTE: exactOptionalPropertyTypes is enabled in tsconfig.json.
@@ -197,8 +205,8 @@ class MetacognitiveMonitoringServer {
         if (alternativeInterpretations.length > 0) {
           baseClaim.alternativeInterpretations = alternativeInterpretations;
         }
-        if (typeof claim.falsifiabilityCriteria === "string") {
-          baseClaim.falsifiabilityCriteria = claim.falsifiabilityCriteria;
+        if (typeof claim["falsifiabilityCriteria"] === "string") {
+          baseClaim.falsifiabilityCriteria = claim["falsifiabilityCriteria"];
         }
 
         claims.push(baseClaim as ClaimAssessment);
@@ -207,55 +215,59 @@ class MetacognitiveMonitoringServer {
 
     // Validate reasoning steps
     const reasoningSteps: ReasoningAssessment[] = [];
-    if (Array.isArray(data.reasoningSteps)) {
-      for (const step of data.reasoningSteps as Array<Record<string, unknown>>) {
-        if (!step.step || typeof step.step !== "string") {
+    if (Array.isArray(data["reasoningSteps"])) {
+      for (const step of data["reasoningSteps"] as Array<Record<string, unknown>>) {
+        if (!step["step"] || typeof step["step"] !== "string") {
           throw new Error("Invalid reasoningStep.step: must be a string");
         }
 
-        if (!Array.isArray(step.potentialBiases)) {
+        if (!Array.isArray(step["potentialBiases"])) {
           throw new Error("Invalid reasoningStep.potentialBiases: must be an array");
         }
 
-        if (!Array.isArray(step.assumptions)) {
+        if (!Array.isArray(step["assumptions"])) {
           throw new Error("Invalid reasoningStep.assumptions: must be an array");
         }
 
-        if (typeof step.logicalValidity !== "number" || step.logicalValidity < 0 || step.logicalValidity > 1) {
+        if (typeof step["logicalValidity"] !== "number" || step["logicalValidity"] < 0 || step["logicalValidity"] > 1) {
           throw new Error("Invalid reasoningStep.logicalValidity: must be a number between 0 and 1");
         }
 
-        if (typeof step.inferenceStrength !== "number" || step.inferenceStrength < 0 || step.inferenceStrength > 1) {
+        if (
+          typeof step["inferenceStrength"] !== "number" ||
+          step["inferenceStrength"] < 0 ||
+          step["inferenceStrength"] > 1
+        ) {
           throw new Error("Invalid reasoningStep.inferenceStrength: must be a number between 0 and 1");
         }
 
         const potentialBiases: string[] = [];
-        for (const bias of step.potentialBiases) {
+        for (const bias of step["potentialBiases"]) {
           if (typeof bias === "string") {
             potentialBiases.push(bias);
           }
         }
 
         const assumptions: string[] = [];
-        for (const assumption of step.assumptions) {
+        for (const assumption of step["assumptions"]) {
           if (typeof assumption === "string") {
             assumptions.push(assumption);
           }
         }
 
         reasoningSteps.push({
-          step: step.step as string,
+          step: step["step"] as string,
           potentialBiases,
           assumptions,
-          logicalValidity: step.logicalValidity as number,
-          inferenceStrength: step.inferenceStrength as number
+          logicalValidity: step["logicalValidity"] as number,
+          inferenceStrength: step["inferenceStrength"] as number
         });
       }
     }
 
     // Process uncertainty areas
     const uncertaintyAreas: string[] = [];
-    for (const area of data.uncertaintyAreas) {
+    for (const area of data["uncertaintyAreas"]) {
       if (typeof area === "string") {
         uncertaintyAreas.push(area);
       }
@@ -263,10 +275,10 @@ class MetacognitiveMonitoringServer {
 
     // Process suggested assessments
     const suggestedAssessments: MetacognitiveMonitoringData["suggestedAssessments"] = [];
-    if (Array.isArray(data.suggestedAssessments)) {
-      for (const assessment of data.suggestedAssessments) {
+    if (Array.isArray(data["suggestedAssessments"])) {
+      for (const assessment of data["suggestedAssessments"]) {
         if (typeof assessment === "string" && ["knowledge", "claim", "reasoning", "overall"].includes(assessment)) {
-          suggestedAssessments.push(assessment as any);
+          suggestedAssessments.push(assessment as "knowledge" | "claim" | "reasoning" | "overall");
         }
       }
     }
@@ -279,14 +291,14 @@ class MetacognitiveMonitoringServer {
       Partial<
         Pick<MetacognitiveMonitoringData, "knowledgeAssessment" | "claims" | "reasoningSteps" | "suggestedAssessments">
       > = {
-      task: data.task as string,
-      stage: data.stage as MetacognitiveMonitoringData["stage"],
-      overallConfidence: data.overallConfidence as number,
+      task: data["task"] as string,
+      stage: data["stage"] as MetacognitiveMonitoringData["stage"],
+      overallConfidence: data["overallConfidence"] as number,
       uncertaintyAreas,
-      recommendedApproach: data.recommendedApproach as string,
-      monitoringId: data.monitoringId as string,
-      iteration: data.iteration as number,
-      nextAssessmentNeeded: data.nextAssessmentNeeded as boolean
+      recommendedApproach: data["recommendedApproach"] as string,
+      monitoringId: data["monitoringId"] as string,
+      iteration: data["iteration"] as number,
+      nextAssessmentNeeded: data["nextAssessmentNeeded"] as boolean
     };
 
     // NOTE: exactOptionalPropertyTypes is enabled in tsconfig.json.
@@ -331,7 +343,7 @@ class MetacognitiveMonitoringServer {
     }
 
     // Add to monitoring history
-    this.monitoringHistory[data.monitoringId].push(data);
+    this.monitoringHistory[data.monitoringId]!.push(data);
 
     // Update registries
     this.updateRegistries(data);
@@ -458,6 +470,7 @@ class MetacognitiveMonitoringServer {
 
       for (let i = 0; i < data.reasoningSteps.length; i++) {
         const step = data.reasoningSteps[i];
+        if (!step) continue;
         output += `${chalk.cyan(`Step ${i + 1}:`)} ${step.step}\n`;
 
         output += `  Logical Validity: ${this.getConfidenceBar(step.logicalValidity)}\n`;
