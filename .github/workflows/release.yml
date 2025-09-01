@@ -228,7 +228,7 @@ jobs:
           PACKAGE_NAME=$(jq -r '.name' package.json | sed 's/@//g' | sed 's/\//-/g')
           NEW_VERSION="${{ steps.new-version.outputs.new-version }}"
 
-          # Validate required variables
+           # validate required variables
           if [ -z "$PACKAGE_NAME" ] || [ -z "$NEW_VERSION" ]; then
             echo "❌ Missing required variables:"
             echo "Package name: '$PACKAGE_NAME'"
@@ -254,7 +254,7 @@ jobs:
           echo "🔧 Creating tarball: $TARBALL_NAME"
           (cd "$TMPDIR" && tar -czf "$TARBALL_NAME" .)
 
-          # Verify tarball was created in temp directory
+           # verify tarball was created in temp directory
           if [ ! -f "$TMPDIR/$TARBALL_NAME" ]; then
             echo "❌ Tarball creation failed in temp directory"
             echo "Expected: $TMPDIR/$TARBALL_NAME"
@@ -267,7 +267,7 @@ jobs:
           # Move tarball to working directory
           mv "$TMPDIR/$TARBALL_NAME" .
 
-          # Verify tarball exists in working directory
+           # verify tarball exists in working directory
           if [ ! -f "$TARBALL_NAME" ]; then
             echo "❌ Tarball move failed"
             echo "Expected: $TARBALL_NAME"

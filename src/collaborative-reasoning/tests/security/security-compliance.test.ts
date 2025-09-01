@@ -20,8 +20,9 @@ class SecurityValidators {
     /(?:\+?1[-\s.]?)?(?:\(?[0-9]{3}\)?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4})|(?:\+[1-9]\d{1,14})|(?:\(?\d{3}\)?[-\s.]?\d{3}[-\s.]?\d{4})/g;
 
   // Canonical US SSN pattern with valid ranges (area 001-899 excluding 666, group 01-99, serial 0001-9999)
+  // Optimized to prevent ReDoS attacks by eliminating overlapping alternation and nested quantifiers
   static ssnPattern =
-    /\b(?:00[1-9]|0[1-9]\d|[1-5]\d{2}|6(?:[0-5]\d|6[0-5])|7(?:[0-6]\d|7[0-2])|8\d{2})[-\s]?(?:0[1-9]|[1-9]\d)[-\s]?(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|[1-9]\d{3})\b/iu;
+    /\b(?:00[1-9]|0[1-9]\d|[1-5]\d{2}|6[0-5]\d|66[0-57-9]|7[0-6]\d|77[0-2]|8\d{2})[-\s]?(?:0[1-9]|[1-9]\d)[-\s]?(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|[1-9]\d{3})\b/iu;
 
   /**
    * Validates credit card numbers using Luhn algorithm and common BIN ranges
