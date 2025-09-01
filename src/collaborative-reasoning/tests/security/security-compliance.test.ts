@@ -321,7 +321,7 @@ describe("Security Compliance Tests", () => {
       const testData = TestHelpers.cloneTestData(mockCollaborativeReasoningData);
 
       // Create extremely large dataset
-      const PERSONAS = process.env.CI ? 200 : 1000;
+      const PERSONAS = process.env['CI'] ? 200 : 1000;
       testData.personas = Array.from({ length: PERSONAS }, (_, i) => ({
         id: `persona-${i}`,
         name: `Test Persona ${i}`,
@@ -335,7 +335,7 @@ describe("Security Compliance Tests", () => {
         }
       }));
 
-      const CONTRIBUTIONS = process.env.CI ? 1000 : 5000;
+      const CONTRIBUTIONS = process.env['CI'] ? 1000 : 5000;
       testData.contributions = Array.from({ length: CONTRIBUTIONS }, (_, i) => ({
         personaId: `persona-${i % PERSONAS}`,
         content: "C".repeat(5000),
