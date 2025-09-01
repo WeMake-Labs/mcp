@@ -1,21 +1,22 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.json",
+
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
+    "outDir": "./dist",
+    "rootDir": ".",
     "strict": true,
-    "skipLibCheck": true,
-    "outDir": "dist",
-    "sourceMap": true,
+    "lib": ["ESNext", "DOM"],
+
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
     "declaration": true,
-    "declarationMap": true
+    "emitDeclarationOnly": true,
+    "declarationDir": "./dist/types",
+    "noEmit": false
   },
-  "include": [
-    "*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+
+  "include": ["*.ts", "tests/**/*.ts"],
+  "exclude": ["dist", "node_modules", "build", "coverage"]
 }

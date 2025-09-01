@@ -12,7 +12,8 @@ The Focus Group MCP server allows language models to:
 - Generate actionable recommendations for server improvements
 - Prioritize enhancements based on user impact
 
-This server is particularly valuable during the development process of MCP servers to ensure they meet the needs of various types of LLM users.
+This server is particularly valuable during the development process of MCP servers to ensure they meet the needs of
+various types of LLM users.
 
 ## Installation
 
@@ -85,4 +86,5 @@ Here's a simplified example of invoking the Focus Group tool:
 }
 ```
 
-The Focus Group server would process this data, set up the participants, and begin the evaluation process, managing the turn-taking and feedback integration to produce useful insights for improving the target server.
+The Focus Group server would process this data, set up the participants, and begin the evaluation process, managing the
+turn-taking and feedback integration to produce useful insights for improving the target server.
