@@ -37,6 +37,8 @@
     "build": "bun build --entrypoints ./index.ts --outdir ./dist --format esm --target=bun --sourcemap && (echo '#!/usr/bin/env bun' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js) && chmod +x dist/*.js",
     "types": "bun tsc",
     "prepare": "bun run types && bun run build",
+    "test": "bun test",
+    "test:ci": "bun test --reporter=junit --reporter-outfile=test-results.xml --coverage",
     "release": "bun publish --tag latest",
     "watch": "bun tsc --watch"
   },
