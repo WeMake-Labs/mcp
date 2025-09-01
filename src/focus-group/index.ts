@@ -1,6 +1,6 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema, ListToolsRequestSchema, Tool } from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema, type Tool } from "@modelcontextprotocol/sdk/types.js";
 import chalk from "chalk";
 
 // Types
@@ -79,35 +79,35 @@ class FocusGroupServer {
     const data = input as Record<string, unknown>;
 
     // Validate required fields
-    if (!data.targetServer || typeof data.targetServer !== "string") {
+    if (!data["targetServer"] || typeof data["targetServer"] !== "string") {
       throw new Error("Invalid targetServer: must be a string");
     }
 
-    if (!Array.isArray(data.personas)) {
+    if (!Array.isArray(data["personas"])) {
       throw new Error("Invalid personas: must be an array");
     }
 
-    if (!Array.isArray(data.feedback)) {
+    if (!Array.isArray(data["feedback"])) {
       throw new Error("Invalid feedback: must be an array");
     }
 
-    if (!data.stage || typeof data.stage !== "string") {
+    if (!data["stage"] || typeof data["stage"] !== "string") {
       throw new Error("Invalid stage: must be a string");
     }
 
-    if (!data.activePersonaId || typeof data.activePersonaId !== "string") {
+    if (!data["activePersonaId"] || typeof data["activePersonaId"] !== "string") {
       throw new Error("Invalid activePersonaId: must be a string");
     }
 
-    if (!data.sessionId || typeof data.sessionId !== "string") {
+    if (!data["sessionId"] || typeof data["sessionId"] !== "string") {
       throw new Error("Invalid sessionId: must be a string");
     }
 
-    if (typeof data.iteration !== "number" || data.iteration < 0) {
+    if (typeof data["iteration"] !== "number" || data["iteration"] < 0) {
       throw new Error("Invalid iteration: must be a non-negative number");
     }
 
-    if (typeof data.nextFeedbackNeeded !== "boolean") {
+    if (typeof data["nextFeedbackNeeded"] !== "boolean") {
       throw new Error("Invalid nextFeedbackNeeded: must be a boolean");
     }
 
@@ -194,13 +194,13 @@ class FocusGroupServer {
     // If active persona not found (shouldn't happen ideally), default to first
     const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % personaIds.length;
 
-    return personaIds[nextIndex];
+    return personaIds[nextIndex] || personaIds[0] || data.activePersonaId;
   }
 
   private getPersonaColor(index: number): (text: string) => string {
     const colors = [chalk.blue, chalk.green, chalk.yellow, chalk.magenta, chalk.cyan, chalk.red];
 
-    return colors[index % colors.length];
+    return colors[index % colors.length] || chalk.white;
   }
 
   private getFeedbackTypeColor(type: string): (text: string) => string {
@@ -259,6 +259,8 @@ class FocusGroupServer {
     output += `${chalk.bold("PERSONAS:")}\n`;
     for (let i = 0; i < data.personas.length; i++) {
       const persona = data.personas[i];
+      if (!persona) continue;
+
       const color = this.getPersonaColor(i);
 
       output += `${color(`${persona.name} (${persona.id})`)}\n`;
