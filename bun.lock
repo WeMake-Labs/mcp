@@ -53,6 +53,19 @@
         "typescript": "^5.9.2",
       },
     },
+    "src/focus-group": {
+      "name": "@wemake.cx/focus-group",
+      "version": "0.0.3",
+      "bin": {
+        "mcp-server-focus-group": "dist/index.js",
+      },
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.17.4",
+      },
+      "devDependencies": {
+        "typescript": "^5.7.2",
+      },
+    },
     "src/metacognitive-monitoring": {
       "name": "@wemake.cx/metacognitive-monitoring",
       "version": "0.0.3",
@@ -490,6 +503,8 @@
     "@wemake.cx/analogical-reasoning": ["@wemake.cx/analogical-reasoning@workspace:src/analogical-reasoning"],
 
     "@wemake.cx/collaborative-reasoning": ["@wemake.cx/collaborative-reasoning@workspace:src/collaborative-reasoning"],
+
+    "@wemake.cx/focus-group": ["@wemake.cx/focus-group@workspace:src/focus-group"],
 
     "@wemake.cx/metacognitive-monitoring": ["@wemake.cx/metacognitive-monitoring@workspace:src/metacognitive-monitoring"],
 
