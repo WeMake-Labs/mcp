@@ -138,6 +138,7 @@ class FocusGroupServer {
       .replace(/javascript:/gi, "")
       .replace(/on\w+\s*=/gi, "")
       .replace(/\.\./g, "") // Path traversal
+      // eslint-disable-next-line no-control-regex
       .replace(/[\u0000-\u001F\u007F]/g, ""); // Control characters
 
     // Redact sensitive patterns
@@ -207,83 +208,92 @@ class FocusGroupServer {
 
     // Validate personas
     const personaIds = new Set<string>();
-    for (const [index, persona] of (data["personas"] as any[]).entries()) {
+    for (const [index, persona] of (data["personas"] as Record<string, unknown>[]).entries()) {
       if (!persona || typeof persona !== "object") {
         throw new Error(`Persona at index ${index} must be an object`);
       }
-      if (!persona.id || typeof persona.id !== "string") {
+      if (!persona["id"] || typeof persona["id"] !== "string") {
         throw new Error(`Persona at index ${index} must have a valid id`);
       }
-      if (personaIds.has(persona.id)) {
-        throw new Error(`Duplicate persona id: ${persona.id}`);
+      if (personaIds.has(persona["id"] as string)) {
+        throw new Error(`Duplicate persona id: ${persona["id"]}`);
       }
-      personaIds.add(persona.id);
+      personaIds.add(persona["id"] as string);
 
-      if (!persona.name || typeof persona.name !== "string") {
-        throw new Error(`Persona ${persona.id} must have a valid name`);
+      if (!persona["name"] || typeof persona["name"] !== "string") {
+        throw new Error(`Persona ${persona["id"]} must have a valid name`);
       }
-      persona.name = this.sanitizeInput(persona.name, 200);
+      persona["name"] = this.sanitizeInput(persona["name"] as string, 200);
 
-      if (!persona.userType || typeof persona.userType !== "string") {
-        throw new Error(`Persona ${persona.id} must have a valid userType`);
-      }
-
-      if (!persona.usageScenario || typeof persona.usageScenario !== "string") {
-        throw new Error(`Persona ${persona.id} must have a valid usageScenario`);
-      }
-      persona.usageScenario = this.sanitizeInput(persona.usageScenario, 1000);
-
-      if (!Array.isArray(persona.expectations)) {
-        throw new Error(`Persona ${persona.id} expectations must be an array`);
+      if (!persona["userType"] || typeof persona["userType"] !== "string") {
+        throw new Error(`Persona ${persona["id"]} must have a valid userType`);
       }
 
-      if (!Array.isArray(persona.priorities)) {
-        throw new Error(`Persona ${persona.id} priorities must be an array`);
+      if (!persona["usageScenario"] || typeof persona["usageScenario"] !== "string") {
+        throw new Error(`Persona ${persona["id"]} must have a valid usageScenario`);
+      }
+      persona["usageScenario"] = this.sanitizeInput(persona["usageScenario"] as string, 1000);
+
+      if (!Array.isArray(persona["expectations"])) {
+        throw new Error(`Persona ${persona["id"]} expectations must be an array`);
       }
 
-      if (!Array.isArray(persona.constraints)) {
-        throw new Error(`Persona ${persona.id} constraints must be an array`);
+      if (!Array.isArray(persona["priorities"])) {
+        throw new Error(`Persona ${persona["id"]} priorities must be an array`);
       }
 
-      if (!persona.communication || typeof persona.communication !== "object") {
-        throw new Error(`Persona ${persona.id} must have communication object`);
+      if (!Array.isArray(persona["constraints"])) {
+        throw new Error(`Persona ${persona["id"]} constraints must be an array`);
       }
-      if (!persona.communication.style || typeof persona.communication.style !== "string") {
-        throw new Error(`Persona ${persona.id} communication must have style`);
+
+      if (!persona["communication"] || typeof persona["communication"] !== "object") {
+        throw new Error(`Persona ${persona["id"]} must have communication object`);
       }
-      if (!persona.communication.tone || typeof persona.communication.tone !== "string") {
-        throw new Error(`Persona ${persona.id} communication must have tone`);
+      const communication = persona["communication"] as Record<string, unknown>;
+      if (!communication["style"] || typeof communication["style"] !== "string") {
+        throw new Error(`Persona ${persona["id"]} communication must have style`);
+      }
+      if (!communication["tone"] || typeof communication["tone"] !== "string") {
+        throw new Error(`Persona ${persona["id"]} communication must have tone`);
       }
     }
 
     if (!Array.isArray(data["feedback"])) {
       throw new Error("Invalid feedback: must be an array");
     }
-    if ((data["feedback"] as any[]).length > MAX_ARRAY_LENGTH) {
+    if ((data["feedback"] as Record<string, unknown>[]).length > MAX_ARRAY_LENGTH) {
       throw new Error(`Too many feedback items: maximum ${MAX_ARRAY_LENGTH} allowed`);
     }
 
     // Validate feedback items
     const validFeedbackTypes = ["praise", "confusion", "suggestion", "usability", "feature", "bug", "summary"];
-    for (const [index, feedback] of (data["feedback"] as any[]).entries()) {
+    for (const [index, feedback] of (data["feedback"] as Record<string, unknown>[]).entries()) {
       if (!feedback || typeof feedback !== "object") {
         throw new Error(`Feedback at index ${index} must be an object`);
       }
-      if (!feedback.personaId || typeof feedback.personaId !== "string") {
+      if (!feedback["personaId"] || typeof feedback["personaId"] !== "string") {
         throw new Error(`Feedback at index ${index} must have a valid personaId`);
       }
-      if (!personaIds.has(feedback.personaId)) {
-        throw new Error(`Feedback at index ${index} references unknown persona: ${feedback.personaId}`);
+      if (!personaIds.has(feedback["personaId"] as string)) {
+        throw new Error(`Feedback at index ${index} references unknown persona: ${feedback["personaId"]}`);
       }
-      if (feedback.content === null || feedback.content === undefined || typeof feedback.content !== "string") {
+      if (
+        feedback["content"] === null ||
+        feedback["content"] === undefined ||
+        typeof feedback["content"] !== "string"
+      ) {
         throw new Error(`Feedback at index ${index} must have valid content`);
       }
-      feedback.content = this.sanitizeInput(feedback.content, 5000);
+      feedback["content"] = this.sanitizeInput(feedback["content"] as string, 5000);
 
-      if (!feedback.type || !validFeedbackTypes.includes(feedback.type)) {
+      if (!feedback["type"] || !validFeedbackTypes.includes(feedback["type"] as string)) {
         throw new Error(`Feedback at index ${index} must have valid type: ${validFeedbackTypes.join(", ")}`);
       }
-      if (typeof feedback.severity !== "number" || feedback.severity < 0 || feedback.severity > 1) {
+      if (
+        typeof feedback["severity"] !== "number" ||
+        (feedback["severity"] as number) < 0 ||
+        (feedback["severity"] as number) > 1
+      ) {
         throw new Error(`Feedback at index ${index} severity must be a number between 0 and 1`);
       }
     }
@@ -328,44 +338,44 @@ class FocusGroupServer {
       if (!Array.isArray(data["focusAreaAnalyses"])) {
         throw new Error("focusAreaAnalyses must be an array");
       }
-      if ((data["focusAreaAnalyses"] as any[]).length > MAX_ARRAY_LENGTH) {
+      if ((data["focusAreaAnalyses"] as Record<string, unknown>[]).length > MAX_ARRAY_LENGTH) {
         throw new Error(`Too many focus area analyses: maximum ${MAX_ARRAY_LENGTH} allowed`);
       }
 
-      for (const [index, analysis] of (data["focusAreaAnalyses"] as any[]).entries()) {
+      for (const [index, analysis] of (data["focusAreaAnalyses"] as Record<string, unknown>[]).entries()) {
         if (!analysis || typeof analysis !== "object") {
           throw new Error(`Focus area analysis at index ${index} must be an object`);
         }
-        if (!analysis.area || typeof analysis.area !== "string") {
+        if (!analysis["area"] || typeof analysis["area"] !== "string") {
           throw new Error(`Focus area analysis at index ${index} must have a valid area`);
         }
-        analysis.area = this.sanitizeInput(analysis.area, 200);
+        analysis["area"] = this.sanitizeInput(analysis["area"] as string, 200);
 
-        if (!Array.isArray(analysis.findings)) {
+        if (!Array.isArray(analysis["findings"])) {
           throw new Error(`Focus area analysis at index ${index} findings must be an array`);
         }
 
-        for (const [findingIndex, finding] of analysis.findings.entries()) {
+        for (const [findingIndex, finding] of (analysis["findings"] as Record<string, unknown>[]).entries()) {
           if (!finding || typeof finding !== "object") {
             throw new Error(`Finding at index ${findingIndex} in analysis ${index} must be an object`);
           }
-          if (!finding.personaId || typeof finding.personaId !== "string") {
+          if (!finding["personaId"] || typeof finding["personaId"] !== "string") {
             throw new Error(`Finding at index ${findingIndex} in analysis ${index} must have valid personaId`);
           }
-          if (!personaIds.has(finding.personaId)) {
+          if (!personaIds.has(finding["personaId"] as string)) {
             throw new Error(
-              `Finding at index ${findingIndex} in analysis ${index} references unknown persona: ${finding.personaId}`
+              `Finding at index ${findingIndex} in analysis ${index} references unknown persona: ${finding["personaId"]}`
             );
           }
-          if (!finding.finding || typeof finding.finding !== "string") {
+          if (!finding["finding"] || typeof finding["finding"] !== "string") {
             throw new Error(`Finding at index ${findingIndex} in analysis ${index} must have valid finding`);
           }
-          finding.finding = this.sanitizeInput(finding.finding, 2000);
+          finding["finding"] = this.sanitizeInput(finding["finding"] as string, 2000);
 
-          if (!finding.impact || typeof finding.impact !== "string") {
+          if (!finding["impact"] || typeof finding["impact"] !== "string") {
             throw new Error(`Finding at index ${findingIndex} in analysis ${index} must have valid impact`);
           }
-          finding.impact = this.sanitizeInput(finding.impact, 1000);
+          finding["impact"] = this.sanitizeInput(finding["impact"] as string, 1000);
         }
       }
     }
@@ -666,12 +676,9 @@ class FocusGroupServer {
 
       // Generate visualization
       const visualization = this.visualizeFocusGroup(validatedInput);
-      // Use Bun's native logging with fallback to console.error
-      const errorMessage = `Focus Group Visualization Error: ${typeof visualization === "string" ? visualization : JSON.stringify(visualization, null, 2)}`;
-      if (typeof Bun !== "undefined" && Bun.stderr) {
-        Bun.stderr.write(errorMessage + "\n");
-      } else {
-        console.error(errorMessage);
+      // Log visualization for development debugging
+      if (process.env.NODE_ENV === "development") {
+        console.error(`Focus Group Visualization:\n${visualization}`);
       }
 
       // Get the actual feedback count after duplicate filtering
