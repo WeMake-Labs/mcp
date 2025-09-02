@@ -63,8 +63,7 @@
         "@modelcontextprotocol/sdk": "^1.17.4",
       },
       "devDependencies": {
-        "@types/node": "^22.17.2",
-        "typescript": "^5.9.2",
+        "typescript": "^5.7.2",
       },
     },
     "src/metacognitive-monitoring": {

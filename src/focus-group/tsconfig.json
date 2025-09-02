@@ -6,7 +6,7 @@
     "outDir": "./dist",
     "rootDir": ".",
     "strict": true,
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext"],
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

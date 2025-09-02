@@ -16,6 +16,7 @@
   "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/focus-group",
   "author": "heyFlorentin",
   "engines": {
+    "node": ">=18",
     "bun": ">=1.2.0"
   },
   "packageManager": "bun@1.2.0",
@@ -26,6 +27,15 @@
     "server-analysis",
     "llm-evaluation"
   ],
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "bin": {
     "mcp-server-focus-group": "dist/index.js"
   },
@@ -45,7 +55,6 @@
     "@modelcontextprotocol/sdk": "^1.17.4"
   },
   "devDependencies": {
-    "@types/node": "^22.17.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.7.2"
   }
 }

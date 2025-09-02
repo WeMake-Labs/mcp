@@ -20,6 +20,8 @@ various types of LLM users.
 ```sh
 bun install
 bun run build
+# Dev (no build)
+bun index.ts
 ```
 
 ## Usage
@@ -27,7 +29,10 @@ bun run build
 The Focus Group server can be run using:
 
 ```sh
-node dist/index.js
+# Using published CLI binary
+mcp-server-focus-group
+# Or using Bun with the built bundle
+bun run dist/index.js
 ```
 
 As an MCP server, it communicates using stdin/stdout according to the MCP protocol.
