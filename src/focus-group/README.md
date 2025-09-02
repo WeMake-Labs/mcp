@@ -17,16 +17,16 @@ various types of LLM users.
 
 ## Installation
 
-```bash
-npm install
-npm run build
+```sh
+bun install
+bun run build
 ```
 
 ## Usage
 
 The Focus Group server can be run using:
 
-```bash
+```sh
 node dist/index.js
 ```
 

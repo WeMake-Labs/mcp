@@ -55,7 +55,7 @@
     },
     "src/focus-group": {
       "name": "@wemake.cx/focus-group",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "bin": {
         "mcp-server-focus-group": "dist/index.js",
       },
