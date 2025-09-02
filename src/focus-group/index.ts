@@ -1,7 +1,13 @@
+/// <reference types="bun:test" />
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, type Tool } from "@modelcontextprotocol/sdk/types.js";
 import chalk from "chalk";
+
+// Configuration constants
+const SIMILARITY_THRESHOLD = 0.8; // Threshold for detecting near-duplicate feedback
+const MAX_STRING_LENGTH = 10000; // Maximum length for string fields
+const MAX_ARRAY_LENGTH = 100; // Maximum length for array fields
 
 // Types
 interface FocusGroupPersona {
@@ -69,11 +75,117 @@ interface FocusGroupData {
   suggestedFocusArea?: string;
 }
 
+/**
+ * FocusGroupServer manages personas, feedback, focus area analyses and session data for MCP focus-group workflows.
+ * 
+ * This class provides a comprehensive framework for conducting LLM-based focus groups to evaluate MCP servers
+ * from multiple user perspectives. It handles structured evaluation, feedback collection, and recommendation generation.
+ * 
+ * @class FocusGroupServer
+ * 
+ * Architecture:
+ * - personaRegistry: Maps sessionId -> personaId -> FocusGroupPersona. Stores all personas participating in focus groups.
+ * - feedbackHistory: Maps sessionId -> Feedback[]. Maintains chronological feedback with similarity-based deduplication.
+ * - focusAreaTracker: Maps sessionId -> FocusAreaAnalysis[]. Tracks analysis of specific focus areas like API design, documentation.
+ * - sessionHistory: Maps sessionId -> FocusGroupData[]. Stores complete session snapshots for audit and recovery.
+ * 
+ * Lifecycle:
+ * - Instances are created per server startup and persist for the server lifetime
+ * - Methods are synchronous and thread-safe for single-threaded Node.js/Bun execution
+ * - No external locking required due to single-threaded event loop
+ * - Session data persists in memory until server restart
+ * 
+ * Main Methods:
+ * - processFocusGroup(input): Validates input, updates registries, generates visualization, returns structured results
+ * - validateFocusGroupData(input): Comprehensive validation with detailed error messages for malformed data
+ * - updateRegistries(data): Updates internal state with new personas, feedback (with similarity detection), and analyses
+ * 
+ * @example
+ * ```typescript
+ * const server = new FocusGroupServer();
+ * const result = server.processFocusGroup({
+ *   targetServer: "my-mcp-server",
+ *   personas: [{ id: "expert1", name: "Expert User", ... }],
+ *   feedback: [{ personaId: "expert1", content: "Great API design", type: "praise", severity: 0.8 }],
+ *   stage: "initial-impressions",
+ *   activePersonaId: "expert1",
+ *   sessionId: "session-123",
+ *   iteration: 1,
+ *   nextFeedbackNeeded: true
+ * });
+ * ```
+ */
 class FocusGroupServer {
   private personaRegistry: Record<string, Record<string, FocusGroupPersona>> = {};
   private feedbackHistory: Record<string, Feedback[]> = {};
   private focusAreaTracker: Record<string, FocusAreaAnalysis[]> = {};
   private sessionHistory: Record<string, FocusGroupData[]> = {};
+
+  /**
+   * Sanitizes input string by removing potentially dangerous content and limiting length.
+   * @param input - The input string to sanitize
+   * @param maxLength - Maximum allowed length (default: MAX_STRING_LENGTH)
+   * @returns Sanitized string
+   */
+  private sanitizeInput(input: string, maxLength: number = MAX_STRING_LENGTH): string {
+    if (typeof input !== 'string') {
+      return '';
+    }
+    
+    // Remove script tags and dangerous patterns
+    let sanitized = input
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '')
+      .replace(/javascript:/gi, '')
+      .replace(/on\w+\s*=/gi, '')
+      .replace(/\.\./g, '') // Path traversal
+      .replace(/[\u0000-\u001F\u007F]/g, ''); // Control characters
+    
+    // Redact sensitive patterns
+    sanitized = sanitized
+      .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, '[EMAIL_REDACTED]')
+      .replace(/\b\d{3}-\d{2}-\d{4}\b/g, '[SSN_REDACTED]')
+      .replace(/\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/g, '[CARD_REDACTED]')
+      .replace(/\b(?:password|pwd|secret|key|token)\s*[:=]\s*\S+/gi, '[CREDENTIAL_REDACTED]');
+    
+    return sanitized.slice(0, maxLength).trim();
+  }
+
+  /**
+   * Normalizes text for similarity comparison by removing punctuation, 
+   * collapsing whitespace, and converting to lowercase.
+   * @param text - The text to normalize
+   * @returns Normalized text
+   */
+  private normalizeText(text: string): string {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s]/g, '') // Remove punctuation
+      .replace(/\s+/g, ' ') // Collapse whitespace
+      .trim();
+  }
+
+  /**
+   * Calculates similarity between two texts using Jaccard similarity on word sets.
+   * @param text1 - First text
+   * @param text2 - Second text
+   * @returns Similarity score between 0 and 1
+   */
+  private calculateSimilarity(text1: string, text2: string): number {
+    const normalized1 = this.normalizeText(text1);
+    const normalized2 = this.normalizeText(text2);
+    
+    if (normalized1 === normalized2) return 1.0;
+    if (!normalized1 || !normalized2) return 0.0;
+    
+    const words1 = new Set(normalized1.split(' '));
+    const words2 = new Set(normalized2.split(' '));
+    
+    const intersection = new Set([...words1].filter(x => words2.has(x)));
+    const union = new Set([...words1, ...words2]);
+    
+    return intersection.size / union.size;
+  }
 
   private validateFocusGroupData(input: unknown): FocusGroupData {
     const data = input as Record<string, unknown>;
@@ -82,28 +194,122 @@ class FocusGroupServer {
     if (!data["targetServer"] || typeof data["targetServer"] !== "string") {
       throw new Error("Invalid targetServer: must be a string");
     }
+    data["targetServer"] = this.sanitizeInput(data["targetServer"] as string, 200);
 
     if (!Array.isArray(data["personas"])) {
       throw new Error("Invalid personas: must be an array");
+    }
+    if (data["personas"].length === 0) {
+      throw new Error("At least one persona is required");
+    }
+    if (data["personas"].length > MAX_ARRAY_LENGTH) {
+      throw new Error(`Too many personas: maximum ${MAX_ARRAY_LENGTH} allowed`);
+    }
+
+    // Validate personas
+    const personaIds = new Set<string>();
+    for (const [index, persona] of (data["personas"] as any[]).entries()) {
+      if (!persona || typeof persona !== 'object') {
+        throw new Error(`Persona at index ${index} must be an object`);
+      }
+      if (!persona.id || typeof persona.id !== 'string') {
+        throw new Error(`Persona at index ${index} must have a valid id`);
+      }
+      if (personaIds.has(persona.id)) {
+        throw new Error(`Duplicate persona id: ${persona.id}`);
+      }
+      personaIds.add(persona.id);
+      
+      if (!persona.name || typeof persona.name !== 'string') {
+        throw new Error(`Persona ${persona.id} must have a valid name`);
+      }
+      persona.name = this.sanitizeInput(persona.name, 200);
+      
+      if (!persona.userType || typeof persona.userType !== 'string') {
+        throw new Error(`Persona ${persona.id} must have a valid userType`);
+      }
+      
+      if (!persona.usageScenario || typeof persona.usageScenario !== 'string') {
+        throw new Error(`Persona ${persona.id} must have a valid usageScenario`);
+      }
+      persona.usageScenario = this.sanitizeInput(persona.usageScenario, 1000);
+      
+      if (!Array.isArray(persona.expectations)) {
+        throw new Error(`Persona ${persona.id} expectations must be an array`);
+      }
+      
+      if (!Array.isArray(persona.priorities)) {
+        throw new Error(`Persona ${persona.id} priorities must be an array`);
+      }
+      
+      if (!Array.isArray(persona.constraints)) {
+        throw new Error(`Persona ${persona.id} constraints must be an array`);
+      }
+      
+      if (!persona.communication || typeof persona.communication !== 'object') {
+        throw new Error(`Persona ${persona.id} must have communication object`);
+      }
+      if (!persona.communication.style || typeof persona.communication.style !== 'string') {
+        throw new Error(`Persona ${persona.id} communication must have style`);
+      }
+      if (!persona.communication.tone || typeof persona.communication.tone !== 'string') {
+        throw new Error(`Persona ${persona.id} communication must have tone`);
+      }
     }
 
     if (!Array.isArray(data["feedback"])) {
       throw new Error("Invalid feedback: must be an array");
     }
+    if ((data["feedback"] as any[]).length > MAX_ARRAY_LENGTH) {
+      throw new Error(`Too many feedback items: maximum ${MAX_ARRAY_LENGTH} allowed`);
+    }
+
+    // Validate feedback items
+    const validFeedbackTypes = ['praise', 'confusion', 'suggestion', 'usability', 'feature', 'bug', 'summary'];
+    for (const [index, feedback] of (data["feedback"] as any[]).entries()) {
+      if (!feedback || typeof feedback !== 'object') {
+        throw new Error(`Feedback at index ${index} must be an object`);
+      }
+      if (!feedback.personaId || typeof feedback.personaId !== 'string') {
+        throw new Error(`Feedback at index ${index} must have a valid personaId`);
+      }
+      if (!personaIds.has(feedback.personaId)) {
+        throw new Error(`Feedback at index ${index} references unknown persona: ${feedback.personaId}`);
+      }
+      if (feedback.content === null || feedback.content === undefined || typeof feedback.content !== 'string') {
+        throw new Error(`Feedback at index ${index} must have valid content`);
+      }
+      feedback.content = this.sanitizeInput(feedback.content, 5000);
+      
+      if (!feedback.type || !validFeedbackTypes.includes(feedback.type)) {
+        throw new Error(`Feedback at index ${index} must have valid type: ${validFeedbackTypes.join(', ')}`);
+      }
+      if (typeof feedback.severity !== 'number' || feedback.severity < 0 || feedback.severity > 1) {
+        throw new Error(`Feedback at index ${index} severity must be a number between 0 and 1`);
+      }
+    }
 
     if (!data["stage"] || typeof data["stage"] !== "string") {
       throw new Error("Invalid stage: must be a string");
+    }
+    const validStages = ['introduction', 'initial-impressions', 'deep-dive', 'synthesis', 'recommendations', 'prioritization'];
+    if (!validStages.includes(data["stage"] as string)) {
+      throw new Error(`stage must be one of: ${validStages.join(', ')}`);
     }
 
     if (!data["activePersonaId"] || typeof data["activePersonaId"] !== "string") {
       throw new Error("Invalid activePersonaId: must be a string");
     }
+    if (!personaIds.has(data["activePersonaId"] as string)) {
+      throw new Error(`activePersonaId references unknown persona: ${data["activePersonaId"]}`);
+    }
 
     if (!data["sessionId"] || typeof data["sessionId"] !== "string") {
       throw new Error("Invalid sessionId: must be a string");
     }
+    data["sessionId"] = this.sanitizeInput(data["sessionId"] as string, 100);
 
-    if (typeof data["iteration"] !== "number" || data["iteration"] < 0) {
+    if (typeof data["iteration"] !== "number" || (data["iteration"] as number) < 0) {
       throw new Error("Invalid iteration: must be a non-negative number");
     }
 
@@ -111,10 +317,51 @@ class FocusGroupServer {
       throw new Error("Invalid nextFeedbackNeeded: must be a boolean");
     }
 
-    // TODO: Add detailed validation for personas, feedback, and focusAreaAnalyses
-    // similar to the collaborative-reasoning server
+    // Validate optional focusAreaAnalyses
+    if (data["focusAreaAnalyses"]) {
+      if (!Array.isArray(data["focusAreaAnalyses"])) {
+        throw new Error('focusAreaAnalyses must be an array');
+      }
+      if ((data["focusAreaAnalyses"] as any[]).length > MAX_ARRAY_LENGTH) {
+        throw new Error(`Too many focus area analyses: maximum ${MAX_ARRAY_LENGTH} allowed`);
+      }
+      
+      for (const [index, analysis] of (data["focusAreaAnalyses"] as any[]).entries()) {
+        if (!analysis || typeof analysis !== 'object') {
+          throw new Error(`Focus area analysis at index ${index} must be an object`);
+        }
+        if (!analysis.area || typeof analysis.area !== 'string') {
+          throw new Error(`Focus area analysis at index ${index} must have a valid area`);
+        }
+        analysis.area = this.sanitizeInput(analysis.area, 200);
+        
+        if (!Array.isArray(analysis.findings)) {
+          throw new Error(`Focus area analysis at index ${index} findings must be an array`);
+        }
+        
+        for (const [findingIndex, finding] of analysis.findings.entries()) {
+          if (!finding || typeof finding !== 'object') {
+            throw new Error(`Finding at index ${findingIndex} in analysis ${index} must be an object`);
+          }
+          if (!finding.personaId || typeof finding.personaId !== 'string') {
+            throw new Error(`Finding at index ${findingIndex} in analysis ${index} must have valid personaId`);
+          }
+          if (!personaIds.has(finding.personaId)) {
+            throw new Error(`Finding at index ${findingIndex} in analysis ${index} references unknown persona: ${finding.personaId}`);
+          }
+          if (!finding.finding || typeof finding.finding !== 'string') {
+            throw new Error(`Finding at index ${findingIndex} in analysis ${index} must have valid finding`);
+          }
+          finding.finding = this.sanitizeInput(finding.finding, 2000);
+          
+          if (!finding.impact || typeof finding.impact !== 'string') {
+            throw new Error(`Finding at index ${findingIndex} in analysis ${index} must have valid impact`);
+          }
+          finding.impact = this.sanitizeInput(finding.impact, 1000);
+        }
+      }
+    }
 
-    // For now, return the data with minimal validation
     return data as unknown as FocusGroupData;
   }
 
@@ -136,12 +383,15 @@ class FocusGroupServer {
     }
 
     for (const feedback of data.feedback) {
-      // Only add new feedback
-      const exists = this.feedbackHistory[sessionId].some(
-        (f) => f.personaId === feedback.personaId && f.content === feedback.content
-      );
+      // Check for similarity with existing feedback to avoid near-duplicates
+      const isDuplicate = this.feedbackHistory[sessionId].some((existing) => {
+        if (existing.personaId !== feedback.personaId) return false;
+        
+        const similarity = this.calculateSimilarity(existing.content, feedback.content);
+        return similarity >= SIMILARITY_THRESHOLD;
+      });
 
-      if (!exists) {
+      if (!isDuplicate) {
         this.feedbackHistory[sessionId].push(feedback);
       }
     }
@@ -408,7 +658,16 @@ class FocusGroupServer {
 
       // Generate visualization
       const visualization = this.visualizeFocusGroup(validatedInput);
-      console.error(visualization);
+      // Use Bun's native logging with fallback to console.error
+        const errorMessage = `Focus Group Visualization Error: ${typeof visualization === 'string' ? visualization : JSON.stringify(visualization, null, 2)}`;
+        if (typeof Bun !== 'undefined' && Bun.stderr) {
+          Bun.stderr.write(errorMessage + '\n');
+        } else {
+          console.error(errorMessage);
+        }
+
+      // Get the actual feedback count after duplicate filtering
+      const actualFeedbackCount = this.feedbackHistory[validatedInput.sessionId]?.length || 0;
 
       // Return the focus group result
       return {
@@ -422,7 +681,7 @@ class FocusGroupServer {
                 stage: validatedInput.stage,
                 iteration: validatedInput.iteration,
                 personaCount: validatedInput.personas.length,
-                feedbackCount: validatedInput.feedback.length,
+                feedbackCount: actualFeedbackCount,
                 focusAreaCount: validatedInput.focusAreaAnalyses?.length || 0,
                 activePersonaId: validatedInput.activePersonaId,
                 nextPersonaId: validatedInput.nextPersonaId,
@@ -744,6 +1003,9 @@ const server = new Server(
 );
 
 const focusGroupServer = new FocusGroupServer();
+
+// Export for testing
+export { FocusGroupServer };
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [FOCUS_GROUP_TOOL]
