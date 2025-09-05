@@ -7,6 +7,7 @@
         "@modelcontextprotocol/sdk": "1.17.4",
         "@wemake.cx/analogical-reasoning": "*",
         "@wemake.cx/collaborative-reasoning": "*",
+        "@wemake.cx/ethical-reasoning": "*",
         "@wemake.cx/metacognitive-monitoring": "*",
         "@wemake.cx/structured-argumentation": "*",
       },
@@ -43,6 +44,20 @@
       "version": "0.1.5",
       "bin": {
         "mcp-server-collaborative-reasoning": "dist/index.js",
+      },
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.17.4",
+      },
+      "devDependencies": {
+        "@types/node": "^22.17.2",
+        "typescript": "^5.9.2",
+      },
+    },
+    "src/ethical-reasoning": {
+      "name": "@wemake.cx/ethical-reasoning",
+      "version": "0.0.1",
+      "bin": {
+        "mcp-server-ethical-reasoning": "dist/index.js",
       },
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.17.4",
@@ -517,6 +532,8 @@
     "@wemake.cx/analogical-reasoning": ["@wemake.cx/analogical-reasoning@workspace:src/analogical-reasoning"],
 
     "@wemake.cx/collaborative-reasoning": ["@wemake.cx/collaborative-reasoning@workspace:src/collaborative-reasoning"],
+
+    "@wemake.cx/ethical-reasoning": ["@wemake.cx/ethical-reasoning@workspace:src/ethical-reasoning"],
 
     "@wemake.cx/focus-group": ["@wemake.cx/focus-group@workspace:src/focus-group"],
 
