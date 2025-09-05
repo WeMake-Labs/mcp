@@ -52,7 +52,7 @@
     "deploy:enterprise": "bun run --filter='./src/*' deploy:enterprise"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.17.4",
+    "@modelcontextprotocol/sdk": "^1.17.4",
     "@wemake.cx/analogical-reasoning": "*",
     "@wemake.cx/collaborative-reasoning": "*",
     "@wemake.cx/metacognitive-monitoring": "*",
