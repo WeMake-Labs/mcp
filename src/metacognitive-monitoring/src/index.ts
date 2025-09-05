@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -72,6 +72,21 @@ class MetacognitiveMonitoringServer {
     if (!data.stage || typeof data.stage !== "string") {
       throw new Error("Invalid stage: must be a string");
     }
+    {
+      const allowed = new Set([
+        "knowledge-assessment",
+        "planning",
+        "execution",
+        "monitoring",
+        "evaluation",
+        "reflection"
+      ]);
+      if (!allowed.has(data.stage as string)) {
+        throw new Error(
+          "Invalid stage: must be one of knowledge-assessment|planning|execution|monitoring|evaluation|reflection"
+        );
+      }
+    }
 
     if (typeof data.overallConfidence !== "number" || data.overallConfidence < 0 || data.overallConfidence > 1) {
       throw new Error("Invalid overallConfidence: must be a number between 0 and 1");
@@ -108,6 +123,15 @@ class MetacognitiveMonitoringServer {
 
       if (!ka.knowledgeLevel || typeof ka.knowledgeLevel !== "string") {
         throw new Error("Invalid knowledgeAssessment.knowledgeLevel: must be a string");
+      }
+
+      {
+        const allowed = new Set(["expert", "proficient", "familiar", "basic", "minimal", "none"]);
+        if (!allowed.has(ka.knowledgeLevel as string)) {
+          throw new Error(
+            "Invalid knowledgeAssessment.knowledgeLevel: must be one of expert|proficient|familiar|basic|minimal|none"
+          );
+        }
       }
 
       if (typeof ka.confidenceScore !== "number" || ka.confidenceScore < 0 || ka.confidenceScore > 1) {
@@ -161,6 +185,12 @@ class MetacognitiveMonitoringServer {
 
         if (!claim.status || typeof claim.status !== "string") {
           throw new Error("Invalid claim.status: must be a string");
+        }
+        {
+          const allowed = new Set(["fact", "inference", "speculation", "uncertain"]);
+          if (!allowed.has(claim.status as string)) {
+            throw new Error("Invalid claim.status: must be one of fact|inference|speculation|uncertain");
+          }
         }
 
         if (typeof claim.confidenceScore !== "number" || claim.confidenceScore < 0 || claim.confidenceScore > 1) {
@@ -500,10 +530,10 @@ class MetacognitiveMonitoringServer {
       const assessments = data.suggestedAssessments || [];
       if (assessments.length > 0) {
         for (const assessment of assessments) {
-          output += `  � ${assessment} assessment\n`;
+          output += `  • ${assessment} assessment\n`;
         }
       } else {
-        output += `  � Continue with current assessment\n`;
+        output += `  • Continue with current assessment\n`;
       }
     }
 
@@ -774,7 +804,7 @@ Key features:
 const server = new Server(
   {
     name: "metacognitive-monitoring-server",
-    version: "0.2.3"
+    version: "0.2.4"
   },
   {
     capabilities: {

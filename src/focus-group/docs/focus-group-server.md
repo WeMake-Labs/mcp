@@ -154,7 +154,7 @@ The server guides a systematic evaluation process:
 
 - **Introduction**: Framing the server's purpose and target audience
 - **Initial impressions**: First reactions from different user types
-- **Deep-dive**: Detailed exploration of specific aspects
+- **Deep dive**: Detailed exploration of specific aspects
 - **Synthesis**: Integrating diverse feedback
 - **Recommendations**: Generating actionable improvements
 - **Prioritization**: Ranking recommendations by impact and effort

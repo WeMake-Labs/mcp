@@ -70,7 +70,7 @@ Example:
 - **analogicalReasoning**
   - Construct and evaluate analogical mappings between domains
   - Input: Comprehensive analogical reasoning data structure
-    - `sourceDoamin` (object): Source domain with name and elements
+    - `sourceDomain` (object): Source domain with name and elements
     - `targetDomain` (object): Target domain with name and elements
     - `mappings` (array): Analogical mappings between domains
     - `analogyId` (string): Unique identifier for the analogy

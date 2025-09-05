@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -76,6 +76,8 @@ class FocusGroupServer {
   private feedbackHistory: Record<string, Feedback[]> = {};
   private focusAreaTracker: Record<string, FocusAreaAnalysis[]> = {};
   private sessionHistory: Record<string, FocusGroupData[]> = {};
+  private sessionOrder: string[] = [];
+  private readonly maxSessions = Number(process.env.FOCUS_MAX_SESSIONS ?? "100");
 
   private validateFocusGroupData(input: unknown): FocusGroupData {
     const data = input as Record<string, unknown>;
@@ -169,11 +171,24 @@ class FocusGroupServer {
     }
   }
 
+  /**
+   * Append new focus-group data to the session’s history,
+   * and evict oldest sessions when the total exceeds maxSessions.
+   */
   private updateSessionHistory(data: FocusGroupData): void {
     let historyEntry = this.sessionHistory[data.sessionId];
     if (!historyEntry) {
       historyEntry = [];
       this.sessionHistory[data.sessionId] = historyEntry;
+      this.sessionOrder.push(data.sessionId);
+      // Evict oldest session if over limit
+      if (this.sessionOrder.length > this.maxSessions) {
+        const evict = this.sessionOrder.shift()!;
+        delete this.sessionHistory[evict];
+        delete this.personaRegistry[evict];
+        delete this.feedbackHistory[evict];
+        delete this.focusAreaTracker[evict];
+      }
     }
 
     historyEntry.push(data);
@@ -228,16 +243,17 @@ class FocusGroupServer {
 
   private getSeverityBar(severity: number): string {
     const barLength = 20;
-    const filledLength = Math.round(severity * barLength);
+    const s = Math.max(0, Math.min(1, severity));
+    const filledLength = Math.round(s * barLength);
     const emptyLength = barLength - filledLength;
 
     let bar = "[";
 
     // Choose color based on severity level
     let color: (text: string) => string;
-    if (severity >= 0.8) {
+    if (s >= 0.8) {
       color = chalk.red;
-    } else if (severity >= 0.5) {
+    } else if (s >= 0.5) {
       color = chalk.yellow;
     } else {
       color = chalk.green;
@@ -245,7 +261,7 @@ class FocusGroupServer {
 
     bar += color("=".repeat(filledLength));
     bar += " ".repeat(emptyLength);
-    bar += `] ${(severity * 100).toFixed(0)}%`;
+    bar += `] ${(s * 100).toFixed(0)}%`;
 
     return bar;
   }
@@ -734,7 +750,7 @@ Key features:
 const server = new Server(
   {
     name: "focus-group-server",
-    version: "0.2.3"
+    version: "0.2.4"
   },
   {
     capabilities: {

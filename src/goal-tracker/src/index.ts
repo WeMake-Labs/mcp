@@ -1,9 +1,12 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { ListToolsRequestSchema, CallToolRequestSchema, CallToolRequest } from "@modelcontextprotocol/sdk/types.js";
 
-type Result = { content: Array<{ type: "text"; text: string }>; isError?: boolean };
+type Result = {
+  content: Array<{ type: "text"; text: string } | { type: "json"; json: unknown }>;
+  isError?: boolean;
+};
 
 interface GoalInput {
   action: "add" | "complete" | "status";
@@ -19,20 +22,45 @@ class GoalTracker {
   private goals: GoalState[] = [];
 
   handle(input: GoalInput): Result {
+    const goal = input.goal?.trim();
     switch (input.action) {
       case "add": {
-        if (input.goal) this.goals.push({ goal: input.goal, completed: false });
+        if (!goal) {
+          return {
+            content: [{ type: "text", text: "Fehlender Parameter: 'goal' für action 'add'." }],
+            isError: true
+          };
+        }
+        // idempotent: identische Ziele nicht doppelt hinzufügen
+        if (!this.goals.some((g) => g.goal === goal)) {
+          this.goals.push({ goal, completed: false });
+        }
         break;
       }
       case "complete": {
-        const g = this.goals.find((x) => x.goal === input.goal);
-        if (g) g.completed = true;
+        if (!goal) {
+          return {
+            content: [{ type: "text", text: "Fehlender Parameter: 'goal' für action 'complete'." }],
+            isError: true
+          };
+        }
+        const g = this.goals.find((x) => x.goal === goal);
+        if (g) {
+          g.completed = true;
+        } else {
+          return {
+            content: [{ type: "text", text: `Goal nicht gefunden: ${goal}` }],
+            isError: true
+          };
+        }
         break;
       }
       case "status":
         break;
     }
-    return { content: [{ type: "text", text: JSON.stringify({ goals: this.goals }) }] };
+    return {
+      content: [{ type: "json", json: { goals: this.goals } }]
+    };
   }
 }
 
@@ -41,15 +69,20 @@ const GOAL_TRACKER_TOOL = {
   description: "Adds goals, marks completion, and reports status",
   inputSchema: {
     type: "object",
+    additionalProperties: false,
     properties: {
       action: { type: "string", enum: ["add", "complete", "status"] },
-      goal: { type: "string" }
+      goal: { type: "string", minLength: 1 }
     },
     required: ["action"]
   }
 };
 
-const server = new Server({ name: "goal-tracker-server", version: "0.2.3" }, { capabilities: { tools: {} } });
+// src/goal-tracker/src/index.ts (around lines 52–53)
+
+// derive version from build/env rather than hard-coding
+const version = process.env.PKG_VERSION ?? "0.0.0";
+const server = new Server({ name: "goal-tracker-server", version }, { capabilities: { tools: {} } });
 const tracker = new GoalTracker();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [GOAL_TRACKER_TOOL] }));
@@ -70,3 +103,7 @@ runServer().catch((err) => {
   console.error("Fatal error running server:", err);
   process.exit(1);
 });
+
+// Graceful Shutdown
+process.on("SIGINT", () => process.exit(0));
+process.on("SIGTERM", () => process.exit(0));

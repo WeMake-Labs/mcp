@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { ListToolsRequestSchema, CallToolRequestSchema, CallToolRequest } from "@modelcontextprotocol/sdk/types.js";
@@ -12,10 +12,15 @@ interface NarrativeInput {
 }
 
 function planNarrative(data: NarrativeInput) {
+  const chars = data.characters
+    .map((c) => c.trim())
+    .filter(Boolean)
+    .join(", ");
+
   return {
-    setup: data.premise,
-    conflicts: data.arcs,
-    resolution: `Characters ${data.characters.join(", ")} resolve the plot.`
+    setup: data.premise.trim(),
+    conflicts: data.arcs.map((a) => a.trim()).filter(Boolean),
+    resolution: `Characters ${chars} resolve the plot.`
   };
 }
 
@@ -25,32 +30,46 @@ const NARRATIVE_PLANNER_TOOL = {
   inputSchema: {
     type: "object",
     properties: {
-      premise: { type: "string" },
-      characters: { type: "array", items: { type: "string" } },
-      arcs: { type: "array", items: { type: "string" } }
+      premise: { type: "string", minLength: 1 },
+      characters: { type: "array", items: { type: "string" }, minItems: 1 },
+      arcs: { type: "array", items: { type: "string" }, minItems: 1 }
     },
-    required: ["premise", "characters", "arcs"]
+    required: ["premise", "characters", "arcs"],
+    additionalProperties: false
   }
 };
 
 class NarrativePlannerServer {
   async process(input: unknown): Promise<Result> {
-    const data = input as NarrativeInput;
-    if (!data.premise || !Array.isArray(data.characters) || !Array.isArray(data.arcs)) {
+    if (!input || typeof input !== "object") {
       return { content: [{ type: "text", text: "Invalid input" }], isError: true };
     }
-    const outline = planNarrative(data);
+    const data = input as Partial<NarrativeInput>;
+    if (
+      typeof data.premise !== "string" ||
+      !data.premise.trim() ||
+      !Array.isArray(data.characters) ||
+      !Array.isArray(data.arcs) ||
+      !data.characters.every((c) => typeof c === "string") ||
+      !data.arcs.every((a) => typeof a === "string")
+    ) {
+      return { content: [{ type: "text", text: "Invalid input" }], isError: true };
+    }
+    // After validation, we can safely cast to NarrativeInput since all required properties are confirmed
+    const outline = planNarrative(data as NarrativeInput);
     return { content: [{ type: "text", text: JSON.stringify(outline) }] };
   }
 }
 
-const server = new Server({ name: "narrative-planner-server", version: "0.2.3" }, { capabilities: { tools: {} } });
+import { readFileSync } from "node:fs";
+const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf-8"));
+const server = new Server({ name: "narrative-planner-server", version: pkg.version }, { capabilities: { tools: {} } });
 const narrativeServer = new NarrativePlannerServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [NARRATIVE_PLANNER_TOOL] }));
 server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
   if (req.params.name === "narrativePlanner") {
-    return await narrativeServer.process(req.params.arguments);
+    return await narrativeServer.process(req.params.arguments ?? {});
   }
   return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
 });

@@ -84,8 +84,13 @@ class AnalogicalReasoningServer {
       throw new Error("Invalid analogyId: must be a string");
     }
 
-    if (!data.purpose || typeof data.purpose !== "string") {
-      throw new Error("Invalid purpose: must be a string");
+    if (
+      typeof data.purpose !== "string" ||
+      !["explanation", "prediction", "problem-solving", "creative-generation"].includes(data.purpose)
+    ) {
+      throw new Error(
+        "Invalid purpose: must be one of explanation | prediction | problem-solving | creative-generation"
+      );
     }
 
     if (typeof data.confidence !== "number" || data.confidence < 0 || data.confidence > 1) {
@@ -355,7 +360,7 @@ class AnalogicalReasoningServer {
   private visualizeMapping(data: AnalogicalReasoningData): string {
     const { sourceDomain, targetDomain, mappings } = data;
 
-    let output = `\n${chalk.bold(`ANALOGY: ${sourceDomain.name}  ${targetDomain.name}`)} (ID: ${data.analogyId})\n\n`;
+    let output = `\n${chalk.bold(`ANALOGY: ${sourceDomain.name} → ${targetDomain.name}`)} (ID: ${data.analogyId})\n\n`;
 
     // Purpose and confidence
     output += `${chalk.cyan("Purpose:")} ${data.purpose}\n`;
@@ -436,7 +441,7 @@ class AnalogicalReasoningServer {
     if (data.inferences.length > 0) {
       output += `${chalk.bold("INFERENCES:")}\n`;
       for (const inference of data.inferences) {
-        const confidenceIndicator = inference.confidence >= 0.7 ? "" : "?";
+        const confidenceIndicator = inference.confidence >= 0.7 ? "★" : "?";
         output += `  ${confidenceIndicator} ${inference.statement}\n`;
         output += `    ${chalk.dim(`Confidence: ${(inference.confidence * 100).toFixed(0)}%`)}\n`;
         output += "\n";
@@ -466,10 +471,10 @@ class AnalogicalReasoningServer {
       const operations = data.suggestedOperations || [];
       if (operations.length > 0) {
         for (const operation of operations) {
-          output += `   ${operation}\n`;
+          output += `  - ${operation}\n`;
         }
       } else {
-        output += `   Continue refining the analogy\n`;
+        output += `  - Continue refining the analogy\n`;
       }
     }
 
@@ -488,7 +493,9 @@ class AnalogicalReasoningServer {
 
       // Generate visualization
       const visualization = this.visualizeMapping(validatedInput);
-      console.error(visualization);
+      if (!process.env.AR_SILENT) {
+        console.error(visualization);
+      }
 
       // Return the analysis result
       return {
@@ -593,7 +600,7 @@ export default function createServer(_: { config: z.infer<typeof configSchema> }
   const server = new Server(
     {
       name: "analogical-reasoning-server",
-      version: "0.2.3"
+      version: "0.2.4"
     },
     {
       capabilities: {

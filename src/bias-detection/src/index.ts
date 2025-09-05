@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { ListToolsRequestSchema, CallToolRequestSchema, CallToolRequest } from "@modelcontextprotocol/sdk/types.js";
@@ -12,8 +12,10 @@ interface BiasDetectionInput {
 const BIAS_WORDS = ["always", "never", "obviously", "clearly", "everyone", "no one"];
 
 function detectBias(text: string): string[] {
-  const lower = text.toLowerCase();
-  return BIAS_WORDS.filter((w) => lower.includes(w));
+  const escaped = BIAS_WORDS.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const regex = new RegExp(`\\b(${escaped.join("|")})\\b`, "gi");
+  const matches = text.match(regex) ?? [];
+  return [...new Set(matches.map((m) => m.toLowerCase()))];
 }
 
 const BIAS_DETECTION_TOOL = {
@@ -30,10 +32,16 @@ const BIAS_DETECTION_TOOL = {
 
 class BiasDetectionServer {
   async process(input: unknown): Promise<Result> {
-    const data = input as BiasDetectionInput;
-    if (!data.text || typeof data.text !== "string") {
+    if (
+      !input ||
+      typeof input !== "object" ||
+      input === null ||
+      !("text" in input) ||
+      typeof (input as Record<string, unknown>).text !== "string"
+    ) {
       return { content: [{ type: "text", text: "Invalid input" }], isError: true };
     }
+    const data = input as BiasDetectionInput;
     const biases = detectBias(data.text);
     return {
       content: [{ type: "text", text: JSON.stringify({ biases }) }]
@@ -41,7 +49,7 @@ class BiasDetectionServer {
   }
 }
 
-const server = new Server({ name: "bias-detection-server", version: "0.2.3" }, { capabilities: { tools: {} } });
+const server = new Server({ name: "bias-detection-server", version: "0.2.4" }, { capabilities: { tools: {} } });
 const biasServer = new BiasDetectionServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [BIAS_DETECTION_TOOL] }));

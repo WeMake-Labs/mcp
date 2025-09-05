@@ -1,7 +1,7 @@
 # Knowledge Graph Memory Server
 
-A basic implementation of persistent memory using a local knowledge graph. This lets Claude remember information about
-the user across chats.
+A basic implementation of persistent memory using a local knowledge graph. This lets the assistant remember information
+about the user across chats.
 
 ## Core Concepts
 
@@ -147,7 +147,7 @@ Example:
 }
 ```
 
-#### bunx with custom setting
+#### bunx with custom settings
 
 The server can be configured using the following environment variables:
 

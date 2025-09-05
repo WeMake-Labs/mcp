@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/goal-tracker",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "MCP server for tracking and completing simple goals",
   "license": "MIT",
   "type": "module",
@@ -15,6 +15,9 @@
   "publishConfig": {
     "access": "public",
     "tag": "alpha"
+  },
+  "engines": {
+    "bun": ">=1.2.0"
   },
   "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/goal-tracker",
   "author": "heyFlorentin",
@@ -31,10 +34,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked'",
-    "start": "node dist/index.js",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked'",
+    "start": "bun run ./dist/index.js",
     "prepare": "bun run build",
-    "watch": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked' --watch",
+    "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch",
     "release": "bun publish"
   },
   "dependencies": {

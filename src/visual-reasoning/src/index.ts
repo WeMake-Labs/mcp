@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -596,7 +596,7 @@ Parameters explained:
 const server = new Server(
   {
     name: "visual-reasoning-server",
-    version: "0.2.3"
+    version: "0.2.4"
   },
   {
     capabilities: {

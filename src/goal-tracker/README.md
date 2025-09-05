@@ -228,23 +228,23 @@ Follow these steps for effective goal tracking and management:
         "id": "auth_design",
         "description": "Complete authentication system design",
         "completed": false,
-        "dueDate": "2024-02-15"
+        "dueDate": "2030-02-15"
       },
       {
         "id": "auth_implementation",
         "description": "Implement core authentication features",
         "completed": false,
-        "dueDate": "2024-02-28"
+        "dueDate": "2030-02-28"
       },
       {
         "id": "auth_testing",
         "description": "Complete security testing and audit",
         "completed": false,
-        "dueDate": "2024-03-07"
+        "dueDate": "2030-03-07"
       }
     ],
     "tags": ["security", "backend", "user-management"],
-    "dueDate": "2024-03-10",
+    "dueDate": "2030-03-10",
     "estimatedEffort": "3 weeks"
   }
 }
@@ -263,7 +263,7 @@ Follow these steps for effective goal tracking and management:
         "id": "auth_design",
         "description": "Complete authentication system design",
         "completed": true,
-        "dueDate": "2024-02-15"
+        "dueDate": "2030-02-15"
       }
     ]
   }

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -92,16 +92,29 @@ class DecisionFrameworkServer {
       throw new Error("Invalid decisionId: must be a string");
     }
 
-    if (!data.analysisType || typeof data.analysisType !== "string") {
-      throw new Error("Invalid analysisType: must be a string");
+    // stronger runtime validation for analysisType
+    const allowedAnalysis = new Set(["expected-utility", "multi-criteria", "maximin", "minimax-regret", "satisficing"]);
+    if (!data.analysisType || typeof data.analysisType !== "string" || !allowedAnalysis.has(data.analysisType)) {
+      throw new Error("Invalid analysisType: must be one of " + [...allowedAnalysis].join(", "));
     }
 
-    if (!data.stage || typeof data.stage !== "string") {
-      throw new Error("Invalid stage: must be a string");
+    // stronger runtime validation for stage
+    const allowedStages = new Set([
+      "problem-definition",
+      "options",
+      "criteria",
+      "evaluation",
+      "analysis",
+      "recommendation"
+    ]);
+    if (!data.stage || typeof data.stage !== "string" || !allowedStages.has(data.stage)) {
+      throw new Error("Invalid stage: must be one of " + [...allowedStages].join(", "));
     }
 
-    if (!data.riskTolerance || typeof data.riskTolerance !== "string") {
-      throw new Error("Invalid riskTolerance: must be a string");
+    // stronger runtime validation for riskTolerance
+    const allowedRisk = new Set(["risk-averse", "risk-neutral", "risk-seeking"]);
+    if (!data.riskTolerance || typeof data.riskTolerance !== "string" || !allowedRisk.has(data.riskTolerance)) {
+      throw new Error("Invalid riskTolerance: must be one of " + [...allowedRisk].join(", "));
     }
 
     if (!data.timeHorizon || typeof data.timeHorizon !== "string") {
@@ -171,8 +184,15 @@ class DecisionFrameworkServer {
           throw new Error(`Invalid criterion weight for criterion ${criterion.id}: must be a number between 0 and 1`);
         }
 
-        if (!criterion.evaluationMethod || typeof criterion.evaluationMethod !== "string") {
-          throw new Error(`Invalid criterion evaluationMethod for criterion ${criterion.id}: must be a string`);
+        const allowedEval = new Set<Criterion["evaluationMethod"]>(["quantitative", "qualitative", "boolean"]);
+        if (
+          !criterion.evaluationMethod ||
+          typeof criterion.evaluationMethod !== "string" ||
+          !allowedEval.has(criterion.evaluationMethod as Criterion["evaluationMethod"])
+        ) {
+          throw new Error(
+            `Invalid criterion evaluationMethod for criterion ${criterion.id}: must be one of ${[...allowedEval].join(", ")}`
+          );
         }
 
         criteria.push({
@@ -187,20 +207,26 @@ class DecisionFrameworkServer {
 
     // Process criteria evaluations
     const criteriaEvaluations: CriterionEvaluation[] = [];
+    const optionIds = new Set(options.map((o) => o.id));
+    const criterionIds = new Set(criteria.map((c) => c.id));
+
     if (Array.isArray(data.criteriaEvaluations)) {
       for (const evaluation of data.criteriaEvaluations as Array<Record<string, unknown>>) {
         if (!evaluation.criterionId || typeof evaluation.criterionId !== "string") {
           throw new Error("Invalid criterionId in evaluation: must be a string");
         }
-
         if (!evaluation.optionId || typeof evaluation.optionId !== "string") {
           throw new Error("Invalid optionId in evaluation: must be a string");
         }
-
+        if (!criterionIds.has(evaluation.criterionId as string)) {
+          throw new Error(`Unknown criterionId in evaluation: ${evaluation.criterionId}`);
+        }
+        if (!optionIds.has(evaluation.optionId as string)) {
+          throw new Error(`Unknown optionId in evaluation: ${evaluation.optionId}`);
+        }
         if (typeof evaluation.score !== "number" || evaluation.score < 0 || evaluation.score > 1) {
           throw new Error("Invalid score in evaluation: must be a number between 0 and 1");
         }
-
         if (!evaluation.justification || typeof evaluation.justification !== "string") {
           throw new Error("Invalid justification in evaluation: must be a string");
         }
@@ -228,6 +254,9 @@ class DecisionFrameworkServer {
 
         if (!outcome.optionId || typeof outcome.optionId !== "string") {
           throw new Error(`Invalid optionId for outcome ${outcome.id}: must be a string`);
+        }
+        if (!options.some((o) => o.id === outcome.optionId)) {
+          throw new Error(`Unknown optionId for outcome ${outcome.id}: ${outcome.optionId}`);
         }
 
         if (typeof outcome.probability !== "number" || outcome.probability < 0 || outcome.probability > 1) {
@@ -284,8 +313,12 @@ class DecisionFrameworkServer {
     // Process expected values
     const expectedValues: Record<string, number> = {};
     if (data.expectedValues && typeof data.expectedValues === "object") {
+      const optionIdsSet = new Set(options.map((o) => o.id));
       for (const [optionId, value] of Object.entries(data.expectedValues)) {
         if (typeof value === "number") {
+          if (!optionIdsSet.has(optionId)) {
+            throw new Error(`expectedValues contains unknown optionId: ${optionId}`);
+          }
           expectedValues[optionId] = value;
         }
       }
@@ -294,8 +327,12 @@ class DecisionFrameworkServer {
     // Process multi-criteria scores
     const multiCriteriaScores: Record<string, number> = {};
     if (data.multiCriteriaScores && typeof data.multiCriteriaScores === "object") {
+      const optionIdsSet = new Set(options.map((o) => o.id));
       for (const [optionId, score] of Object.entries(data.multiCriteriaScores)) {
         if (typeof score === "number") {
+          if (!optionIdsSet.has(optionId)) {
+            throw new Error(`multiCriteriaScores contains unknown optionId: ${optionId}`);
+          }
           multiCriteriaScores[optionId] = score;
         }
       }
@@ -493,6 +530,7 @@ class DecisionFrameworkServer {
 
     const multiCriteriaScores: Record<string, number> = {};
     const optionEvaluations: Record<string, CriterionEvaluation[]> = {};
+    const criterionMap = new Map<string, (typeof data.criteria)[0]>(data.criteria.map((c) => [c.id, c]));
 
     // Group evaluations by option
     for (const evaluation of data.criteriaEvaluations) {
@@ -508,7 +546,7 @@ class DecisionFrameworkServer {
       let totalWeight = 0;
 
       for (const evaluation of evaluations) {
-        const criterion = data.criteria.find((c) => c.id === evaluation.criterionId);
+        const criterion = criterionMap.get(evaluation.criterionId);
         if (criterion) {
           weightedScore += evaluation.score * criterion.weight;
           totalWeight += criterion.weight;
@@ -668,9 +706,9 @@ class DecisionFrameworkServer {
     if (data.nextStageNeeded) {
       output += `${chalk.blue("SUGGESTED NEXT STAGE:")}\n`;
       if (data.suggestedNextStage) {
-        output += `   Move to ${data.suggestedNextStage} stage\n`;
+        output += `  - Move to ${data.suggestedNextStage} stage\n`;
       } else {
-        output += `   Continue with the current stage\n`;
+        output += `  - Continue with the current stage\n`;
       }
     }
 
@@ -758,6 +796,7 @@ Key features:
 
   inputSchema: {
     type: "object",
+    additionalProperties: false,
     properties: {
       decisionStatement: {
         type: "string",
@@ -768,6 +807,7 @@ Key features:
         description: "Available options or alternatives",
         items: {
           type: "object",
+          additionalProperties: false,
           properties: {
             id: {
               type: "string",
@@ -790,6 +830,7 @@ Key features:
         description: "Criteria for evaluating options",
         items: {
           type: "object",
+          additionalProperties: false,
           properties: {
             id: {
               type: "string",
@@ -823,6 +864,7 @@ Key features:
         description: "Evaluations of options against criteria",
         items: {
           type: "object",
+          additionalProperties: false,
           properties: {
             criterionId: {
               type: "string",
@@ -851,6 +893,7 @@ Key features:
         description: "Possible outcomes and their probabilities",
         items: {
           type: "object",
+          additionalProperties: false,
           properties: {
             id: {
               type: "string",
@@ -889,6 +932,7 @@ Key features:
         description: "Gaps in information that affect the decision",
         items: {
           type: "object",
+          additionalProperties: false,
           properties: {
             description: {
               type: "string",
@@ -1003,7 +1047,7 @@ Key features:
 const server = new Server(
   {
     name: "decision-framework-server",
-    version: "0.2.3"
+    version: "0.2.4"
   },
   {
     capabilities: {

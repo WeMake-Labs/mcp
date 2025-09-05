@@ -45,7 +45,7 @@ The server encourages analysis through multiple ethical frameworks to:
     - `scenario` (string): Description of the situation requiring ethical evaluation
     - `action` (string): Specific action or policy to evaluate
     - `frameworks` (string[]): Ethical frameworks to apply
-      - Available options: "utilitarianism", "deontology", "virtue", "care", "social-contract"
+      - Available options: ["utilitarianism","deontology","virtue","care","social-contract"]
       - Minimum 1 framework required
     - `confidence` (number): Confidence in the information provided (0.0-1.0)
     - `nextStepNeeded` (boolean): Whether further analysis is required

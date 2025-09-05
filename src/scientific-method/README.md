@@ -98,7 +98,7 @@ Systematic approach to result interpretation:
       - `expectedOutcomes` (string[]): Anticipated results
       - `alternativeExplanations` (string[]): Potential confounding factors
     - `stage` (enum): Current stage of scientific inquiry
-      - "observation" | "hypothesis" | "experiment" | "analysis" | "conclusion" | "revision"
+      - "observation" | "question" | "hypothesis" | "experiment" | "analysis" | "conclusion" | "iteration"
     - `iteration` (number): Current iteration of the inquiry process
     - `confidence` (number): Confidence level in current findings (0.0-1.0)
     - `nextStageNeeded` (boolean): Whether progression to next stage is required

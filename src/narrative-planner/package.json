@@ -1,12 +1,18 @@
 {
   "name": "@wemake.cx/narrative-planner",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "MCP server that creates simple narrative outlines",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
-  "exports": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/WeMake-AI/mcp.git",
@@ -15,6 +21,9 @@
   "publishConfig": {
     "access": "public",
     "tag": "alpha"
+  },
+  "engines": {
+    "bun": ">=1.2.0"
   },
   "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/narrative-planner",
   "author": "heyFlorentin",
@@ -31,10 +40,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked'",
-    "start": "node dist/index.js",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked'",
+    "start": "bun run ./dist/index.js",
     "prepare": "bun run build",
-    "watch": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked' --watch",
+    "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch",
     "release": "bun publish"
   },
   "dependencies": {

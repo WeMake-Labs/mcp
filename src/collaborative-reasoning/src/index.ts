@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -72,7 +72,6 @@ class CollaborativeReasoningServer {
   private contributionHistory: Record<string, Contribution[]> = {};
   private disagreementTracker: Record<string, Disagreement[]> = {};
   private sessionHistory: Record<string, CollaborativeReasoningData[]> = {};
-  private nextContributionId = 1;
 
   private validateCollaborativeReasoningData(input: unknown): CollaborativeReasoningData {
     const data = input as Record<string, unknown>;
@@ -649,7 +648,9 @@ class CollaborativeReasoningServer {
 
       // Generate visualization
       const visualization = this.visualizeCollaborativeReasoning(validatedInput);
-      console.error(visualization);
+      if (process.env.MCP_VISUALIZE !== "0") {
+        console.error(visualization);
+      }
 
       // Return the collaboration result
       return {
@@ -946,7 +947,7 @@ Key features:
 const server = new Server(
   {
     name: "collaborative-reasoning-server",
-    version: "0.2.3"
+    version: "0.2.4"
   },
   {
     capabilities: {

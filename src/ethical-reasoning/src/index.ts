@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -6,7 +6,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema, Tool } from "@modelconte
 import chalk from "chalk";
 
 // Supported frameworks
-const frameworks = ["utilitarianism", "deontology", "virtue", "care", "social-contract"] as const;
+const frameworks = Object.freeze(["utilitarianism", "deontology", "virtue", "care", "social-contract"] as const);
 
 type FrameworkType = (typeof frameworks)[number];
 
@@ -86,19 +86,26 @@ class EthicalReasoningServer {
     try {
       const data = this.validateData(input);
       this.history.push(data);
-
-      console.error(chalk.bold("Scenario:") + " " + data.scenario);
-      console.error(chalk.bold("Action:") + " " + data.action);
-      console.error("");
+      const verbose = process.env.MCP_VERBOSE === "1";
+      if (verbose) {
+        console.error(chalk.bold("Scenario:") + " " + data.scenario);
+        console.error(chalk.bold("Action:") + " " + data.action);
+        console.error("");
+      }
+      const guidanceByFramework: Record<FrameworkType, string> = {} as Record<FrameworkType, string>;
       for (const f of data.frameworks) {
         const header = chalk.cyan(`[${f}]`);
         const guidance = this.frameworkGuidance(f, data.scenario, data.action);
+        guidanceByFramework[f] = guidance;
         console.error(header + " " + guidance);
       }
-      console.error("");
+      if (verbose) console.error("");
 
       const output = {
         requestNumber: this.history.length,
+        frameworks: data.frameworks,
+        guidance: guidanceByFramework,
+        confidence: data.confidence,
         nextStepNeeded: data.nextStepNeeded,
         suggestedNext: data.suggestedNext || []
       };
@@ -118,9 +125,10 @@ const ETHICAL_REASONING_TOOL: Tool = {
   description: `Evaluate a proposed action using multiple ethical frameworks.`,
   inputSchema: {
     type: "object",
+    additionalProperties: false,
     properties: {
-      scenario: { type: "string", description: "Description of the situation" },
-      action: { type: "string", description: "Action or policy to evaluate" },
+      scenario: { type: "string", minLength: 1, description: "Description of the situation" },
+      action: { type: "string", minLength: 1, description: "Action or policy to evaluate" },
       frameworks: {
         type: "array",
         description: "Ethical frameworks to apply",
@@ -139,7 +147,7 @@ const ETHICAL_REASONING_TOOL: Tool = {
   }
 };
 
-const server = new Server({ name: "ethical-reasoning-server", version: "0.2.3" }, { capabilities: { tools: {} } });
+const server = new Server({ name: "ethical-reasoning-server", version: "0.2.4" }, { capabilities: { tools: {} } });
 const ethicalServer = new EthicalReasoningServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ETHICAL_REASONING_TOOL] }));
@@ -154,6 +162,8 @@ async function runServer() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error("Ethical Reasoning MCP Server running on stdio");
+  process.once("SIGINT", () => process.exit(0));
+  process.once("SIGTERM", () => process.exit(0));
 }
 
 runServer().catch((err) => {

@@ -37,7 +37,7 @@ interface Contribution {
   personaId: string;
   content: string;
   type: "observation" | "question" | "insight" | "concern" | "suggestion" | "challenge" | "synthesis";
-  referencesIds?: string[]; // IDs of previous contributions this builds upon
+  referenceIds?: string[]; // IDs of previous contributions this builds upon
   confidence: number; // 0.0-1.0
 }
 
