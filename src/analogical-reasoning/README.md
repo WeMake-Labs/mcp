@@ -1,236 +1,154 @@
 # Analogical Reasoning MCP Server
 
-## Motivation
+A structured framework for constructing, mapping, and evaluating analogies to enhance systematic analogical thinking and
+problem-solving.
 
-Analogical thinking is a powerful cognitive tool that humans use to understand new concepts by relating them to familiar
-ones. While language models can use analogies, they often:
+## Core Concepts
 
-1. Apply analogies inconsistently or abandon them partway through analysis
-2. Fail to explicitly map structural relationships between source and target domains
-3. Overextend analogies beyond their useful boundaries
-4. Miss opportunities to leverage analogical transfer for problem-solving
-5. Struggle to evaluate the quality and limitations of different analogies
+### Domain Elements
 
-The Analogical Reasoning Server addresses these limitations by providing a structured framework for constructing,
-mapping, and evaluating analogies. By externalizing analogical thinking, models can leverage this powerful cognitive
-tool more systematically and effectively.
+Domain elements are the building blocks of analogical reasoning. Each element has:
 
-## Technical Specification
+- A unique identifier
+- A name and type (entity, attribute, relation, process)
+- A descriptive explanation
 
-### Tool Interface
+Example:
 
-```typescript
-interface DomainElement {
-  id: string;
-  name: string;
-  type: "entity" | "attribute" | "relation" | "process";
-  description: string;
-}
-
-interface AnalogicalMapping {
-  sourceElement: string; // ID of source domain element
-  targetElement: string; // ID of target domain element
-  mappingStrength: number; // 0.0-1.0
-  justification: string;
-  limitations?: string[];
-}
-
-interface AnalogicalReasoningData {
-  // Core analogy components
-  sourceDoamin: {
-    name: string;
-    elements: DomainElement[];
-  };
-  targetDomain: {
-    name: string;
-    elements: DomainElement[];
-  };
-  mappings: AnalogicalMapping[];
-
-  // Analogy metadata
-  analogyId: string;
-  purpose: "explanation" | "prediction" | "problem-solving" | "creative-generation";
-  confidence: number; // 0.0-1.0
-  iteration: number; // (integer)
-
-  // Evaluation
-  strengths: string[];
-  limitations: string[];
-  inferences: Array<{
-    statement: string;
-    confidence: number;
-    basedOnMappings: string[]; // IDs of mappings supporting this inference
-  }>;
-
-  // Next steps
-  nextOperationNeeded: boolean;
-  suggestedOperations?: Array<
-    "add-mapping" | "revise-mapping" | "draw-inference" | "evaluate-limitation" | "try-new-source"
-  >;
+```json
+{
+  "id": "water_flow",
+  "name": "Water Flow",
+  "type": "process",
+  "description": "Movement of water through pipes under pressure"
 }
 ```
 
-### Process Flow
+### Analogical Mappings
 
-```mermaid
-sequenceDiagram
-    participant Model
-    participant AnServer as Analogical Reasoning Server
-    participant State as Analogy State
+Mappings define correspondences between source and target domain elements. They include:
 
-    Model->>AnServer: Define source domain
-    AnServer->>State: Store source domain structure
-    AnServer-->>Model: Return analogy state
+- Source and target element references
+- Mapping strength (0.0-1.0)
+- Justification for the mapping
+- Known limitations
 
-    Model->>AnServer: Define target domain
-    AnServer->>State: Store target domain structure
-    AnServer-->>Model: Return analogy state
+Example:
 
-    Model->>AnServer: Create structural mappings
-    AnServer->>State: Store mappings between domains
-    AnServer-->>Model: Return analogy state with visualization
-
-    Model->>AnServer: Draw inferences
-    AnServer->>State: Store inferences based on mappings
-    AnServer-->>Model: Return updated analogy state
-
-    Model->>AnServer: Evaluate limitations
-    AnServer->>State: Update with analogy limitations
-    AnServer-->>Model: Return final analogy state
-
-    Model->>AnServer: Revise mappings (optional)
-    AnServer->>State: Update mappings
-    AnServer-->>Model: Return revised analogy state
+```json
+{
+  "sourceElement": "water_flow",
+  "targetElement": "electric_current",
+  "mappingStrength": 0.9,
+  "justification": "Both involve flow of substance through conduits",
+  "limitations": ["Water is visible, electricity is not"]
+}
 ```
 
-## Key Features
+### Inferences
 
-### 1. Explicit Domain Structuring
+Inferences are conclusions drawn from analogical mappings. They contain:
 
-The server requires explicit structuring of both domains:
+- Statement of the inference
+- Confidence level (0.0-1.0)
+- Supporting mappings that justify the inference
 
-- **Entities**: Objects or concepts in each domain
-- **Attributes**: Properties of those entities
-- **Relations**: How entities relate to each other
-- **Processes**: Dynamic interactions between entities
+Example:
 
-### 2. Structural Mapping
-
-The server facilitates explicit mapping between domains:
-
-- **Element-to-element**: Which elements correspond to each other
-- **Relation-to-relation**: Preserving the structural relationships
-- **Mapping strength**: Rating how well each mapping works
-- **Justification**: Explanation for why the mapping is valid
-
-### 3. Inference Generation
-
-The server guides drawing inferences from the analogy:
-
-- **Projection**: Transferring knowledge from source to target
-- **Prediction**: Making predictions based on source domain patterns
-- **Novel insights**: Identifying new perspectives on the target domain
-
-### 4. Analogy Evaluation
-
-Each analogy is systematically evaluated:
-
-- **Strengths**: Where the analogy is particularly illuminating
-- **Limitations**: Where the analogy breaks down
-- **Confidence**: Overall assessment of analogy quality
-- **Alternatives**: Considering different source domains
-
-### 5. Visual Representation
-
-The server provides visualization of the analogical mapping:
-
-- Connection diagrams showing mappings between domains
-- Color-coding for mapping strength
-- Highlighting unmapped elements in both domains
-
-## Usage Examples
-
-### Complex Concept Explanation
-
-When explaining complex technical concepts, the model can develop systematic analogies to more familiar domains, with
-explicit mappings and limitations.
-
-### Problem Solving by Analogy
-
-For novel problems, the model can map them to familiar solved problems and transfer solution strategies.
-
-### Creative Ideation
-
-When generating creative ideas, the model can systematically map concepts from distant domains to generate novel
-combinations.
-
-### Scientific Modeling
-
-For scientific concepts, the model can evaluate the strengths and limitations of different analogical models.
-
-## Implementation
-
-The server is implemented using TypeScript with:
-
-- A core AnalogicalReasoningServer class
-- Domain representation and visualization components
-- Mapping quality evaluation algorithms
-- Inference projection guidelines
-- Standard MCP server connection via stdin/stdout
-
-## License
-
-**Note: This sub-package is licensed under the MIT License (see LICENSE file in this directory), while the repository
-root uses the BSL-1.1 license.**
-
-## Privacy & Logging Controls
-
-- PII awareness: Analogical data may include personal data (names, IDs, free-text justifications). Before any
-  visualization or logging, you must redact or aggregate such content. Treat all free-text fields as potentially
-  sensitive (e.g., DomainElement.name/description, mapping.justification, inferences[].statement,
-  strengths/limitations).
-- Environment toggles:
-  - AR_SILENT: When set to a truthy value, disables visualization emission to stderr; visualization is otherwise
-    printed. See emission in [index.ts](/src/analogical-reasoning/index.ts) where visualization is written unless this
-    variable is set.
-  - AUDIT_LOG_LEVEL: Sets the minimal log level for your environment (e.g., error, warn, info). Used across the monorepo
-    for audit logging. See guidance in [README.md](../../README.md).
-  - PII_REDACTION_STRICT: When set to true, enforce strict upstream redaction before constructing
-    `AnalogicalReasoningData` and before any server call. Redaction must occur in the client adapter or gateway (see
-    references below).
-- Data retention & deletion: This server keeps state in-memory only; no data is persisted by default. If you forward
-  outputs or persist data, enforce a retention window via DATA_RETENTION_DAYS in your environment and ensure periodic
-  deletion jobs. See [README.md](../../README.md) and [SECURITY.md](../../docs/SECURITY.md).
-- Data subject requests (DSRs): For access/erasure requests, contact <privacy@wemake.cx> or use the DSR portal linked in
-  [SECURITY.md](../../docs/SECURITY.md). Ensure request handling covers any downstream storage/log sinks integrated with
-  this server.
-
-Example: disable visualization output and minimize logs via environment variables
-
-```env
-# Disable visualization emission to stderr for this server
-AR_SILENT=true
-
-# Enterprise audit logging minimum level (example)
-AUDIT_LOG_LEVEL=error
-
-# Enforce strict upstream redaction prior to any MCP call
-PII_REDACTION_STRICT=true
-
-# Optional: retention if your environment persists logs/outputs
-DATA_RETENTION_DAYS=30
-GDPR_ENABLED=true
+```json
+{
+  "statement": "Electrical resistance is like pipe friction",
+  "confidence": 0.8,
+  "basedOnMappings": ["water_flow_to_current", "pipe_to_wire"]
+}
 ```
 
-Redaction configuration locations
+## API
 
-- Upstream redaction layer: Apply masking/tokenization before building AnalogicalReasoningData in your client adapter or
-  gateway.
-- Code emit points: Visualization surfaces at [visualizeMapping](/src/analogical-reasoning/index.ts#L320) and is written
-  in [processAnalogicalReasoning](/src/analogical-reasoning/index.ts#L476). If `AR_SILENT` is set, emission is
-  suppressed.
-- Policies & retention: See [README.md](../../README.md) and [SECURITY.md](../../docs/SECURITY.md) for GDPR guidance
-  (data minimization, purpose limitation, storage limitation, DSR handling).
+### Tools
 
-This server enhances model capabilities in domains requiring creative problem-solving, explanation of complex concepts,
-and transfer of knowledge between different fields or contexts.
+- **analogicalReasoning**
+  - Construct and evaluate analogical mappings between domains
+  - Input: Comprehensive analogical reasoning data structure
+    - `sourceDomain` (object): Source domain with name and elements
+    - `targetDomain` (object): Target domain with name and elements
+    - `mappings` (array): Analogical mappings between domains
+    - `analogyId` (string): Unique identifier for the analogy
+    - `purpose` (enum): "explanation" | "prediction" | "problem-solving" | "creative-generation"
+    - `confidence` (number): Overall confidence in the analogy (0.0-1.0)
+    - `iteration` (number): Current iteration of the analogical reasoning process
+    - `strengths` (string[]): Areas where the analogy is particularly strong
+    - `limitations` (string[]): Known limitations of the analogy
+    - `inferences` (array): Conclusions drawn from the mappings
+    - `nextOperationNeeded` (boolean): Whether further operations are required
+    - `suggestedOperations` (array): Recommended next steps
+  - Returns structured analogical analysis with mappings and evaluations
+  - Supports iterative refinement of analogical reasoning
+
+## Setup
+
+### bunx
+
+```json
+{
+  "mcpServers": {
+    "Analogical Reasoning": {
+      "command": "bunx",
+      "args": ["-y", "@wemake.cx/analogical-reasoning@latest"]
+    }
+  }
+}
+```
+
+#### bunx with custom settings
+
+The server can be configured using the following environment variables:
+
+```json
+{
+  "mcpServers": {
+    "Analogical Reasoning": {
+      "command": "bunx",
+      "args": ["-y", "@wemake.cx/analogical-reasoning@latest"],
+      "env": {
+        "ANALOGY_MAX_ELEMENTS": "50",
+        "ANALOGY_MIN_CONFIDENCE": "0.3"
+      }
+    }
+  }
+}
+```
+
+- `ANALOGY_MAX_ELEMENTS`: Maximum number of elements per domain (default: 20)
+- `ANALOGY_MIN_CONFIDENCE`: Minimum confidence threshold for mappings (default: 0.1)
+
+## System Prompt
+
+The prompt for utilizing analogical reasoning should encourage systematic mapping and evaluation:
+
+```markdown
+Follow these steps for analogical reasoning:
+
+1. Domain Definition:
+   - Clearly define both source and target domains
+   - Identify key entities, attributes, relations, and processes in each domain
+   - Ensure domains are well-structured before proceeding
+
+2. Systematic Mapping:
+   - Create explicit mappings between corresponding elements
+   - Assign mapping strength based on structural similarity
+   - Provide clear justification for each mapping
+   - Identify limitations where mappings break down
+
+3. Inference Generation:
+   - Draw conclusions based on established mappings
+   - Assign confidence levels to inferences
+   - Reference supporting mappings for each inference
+   - Consider alternative interpretations
+
+4. Evaluation and Refinement:
+   - Assess overall analogy quality and limitations
+   - Identify areas for improvement or alternative source domains
+   - Iterate on mappings based on new insights
+   - Document lessons learned for future analogical reasoning
+```

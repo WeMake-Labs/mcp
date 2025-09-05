@@ -1,0 +1,50 @@
+{
+  "name": "@wemake.cx/ethical-reasoning",
+  "version": "0.2.10",
+  "description": "MCP server for structured ethical reasoning across multiple frameworks",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WeMake-AI/mcp.git",
+    "directory": "src/ethical-reasoning"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest"
+  },
+  "engines": {
+    "bun": ">=1.2.0"
+  },
+  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/ethical-reasoning",
+  "author": "heyFlorentin",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ethics",
+    "model-enhancement"
+  ],
+  "bin": {
+    "mcp-server-ethical-reasoning": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' && tsc",
+    "start": "bun run ./dist/index.js",
+    "prepare": "bun run build",
+    "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch",
+    "release": "bun publish"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.3.3"
+  }
+}

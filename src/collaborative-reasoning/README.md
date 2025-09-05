@@ -1,389 +1,174 @@
 # Collaborative Reasoning MCP Server
 
-[![Version](https://img.shields.io/npm/v/@wemake.cx/collaborative-reasoning.svg)](https://www.npmjs.com/package/@wemake.cx/collaborative-reasoning)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Bun](https://img.shields.io/badge/runtime-bun-black)](https://bun.sh/)
+A sophisticated MCP server for simulating expert collaboration with diverse perspectives to tackle complex problems
+through structured multi-persona reasoning.
 
-A Model Context Protocol (MCP) server that enables structured multi-persona collaboration for complex problem-solving.
-This server creates a framework for simulating expert collaboration with diverse perspectives, systematic disagreement
-management, and comprehensive insight synthesis.
+## Core Concepts
 
-## Motivation
+### Expert Personas
 
-Complex problems often benefit from diverse perspectives and expertise. While language models can attempt to simulate
-different viewpoints, they often:
+The server creates and manages expert personas with distinct characteristics:
 
-1. **Perspective Inconsistency**: Fail to maintain consistent, distinct perspectives throughout an analysis
-2. **Lack of Productive Tension**: Struggle to create genuine productive disagreement between viewpoints
-3. **Domain Blending**: Unrealistically blend different expertise domains
-4. **Integration Gaps**: Neglect systematic integration of insights from different perspectives
-5. **Synthesis Limitations**: Miss opportunities for creative synthesis emerging from diverse thinking
+- **Identity**: Unique ID, name, and background
+- **Expertise**: Specific areas of knowledge and experience
+- **Perspective**: Unique viewpoint and approach to problems
+- **Biases**: Acknowledged limitations and potential blind spots
+- **Communication Style**: Tone and approach to interaction
 
-The Collaborative Reasoning Server addresses these limitations by:
+Example persona:
 
-- Creating structured environments for multiple simulated experts
-- Maintaining consistent persona characteristics and biases
-- Facilitating productive disagreements and their resolution
-- Tracking cross-pollination of ideas between perspectives
-- Providing visual representations of collaborative processes
-- Ensuring comprehensive synthesis of diverse viewpoints
-
-## Technical Specification
-
-### Tool Interface
-
-```typescript
-interface Persona {
-  id: string;
-  name: string;
-  expertise: string[];
-  background: string;
-  perspective: string;
-  biases: string[];
-  communication: {
-    style: string;
-    tone: string;
-  };
-}
-
-interface Contribution {
-  personaId: string;
-  content: string;
-  type: "observation" | "question" | "insight" | "concern" | "suggestion" | "challenge" | "synthesis";
-  referenceIds?: string[]; // IDs of previous contributions this builds upon
-  confidence: number; // 0.0-1.0
-}
-
-interface Disagreement {
-  topic: string;
-  positions: Array<{
-    personaId: string;
-    position: string;
-    arguments: string[];
-  }>;
-  resolution?: {
-    type: "consensus" | "compromise" | "integration" | "tabled";
-    description: string;
-  };
-}
-
-interface CollaborativeReasoningData {
-  // Core collaboration components
-  topic: string;
-  personas: Persona[];
-  contributions: Contribution[];
-  disagreements?: Disagreement[];
-
-  // Process structure
-  stage: "problem-definition" | "ideation" | "critique" | "integration" | "decision" | "reflection";
-  activePersonaId: string;
-  nextPersonaId?: string;
-
-  // Collaboration output
-  keyInsights?: string[];
-  consensusPoints?: string[];
-  openQuestions?: string[];
-  finalRecommendation?: string;
-
-  // Process metadata
-  sessionId: string;
-  iteration: number;
-
-  // Next steps
-  nextContributionNeeded: boolean;
-  suggestedContributionTypes?: string[];
+```json
+{
+  "id": "tech-lead",
+  "name": "Sarah Chen",
+  "expertise": ["software architecture", "scalability", "team leadership"],
+  "background": "15 years in enterprise software development",
+  "perspective": "Pragmatic focus on maintainable, scalable solutions",
+  "biases": ["over-engineering tendency", "preference for proven technologies"],
+  "communication": {
+    "style": "analytical",
+    "tone": "direct"
+  }
 }
 ```
 
-### Process Flow
+### Collaborative Process
 
-```mermaid
-sequenceDiagram
-    participant Model
-    participant ColServer as Collaborative Reasoning Server
-    participant State as Collaboration State
+The reasoning process follows structured stages:
 
-    Model->>ColServer: Define problem and personas
-    ColServer->>State: Initialize collaboration with personas
-    ColServer-->>Model: Return initial state with first active persona
+1. **Problem Definition**: Clarify the challenge and scope
+2. **Ideation**: Generate diverse ideas and approaches
+3. **Critique**: Evaluate and challenge proposed solutions
+4. **Integration**: Synthesize insights from different perspectives
+5. **Decision**: Reach consensus or identify trade-offs
+6. **Reflection**: Extract learnings and next steps
 
-    Model->>ColServer: Submit contribution as Persona A
-    ColServer->>State: Store contribution
-    ColServer-->>Model: Return updated state with next persona prompt
+### Contribution Types
 
-    Model->>ColServer: Submit contribution as Persona B
-    ColServer->>State: Store contribution, identify disagreement
-    ColServer-->>Model: Return updated state highlighting disagreement
+Personas contribute through various interaction types:
 
-    Model->>ColServer: Submit contribution as Persona C addressing disagreement
-    ColServer->>State: Store contribution, update disagreement status
-    ColServer-->>Model: Return updated state
+- **Observation**: Factual insights or data points
+- **Question**: Clarifying or probing inquiries
+- **Insight**: Novel connections or understanding
+- **Concern**: Potential risks or limitations
+- **Suggestion**: Proposed solutions or approaches
+- **Challenge**: Constructive disagreement or alternative view
+- **Synthesis**: Integration of multiple perspectives
 
-    Model->>ColServer: Submit synthesis contribution integrating perspectives
-    ColServer->>State: Store synthesis, update consensus points
-    ColServer-->>Model: Return updated state
+### Disagreement Management
 
-    Model->>ColServer: Generate final recommendation
-    ColServer->>State: Store recommendation with multi-perspective justification
-    ColServer-->>Model: Return final collaboration output
-```
+The system tracks and resolves disagreements through:
 
-## Key Features
+- **Position Mapping**: Clear articulation of different viewpoints
+- **Argument Tracking**: Supporting evidence for each position
+- **Resolution Types**: Consensus, compromise, integration, or tabling
+- **Productive Conflict**: Leveraging disagreement for better outcomes
 
-### 1. Multi-Persona Simulation
+## API
 
-The server enables creation and management of diverse personas:
+### Tools
 
-- **Expertise profiles**: Defined knowledge domains
-- **Perspectives**: Unique viewpoints and priorities
-- **Communication styles**: Consistent voice for each persona
-- **Explicit biases**: Acknowledged limitations in each perspective
+- **collaborativeReasoning**
+  - Simulates expert collaboration with diverse perspectives
+  - Input: Comprehensive collaboration data structure
+    - `topic` (string): The problem or challenge being addressed
+    - `personas` (array): Expert personas with expertise, background, and communication style
+    - `contributions` (array): Contributions from personas with type, content, and confidence
+    - `disagreements` (array, optional): Points of disagreement and their resolution
+    - `stage` (enum): Current collaboration stage (problem-definition, ideation, critique, integration, decision,
+      reflection)
+    - `activePersonaId` (string): Currently active persona
+    - `nextPersonaId` (string, optional): Next persona to contribute
+    - `keyInsights` (array, optional): Key insights from the collaboration
+    - `consensusPoints` (array, optional): Points of agreement
+    - `openQuestions` (array, optional): Unresolved questions
+    - `finalRecommendation` (string, optional): Final collaborative recommendation
+    - `sessionId` (string): Unique session identifier
+    - `iteration` (number): Current iteration number
+    - `nextContributionNeeded` (boolean): Whether more input is needed
+    - `suggestedContributionTypes` (array, optional): Suggested next contribution types
+  - Output: Structured collaboration analysis with visual representation
+    - Formatted display of personas, contributions, disagreements, and insights
+    - Progress tracking and next steps
+    - Confidence levels and consensus points
+  - Validates all input data and maintains session history
+  - Provides colorized visual output for better readability
 
-### 2. Structured Collaboration Process
+## Setup
 
-The server guides a systematic collaborative process:
-
-- **Problem definition**: Framing the challenge from multiple perspectives
-- **Ideation**: Generating diverse approaches
-- **Critique**: Systematic evaluation from different viewpoints
-- **Integration**: Synthesizing insights across perspectives
-- **Decision**: Reaching reasoned conclusions
-
-### 3. Disagreement Management
-
-The server provides mechanisms for productive disagreement:
-
-- **Disagreement tracking**: Explicitly documenting differing views
-- **Position mapping**: Clarifying where perspectives diverge
-- **Resolution strategies**: Methods for handling disagreements
-- **Structured debate**: Focused exploration of key differences
-
-### 4. Cross-Pollination Tracking
-
-The server tracks how ideas evolve across personas:
-
-- **Reference links**: How contributions build on each other
-- **Insight evolution**: Tracing how ideas transform
-- **Integration patterns**: How diverse inputs combine
-
-### 5. Visual Representation
-
-The server visualizes the collaborative process:
-
-- Contribution networks showing idea evolution
-- Perspective maps highlighting agreements and disagreements
-- Synthesis visualizations showing integrated insights
-
-## Usage Examples
-
-### Complex Problem Solving
-
-For multifaceted problems, the model can simulate perspectives from different domains (technical, ethical, business,
-legal) to develop comprehensive solutions.
-
-### Product Design
-
-When designing products, the model can incorporate perspectives of engineers, designers, marketers, and users to
-identify optimal approaches.
-
-### Strategic Planning
-
-For organizational strategy, the model can simulate perspectives of different stakeholders and departments to create
-more robust plans.
-
-### Ethical Dilemma Analysis
-
-When analyzing ethical questions, the model can represent diverse philosophical, cultural, and stakeholder perspectives.
-
-## Architecture & Implementation
-
-### Core Components
-
-The server is built with enterprise-grade TypeScript and Bun runtime:
-
-- **CollaborativeReasoningServer**: Main server class with comprehensive input sanitization and GDPR compliance
-- **Persona Registry**: Manages expert personas with consistent characteristics and biases
-- **Contribution Tracking**: Records all interactions with reference linking and confidence scoring
-- **Disagreement Management**: Systematic tracking and resolution of conflicting viewpoints
-- **Session History**: Maintains collaboration state across iterations
-- **Visual Representation**: Rich console output with color-coded contributions and progress bars
-
-### Security Features
-
-- **Input Sanitization**: Comprehensive sanitization of all user inputs
-- **Data Privacy**: Automatic redaction of sensitive information (emails, phone numbers, passwords)
-- **GDPR Compliance**: Privacy-first data handling with configurable retention policies
-- **Path Traversal Protection**: Prevention of directory traversal attacks
-- **Script Injection Prevention**: Removal of potentially malicious script content
-
-### Performance & Scalability
-
-- **Bun Runtime**: High-performance JavaScript runtime with native TypeScript support
-- **Memory Efficient**: Optimized data structures for large collaboration sessions
-- **Concurrent Processing**: Asynchronous handling of multiple collaboration sessions
-- **Comprehensive Testing**: 90%+ test coverage with unit, integration, and E2E tests
-
-## Installation & Setup
-
-### Prerequisites
-
-- **Bun**: Version 1.2.0 or higher
-- **Node.js**: Compatible with Node.js environments via Bun's compatibility layer
-- **TypeScript**: Built-in support via Bun
-
-### Installation
-
-```sh
-# Install via bun (recommended)
-bun add @wemake.cx/collaborative-reasoning
-
-# Install via npm
-npm install @wemake.cx/collaborative-reasoning
-
-# Install via yarn
-yarn add @wemake.cx/collaborative-reasoning
-```
-
-### Development Setup
-
-```sh
-# Clone the repository
-git clone https://github.com/wemake-ai/mcp.git
-cd mcp/src/collaborative-reasoning
-
-# Install dependencies
-bun install
-
-# Build the project
-bun run build
-
-# Run tests
-bun test
-
-# Start development server
-bun run index.ts
-```
-
-### Configuration
-
-The server uses standard MCP protocol configuration:
+### bunx
 
 ```json
 {
   "mcpServers": {
-    "collaborative-reasoning": {
+    "Collaborative Reasoning": {
       "command": "bunx",
-      "args": ["mcp-server-collaborative-reasoning"]
+      "args": ["-y", "@wemake.cx/collaborative-reasoning@latest"]
     }
   }
 }
 ```
 
-## Dependencies
+#### bunx with custom settings
 
-### Runtime Dependencies
+The server supports various configuration options:
 
-`@modelcontextprotocol/sdk`: ^1.17.4 - MCP protocol implementation
-
-_Note: Terminal styling and command-line argument parsing are handled by Bun's built-in APIs, eliminating the need for  
-external dependencies._
-
-### Development Dependencies
-
-- `@types/node`: ^22 - Node.js type definitions
-
-- `typescript`: Latest - TypeScript compiler
-
-## Testing
-
-Comprehensive test suite with multiple testing layers:
-
-```sh
-# Run all tests
-bun test
-
-# Run specific test suites
-bun test tests/unit/
-bun test tests/integration/
-bun test tests/e2e/
-bun test tests/security/
-bun test tests/performance/
-
-# Run with coverage
-bun test --coverage
-```
-
-### Test Structure
-
-- **Unit Tests**: Core functionality and business logic
-- **Integration Tests**: MCP protocol compliance and API integration
-- **E2E Tests**: End-to-end collaboration scenarios
-- **Security Tests**: Input sanitization and security compliance
-- **Performance Tests**: Load testing and performance benchmarks
-
-## API Reference
-
-### Tool: `collaborativeReasoning`
-
-The server exposes a single MCP tool for collaborative reasoning operations.
-
-#### Input Schema
-
-```typescript
-interface CollaborativeReasoningInput {
-  topic: string;
-  personas: Persona[];
-  contributions: Contribution[];
-  disagreements?: Disagreement[];
-  stage: "problem-definition" | "ideation" | "critique" | "integration" | "decision" | "reflection";
-  activePersonaId: string;
-  nextPersonaId?: string;
-  keyInsights?: string[];
-  consensusPoints?: string[];
-  openQuestions?: string[];
-  finalRecommendation?: string;
-  sessionId: string;
-  iteration: number;
-  nextContributionNeeded: boolean;
-  suggestedContributionTypes?: string[];
+```json
+{
+  "mcpServers": {
+    "Collaborative Reasoning": {
+      "command": "bunx",
+      "args": ["-y", "@wemake.cx/collaborative-reasoning@latest"],
+      "env": {
+        "COLLABORATION_MAX_PERSONAS": "8",
+        "COLLABORATION_MAX_ITERATIONS": "20",
+        "COLLABORATION_CONFIDENCE_THRESHOLD": "0.7",
+        "COLLABORATION_VISUAL_OUTPUT": "true"
+      }
+    }
+  }
 }
 ```
 
-#### Output Format
+- `COLLABORATION_MAX_PERSONAS`: Maximum number of personas per session (default: 8)
+- `COLLABORATION_MAX_ITERATIONS`: Maximum collaboration iterations (default: 20)
+- `COLLABORATION_CONFIDENCE_THRESHOLD`: Minimum confidence for consensus (default: 0.7)
+- `COLLABORATION_VISUAL_OUTPUT`: Enable colorized visual output (default: true)
 
-```typescript
-interface CollaborativeReasoningOutput {
-  content: Array<{
-    type: "text";
-    text: string;
-  }>;
-  isError?: boolean;
-}
+## System Prompt
+
+The prompt for utilizing collaborative reasoning should encourage diverse perspective integration:
+
+```markdown
+Follow these steps for collaborative reasoning:
+
+1. Problem Framing:
+   - Define the challenge clearly and comprehensively
+   - Identify key stakeholders and their interests
+   - Establish success criteria and constraints
+   - Set up diverse expert personas with complementary expertise
+
+2. Multi-Perspective Analysis:
+   - Engage each persona to contribute their unique viewpoint
+   - Encourage different types of contributions (observations, insights, concerns)
+   - Surface assumptions and biases explicitly
+   - Promote constructive disagreement and debate
+
+3. Synthesis and Integration:
+   - Identify points of consensus and disagreement
+   - Explore creative combinations of different approaches
+   - Address concerns and limitations raised by personas
+   - Build on insights through cross-pollination of ideas
+
+4. Decision and Recommendation:
+   - Evaluate trade-offs between different approaches
+   - Seek win-win solutions that address multiple perspectives
+   - Document remaining uncertainties and risks
+   - Provide clear, actionable recommendations
+
+5. Reflection and Learning:
+   - Extract key insights and lessons learned
+   - Identify areas for further exploration
+   - Document the reasoning process for future reference
+   - Plan next steps and follow-up actions
 ```
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](../../CONTRIBUTING.md) for details.
-
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with tests
-4. Ensure all tests pass: `bun test`
-5. Build the project: `bun run build`
-6. Submit a pull request
-
-## License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## Support
-
-- **Documentation**: [GitHub Repository](https://github.com/wemake-ai/mcp/tree/main/src/collaborative-reasoning)
-- **Issues**: [GitHub Issues](https://github.com/wemake-ai/mcp/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/wemake-ai/mcp/discussions)
-
-This server enhances model capabilities for complex problems requiring diverse expertise and perspectives, enabling more
-thorough exploration of solution spaces and more robust final recommendations through structured collaborative
-reasoning.

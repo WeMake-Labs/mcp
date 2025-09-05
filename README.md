@@ -1,4 +1,4 @@
-# 🤖 WeMake AI: Enterprise MCP Server Ecosystem
+# 💙 WeMake: Enterprise MCP Server Ecosystem
 
 > **AI-First Enterprise Solutions for the German Market**
 
@@ -9,200 +9,75 @@ on Cloudflare Workers.
 Our MCP servers enable Large Language Models to securely access enterprise data sources, business tools, and AI agents
 while maintaining the highest standards of security, privacy, and regulatory compliance.
 
-## 🏢 Enterprise Features
+## 🧠 Available MCP Servers
 
-- **🛡️ GDPR Compliant**: Built-in data protection and privacy controls
-- **🇩🇪 German Market Focus**: Optimized for German enterprise and healthcare requirements
-- **⚡ Bun-First Development**: High-performance TypeScript with Bun runtime
-- **☁️ Cloudflare Workers**: Edge deployment with global scalability
-- **🤖 AI Agent Ready**: Autonomous systems with self-healing capabilities
-- **📊 Enterprise Monitoring**: Comprehensive observability and audit trails
-- **🔒 Security by Design**: Zero-trust architecture with enterprise-grade security
+Our ecosystem includes specialized MCP servers organized into key cognitive and operational categories:
 
-[![License: BSL-1.1](https://img.shields.io/badge/License-BSL%201.1-blue)](LICENSE)
-[![Bun](https://img.shields.io/badge/Runtime-Bun-orange)](https://bun.sh)
-[![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue)](https://typescriptlang.org)
-[![Cloudflare Workers](https://img.shields.io/badge/Deploy-Cloudflare%20Workers-orange)](https://workers.cloudflare.com)
-[![GDPR Compliant](https://img.shields.io/badge/GDPR-Compliant-green)](https://gdpr.eu)
+### 🎯 Decision & Analysis Frameworks
 
-## 🌟 Enterprise MCP Servers
+- **[Decision Framework](src/decision-framework/)** - Structured decision analysis with multiple frameworks (expected
+  utility, multi-criteria, maximin, minimax regret, satisficing)
+- **[Ethical Reasoning](src/ethical-reasoning/)** - Multi-framework ethical analysis (utilitarianism, deontology, virtue
+  ethics, care ethics, social contract)
+- **[Constraint Solver](src/constraint-solver/)** - Mathematical and logical constraint satisfaction validation
+- **[Goal Tracker](src/goal-tracker/)** - Comprehensive goal lifecycle management with progress monitoring
 
-Our production-ready MCP servers are designed for enterprise environments with focus on security, compliance, and
-scalability.
+### 🧩 Reasoning & Cognition
 
-### 🏥 Healthcare & GDPR Compliance
+- **[Structured Argumentation](src/structured-argumentation/)** - Systematic dialectical reasoning with
+  thesis-antithesis-synthesis progression
+- **[Analogical Reasoning](src/analogical-reasoning/)** - Structured analogy construction and mapping for
+  problem-solving
+- **[Collaborative Reasoning](src/collaborative-reasoning/)** - Multi-persona expert collaboration simulation
+- **[Sequential Thinking](src/sequential-thinking/)** - Step-by-step reasoning with logical dependency tracking
+- **[Metacognitive Monitoring](src/metacognitive-monitoring/)** - Self-monitoring of knowledge boundaries and reasoning
+  quality
+- **[Scientific Method](src/scientific-method/)** - Systematic scientific inquiry and hypothesis testing framework
 
-- **`@wemake.cx/mcp-gdpr-server`** - GDPR-compliant data processing with audit trails
-- **`@wemake.cx/mcp-healthcare-server`** - German healthcare standards (DiGA, ePA, TI)
-- **`@wemake.cx/mcp-audit-server`** - Enterprise audit logging and compliance reporting
+### 💾 Memory & Data Management
 
-### 🤖 AI Agent Automation
+- **[Memory](src/memory/)** - Persistent knowledge graph for cross-session information retention
+- **[Transaction Manager](src/transaction-manager/)** - ACID-compliant multi-step operation management with rollback
+  support
 
-- **`@wemake.cx/mcp-agent-server`** - Autonomous AI agent orchestration
-- **`@wemake.cx/mcp-monitoring-server`** - Self-healing systems with predictive analytics
-- **`@wemake.cx/mcp-workflow-server`** - Enterprise workflow automation
+### 🎨 Content & Media Processing
 
-### 🔧 Developer Experience
+- **[Visual Reasoning](src/visual-reasoning/)** - Spatial reasoning and ASCII visualization for geometric analysis
+- **[Multimodal Synthesizer](src/multimodal-synthesizer/)** - Text and image content integration and synthesis
+- **[Narrative Planner](src/narrative-planner/)** - Three-act story structure planning with character development
 
-- **`@wemake.cx/mcp-devtools-server`** - Bun-optimized development tools
-- **`@wemake.cx/mcp-testing-server`** - Enterprise testing and quality assurance
-- **`@wemake.cx/mcp-deployment-server`** - Zero-downtime Cloudflare Workers deployment
+### 🔍 Quality & Evaluation
 
-### 🏢 Enterprise Integration
+- **[Focus Group](src/focus-group/)** - Multi-persona evaluation framework for MCP server assessment
+- **[Bias Detection](src/bias-detection/)** - Language pattern analysis for bias identification
 
-- **`@wemake.cx/mcp-crm-server`** - Enterprise CRM integration (SAP, Salesforce)
-- **`@wemake.cx/mcp-erp-server`** - German ERP systems integration
-- **`@wemake.cx/mcp-security-server`** - Enterprise security and identity management
+### 🏗️ Architecture Features
 
-## 🚀 Getting Started
+- **Bun-first Development**: Primary dev/runtime with Bun; Node/Workers-compatible builds that exclude Bun-only APIs
+- **Enterprise Security**: GDPR compliance, audit logging, and least-privilege access patterns
+- **TypeScript Native**: Full type safety backed by exhaustive JSDoc documentation
+- **Cloudflare Workers Compatible**: Deploy via Worker-compatible bundles free of Bun-only APIs
+- **Monorepo Architecture**: Unified workspace with automated testing and CI/CD
 
-### Prerequisites
-
-- **Bun Runtime**: `curl -fsSL https://bun.sh/install | bash`
-- **Node.js 18+**: For compatibility with existing toolchains
-- **TypeScript 5.0+**: Enterprise-grade type safety
-- **Cloudflare Account**: For edge deployment
-
-### Quick Start
+### 🚀 Quick Start
 
 ```sh
-# Clone the repository
-git clone https://github.com/wemake-ai/mcp.git
-cd mcp
-
-# Install dependencies with Bun
+# Install dependencies
 bun install
 
-# Run enterprise tests
-bun run test
+# Run a specific server (example: decision-framework)
+cd src/decision-framework
+bun run start
 
-# Start development server
-bun run dev
+# Run tests
+bun test
+
+# Build all servers
+bun run build
 ```
 
-_Note: Bun loads `.env` automatically, so no separate `dotenv` setup is required._
-
-### Enterprise Installation
-
-```sh
-# Install specific MCP server
-bun add @wemake.cx/mcp-gdpr-server
-
-# Or install the complete enterprise suite
-bun add @wemake.cx/mcp-enterprise-suite
-```
-
-### Configuration
-
-Create a `.env` file with your enterprise configuration:
-
-```env
-# GDPR Compliance
-GDPR_ENABLED=true
-
-# 7 years for German compliance
-DATA_RETENTION_DAYS=2555
-AUDIT_LOG_LEVEL=enterprise
-
-# Cloudflare Workers
-CLOUDFLARE_ACCOUNT_ID=your_account_id
-CLOUDFLARE_API_TOKEN=your_api_token
-
-# Enterprise Monitoring
-MONITORING_ENDPOINT=https://monitoring.wemake.cx
-ALERT_WEBHOOK=https://alerts.your-company.de
-```
-
-### Using MCP Servers
-
-#### With Claude Desktop
-
-```json
-{
-  "mcpServers": {
-    "wemake-gdpr": {
-      "command": "bunx",
-      "args": ["@wemake.cx/mcp-gdpr-server"],
-      "env": {
-        "GDPR_ENABLED": "true"
-      }
-    }
-  }
-}
-```
-
-#### With Enterprise AI Platforms
-
-```typescript
-import { MCPClient } from "@wemake.cx/mcp-client";
-
-const client = new MCPClient({
-  serverUrl: "https://mcp.wemake.cx",
-  apiKey: process.env.WEMAKE_API_KEY,
-  gdprCompliant: true,
-  auditLogging: true
-});
-
-// Connect to enterprise MCP server
-await client.connect();
-```
-
-## 🚀 Enterprise Deployment
-
-### Cloudflare Workers Deployment
-
-```sh
-# Deploy to Cloudflare Workers
-bun run deploy:production
-
-# Deploy with enterprise monitoring
-bun run deploy:enterprise
-```
-
-### Docker Enterprise
-
-```dockerfile
-FROM oven/bun:1-alpine
-WORKDIR /app
-COPY package.json bun.lockb ./
-RUN bun install --frozen-lockfile
-COPY . .
-EXPOSE 3000
-CMD ["bun", "run", "start"]
-```
-
-### Kubernetes Deployment
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: wemake-mcp-server
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: wemake-mcp
-  template:
-    metadata:
-      labels:
-        app: wemake-mcp
-    spec:
-      containers:
-        - name: mcp-server
-          image: wemake/mcp-server:latest
-          env:
-            - name: GDPR_ENABLED
-              value: "true"
-```
-
-## 📊 Enterprise Monitoring
-
-- **Real-time Metrics**: Performance, usage, and compliance metrics
-- **Audit Trails**: Complete GDPR-compliant audit logging
-- **Health Checks**: Automated monitoring with self-healing
-- **Alerting**: Enterprise-grade alerting and incident management
-- **Analytics**: AI-powered insights and predictive analytics
+Each server includes comprehensive documentation, usage examples, and enterprise-grade security features. Visit
+individual server directories for detailed setup and configuration instructions.
 
 ## 🤝 Enterprise Support
 
@@ -216,15 +91,11 @@ spec:
 ### Contact
 
 - **Website**: [wemake.cx](https://wemake.cx)
-- **Enterprise Sales**: [enterprise@wemake.cx](mailto:enterprise@wemake.cx)
-- **Technical Support**: [support@wemake.cx](mailto:support@wemake.cx)
 - **Security Issues**: [security@wemake.cx](mailto:security@wemake.cx)
-
-See also: [Security Policy](docs/SECURITY.md) • [Code of Conduct](docs/CODE_OF_CONDUCT.md)
 
 ### Community
 
-- **LinkedIn**: [WeMake AI](https://linkedin.com/company/wemake-cx)
+- **LinkedIn**: [WeMake](https://linkedin.com/company/wemake-cx)
 
 ## 📜 License
 
@@ -241,6 +112,6 @@ For enterprise licensing inquiries, contact: <licensing@wemake.cx>
 ---
 
 <div align="center">
-  <strong>Built with ❤️ by WeMake AI for the German Enterprise Market</strong><br>
+  <strong>Built with 💙 by WeMake for the German Enterprise Market</strong><br>
   <em>Empowering AI-First Organizations with Secure, Compliant, and Scalable Solutions</em>
 </div>

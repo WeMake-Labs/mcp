@@ -1,47 +1,34 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "docs": "https://bun.sh/docs/typescript",
-  "extends": "@tsconfig/bun/tsconfig.json",
-  "exclude": ["node_modules", "dist"],
 
   "compilerOptions": {
-    "types": ["bun-types"],
     "lib": ["ESNext"],
     "target": "ESNext",
-    "module": "Preserve",
+    "module": "preserve",
     "moduleDetection": "force",
     "jsx": "react-jsx",
-    "allowJs": false,
+    "allowJs": true,
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "noEmit": true,
 
     "strict": true,
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
 
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false,
+
     "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "sourceMap": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
     "exactOptionalPropertyTypes": true,
-    "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "useUnknownInCatchVariables": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "experimentalDecorators": false,
-    "emitDecoratorMetadata": false,
-    "removeComments": false,
-    "preserveConstEnums": true
+    "noUncheckedIndexedAccess": false
   }
 }

@@ -1,36 +1,19 @@
 # Collaborative Reasoning MCP Server
 
-## Overview
-
-The Collaborative Reasoning MCP Server is an enterprise-grade Model Context Protocol server that facilitates structured
-multi-persona collaboration for complex problem-solving. Built with TypeScript and Bun runtime, it provides a robust
-framework for simulating expert collaboration with comprehensive security, performance optimization, and GDPR
-compliance.
-
-**Version**: 0.1.2  
-**Runtime**: Bun 1.2.0+  
-**Protocol**: MCP (Model Context Protocol)  
-**License**: MIT
-
 ## Motivation
 
 Complex problems often benefit from diverse perspectives and expertise. While language models can attempt to simulate
 different viewpoints, they often:
 
-1. **Perspective Inconsistency**: Fail to maintain consistent, distinct perspectives throughout an analysis
-2. **Lack of Productive Tension**: Struggle to create genuine productive disagreement between viewpoints
-3. **Domain Blending**: Unrealistically blend different expertise domains
-4. **Integration Gaps**: Neglect systematic integration of insights from different perspectives
-5. **Synthesis Limitations**: Miss opportunities for creative synthesis emerging from diverse thinking
+1. Fail to maintain consistent, distinct perspectives throughout an analysis
+2. Struggle to create genuine productive tension between viewpoints
+3. Blend different expertise domains in unrealistic ways
+4. Neglect to systematically integrate insights from different perspectives
+5. Miss opportunities for creative synthesis that emerges from diverse thinking
 
-The Collaborative Reasoning Server addresses these limitations by:
-
-- **Structured Collaboration**: Creating systematic environments for multiple simulated experts
-- **Persona Consistency**: Maintaining distinct characteristics, biases, and communication styles
-- **Disagreement Management**: Facilitating productive conflicts and their resolution
-- **Cross-Pollination Tracking**: Monitoring idea evolution across perspectives
-- **Visual Representation**: Providing rich console output with progress visualization
-- **Comprehensive Synthesis**: Ensuring thorough integration of diverse viewpoints
+The Collaborative Reasoning Server addresses these limitations by creating a structured environment for multiple
+simulated experts to collaborate on complex problems. By externalizing collaborative thinking, models can leverage
+diverse perspectives more systematically and effectively.
 
 ## Technical Specification
 
@@ -101,37 +84,19 @@ interface CollaborativeReasoningData {
 
 ### Server Implementation
 
-The `CollaborativeReasoningServer` class provides enterprise-grade functionality with:
+The server maintains:
 
-#### Core Data Structures
-
-1. **`personaRegistry`**: `Record<string, Record<string, Persona>>` - Stores expert personas by session
-2. **`contributionHistory`**: `Record<string, Contribution[]>` - Tracks all interactions with reference linking
-3. **`disagreementTracker`**: `Record<string, Disagreement[]>` - Documents and manages conflicts
-4. **`sessionHistory`**: `Record<string, CollaborativeReasoningData[]>` - Maintains collaboration state across
-   iterations
-
-#### Security & Compliance Features
-
-- **Input Sanitization**: Comprehensive `sanitizeInput()` method with:
-  - Script tag removal and JavaScript URL filtering
-  - Targeted sensitive data redaction (passwords, tokens, emails, phone numbers) - _pending verification_
-  - Planned path traversal protection - _implementation pending_
-  - Intended medical information privacy protection - _verification required_
-  - Targeted personal name redaction - _testing in progress_
-- **GDPR Compliance**: Privacy-first data handling with planned automatic PII detection - _implementation pending_
-- **Input Validation**: Strict type checking and schema validation
-- **Length Limits**: Configurable input length restrictions (max 10,000 characters)
-
-#### Processing Pipeline
+1. A `personaRegistry` storing defined expert personas
+2. A `contributionHistory` tracking all interactions
+3. A `disagreementTracker` for documenting and resolving conflicts
+4. Facilitation logic to manage collaboration flow
 
 For each collaborative reasoning operation, the server:
 
-1. **Input Validation**: Validates and sanitizes all input data using `validateCollaborativeReasoningData()`
-2. **State Management**: Updates registries and session history via `updateRegistries()` and `updateSessionHistory()`
-3. **Persona Selection**: Determines next active persona using `selectNextPersona()`
-4. **Visualization**: Generates rich console output with `visualizeCollaborativeReasoning()`
-5. **Response Generation**: Returns structured output with next steps and suggestions
+1. Validates the contribution against the active persona
+2. Updates the collaboration state
+3. Manages persona transitions and facilitation
+4. Returns the updated state with suggested next steps
 
 ### Process Flow
 
@@ -233,252 +198,15 @@ more robust plans.
 
 When analyzing ethical questions, the model can represent diverse philosophical, cultural, and stakeholder perspectives.
 
-## API Specification
+## Implementation Notes
 
-### MCP Tool: `collaborativeReasoning`
+The server would be implemented using TypeScript with:
 
-The server exposes a single MCP tool with comprehensive input validation and rich output formatting.
+- A core CollaborativeReasoningServer class
+- Persona management system
+- Contribution and disagreement tracking
+- Facilitation algorithms to guide productive collaboration
+- Standard MCP server connection via stdin/stdout
 
-#### Tool Definition
-
-```typescript
-const COLLABORATIVE_REASONING_TOOL: Tool = {
-  name: "collaborativeReasoning",
-  description: `A detailed tool for simulating expert collaboration with diverse perspectives.
-This tool helps models tackle complex problems by coordinating multiple viewpoints.
-It provides a framework for structured collaborative reasoning and perspective integration.`,
-  inputSchema: {
-    type: "object",
-    properties: {
-      // ... comprehensive schema definition
-    },
-    required: [
-      "topic",
-      "personas",
-      "contributions",
-      "stage",
-      "activePersonaId",
-      "sessionId",
-      "iteration",
-      "nextContributionNeeded"
-    ]
-  }
-};
-```
-
-#### Input Validation
-
-All inputs undergo strict validation:
-
-- **Type Checking**: Ensures all fields match expected types
-- **Required Fields**: Validates presence of mandatory properties
-- **Sanitization**: Removes potentially harmful content
-- **Length Limits**: Enforces reasonable input sizes
-- **Reference Validation**: Checks persona and contribution ID references
-
-#### Output Format
-
-```typescript
-interface CollaborativeReasoningOutput {
-  content: Array<{
-    type: "text";
-    text: string;
-  }>;
-  isError?: boolean;
-}
-```
-
-### Visual Output Features
-
-The server provides rich console visualization:
-
-- **Color-Coded Personas**: Each persona gets a unique color (red, green, yellow, blue, magenta, cyan)
-- **Contribution Type Styling**: Different colors for observation, insight, concern, etc.
-- **Confidence Bars**: Visual representation of contribution confidence levels
-- **Progress Indicators**: Session iteration and stage tracking
-- **Disagreement Highlighting**: Special formatting for conflicts and resolutions
-
-## Operational Procedures
-
-### Server Startup
-
-```sh
-# Development mode
-bun index.ts
-
-# Production mode (after build)
-bun dist/index.js
-
-# With custom configuration
-bun index.ts --config custom-config.json
-```
-
-### MCP Integration
-
-The server implements standard MCP protocol handlers:
-
-```typescript
-// Tool listing
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [COLLABORATIVE_REASONING_TOOL]
-}));
-
-// Tool execution
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "collaborativeReasoning") {
-    return collaborativeReasoningServer.processCollaborativeReasoning(request.params.arguments);
-  }
-  throw new Error(`Unknown tool: ${request.params.name}`);
-});
-```
-
-### Error Handling
-
-Comprehensive error handling with:
-
-- **Input Validation Errors**: Clear messages for invalid inputs
-- **Processing Errors**: Graceful handling of runtime issues
-- **Security Violations**: Logging and blocking of suspicious inputs
-- **Resource Limits**: Protection against memory exhaustion
-
-### Monitoring & Logging
-
-- **Session Tracking**: All collaboration sessions are logged
-- **Performance Metrics**: Processing time and memory usage monitoring
-- **Security Events**: Logging of sanitization actions and blocked inputs
-- **Error Reporting**: Structured error logging with context
-
-### Data Retention
-
-- **Session Data**: Configurable retention periods
-- **Privacy Compliance**: Automatic PII redaction
-- **Memory Management**: Periodic cleanup of old sessions
-- **Export Capabilities**: Session data export for analysis
-
-## Performance Characteristics
-
-### Benchmarks
-
-- **Startup Time target**: < 100ms cold start
-- **Processing Latency target**: < 50ms per contribution
-- **Memory Usage target**: < 50MB for typical sessions
-- **Concurrent Sessions target**: Supports 100+ simultaneous collaborations
-
-_Note: Performance targets are based on initial design goals. Actual benchmarks with detailed methodology, test hardware
-specifications, workload characteristics, and measurement results are pending comprehensive performance testing._
-
-### Scalability
-
-- **Horizontal Scaling**: Stateless design enables load balancing
-- **Memory Efficiency**: Optimized data structures for large sessions
-- **Async Processing**: Non-blocking I/O for high throughput
-- **Resource Limits**: Configurable limits prevent resource exhaustion
-
-## Security Considerations
-
-### Input Security
-
-- **XSS Prevention**: Script tag and JavaScript URL filtering
-- **Injection Protection**: SQL injection and command injection prevention
-- **Path Traversal**: Directory traversal attack prevention
-- **Content Filtering**: Removal of potentially malicious content
-
-### Data Privacy
-
-- **PII Detection**: Automatic identification and redaction of personal information
-- **GDPR Compliance**: Privacy-by-design architecture
-- **Data Minimization**: Only necessary data is stored
-- **Secure Defaults**: Conservative security settings by default
-
-### Access Control
-
-- **Session Isolation**: Each collaboration session is isolated
-- **Resource Limits**: Prevention of resource exhaustion attacks
-- **Rate Limiting**: Protection against abuse
-- **Audit Logging**: Comprehensive security event logging
-
-## Deployment Guide
-
-### Production Deployment
-
-```sh
-# Build for production
-bun run build
-
-# Install production dependencies only
-bun install --production
-
-# Start server
-bun run dist/index.js
-```
-
-### Docker Deployment
-
-```dockerfile
-FROM oven/bun:1.2.0
-WORKDIR /app
-COPY package.json bun.lockb ./
-RUN bun install --production
-COPY dist/ ./dist/
-EXPOSE 3000
-CMD ["bun", "run", "dist/index.js"]
-```
-
-### Environment Configuration
-
-```sh
-# Environment variables
-MCP_SERVER_PORT=3000
-MCP_LOG_LEVEL=info
-MCP_MAX_SESSIONS=1000
-MCP_SESSION_TIMEOUT=3600
-```
-
-## Testing & Quality Assurance
-
-### Test Coverage
-
-Comprehensive test suite with 90%+ coverage:
-
-- **Unit Tests**: Core functionality and business logic
-- **Integration Tests**: MCP protocol compliance
-- **E2E Tests**: End-to-end collaboration scenarios
-- **Security Tests**: Input sanitization and security compliance
-- **Performance Tests**: Load testing and benchmarks
-
-### Quality Gates
-
-- **TypeScript Strict Mode**: Enforced type safety
-- **ESLint**: Code quality and consistency
-- **Prettier**: Code formatting standards
-- **Security Scanning**: Automated vulnerability detection
-- **Performance Monitoring**: Continuous performance tracking
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Memory Issues**: Check session limits and cleanup policies
-2. **Performance Degradation**: Monitor concurrent session count
-3. **Input Validation Errors**: Review input sanitization logs
-4. **MCP Protocol Issues**: Verify SDK version compatibility
-
-### Debug Mode
-
-```sh
-# Enable debug logging
-DEBUG=collaborative-reasoning:* bun run index.ts
-
-# Verbose output
-bun run index.ts --verbose
-```
-
-### Support Resources
-
-- **Documentation**: [GitHub Repository](https://github.com/wemake-ai/mcp)
-- **Issue Tracking**: [GitHub Issues](https://github.com/wemake-ai/mcp/issues)
-- **Community**: [GitHub Discussions](https://github.com/wemake-ai/mcp/discussions)
-
-This server enhances model capabilities for complex problems requiring diverse expertise and perspectives, enabling more
-thorough exploration of solution spaces and more robust final recommendations through enterprise-grade collaborative
-reasoning infrastructure.
+This server would enhance model capabilities for complex problems requiring diverse expertise and perspectives, allowing
+for more thorough exploration of solution spaces and more robust final recommendations.

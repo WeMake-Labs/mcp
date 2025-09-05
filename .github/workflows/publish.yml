@@ -1,0 +1,27 @@
+name: Publish Package
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
+        with:
+          bun-version: "1.2.0"
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - run: bun run test
+      - run: bun run release

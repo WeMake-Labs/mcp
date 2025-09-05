@@ -6,17 +6,15 @@
     "outDir": "./dist",
     "rootDir": ".",
     "strict": true,
-    "lib": ["ESNext", "DOM"],
-
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationDir": "./dist/types",
+    "outFile": "./dist/types/index.d.ts",
     "noEmit": false
   },
 
-  "include": ["*.ts", "tests/**/*.ts"],
-  "exclude": ["dist", "node_modules", "build", "coverage"]
+  "include": ["./**/*.ts", "./**/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
