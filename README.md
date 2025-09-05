@@ -11,7 +11,7 @@ while maintaining the highest standards of security, privacy, and regulatory com
 
 ## 🧠 Available MCP Servers
 
-Our ecosystem includes 17 specialized MCP servers organized into key cognitive and operational categories:
+Our ecosystem includes specialized MCP servers organized into key cognitive and operational categories:
 
 ### 🎯 Decision & Analysis Frameworks
 
@@ -53,10 +53,10 @@ Our ecosystem includes 17 specialized MCP servers organized into key cognitive a
 
 ### 🏗️ Architecture Features
 
-- **Bun-First Development**: Built exclusively with Bun runtime for optimal performance
+- **Bun-first Development**: Primary dev/runtime with Bun; Node/Workers-compatible builds that exclude Bun-only APIs
 - **Enterprise Security**: GDPR compliance, audit logging, and least-privilege access patterns
-- **TypeScript Native**: Full type safety with comprehensive JSDoc documentation
-- **Cloudflare Workers Ready**: Zero-downtime deployment with edge computing support
+- **TypeScript Native**: Full type safety backed by exhaustive JSDoc documentation
+- **Cloudflare Workers Compatible**: Deploy via Worker-compatible bundles free of Bun-only APIs
 - **Monorepo Architecture**: Unified workspace with automated testing and CI/CD
 
 ### 🚀 Quick Start
@@ -91,8 +91,7 @@ individual server directories for detailed setup and configuration instructions.
 ### Contact
 
 - **Website**: [wemake.cx](https://wemake.cx)
-- **Security Issues**: [security@wemake.cx](mailto:security@wemake.cx) See also: [Security Policy](docs/SECURITY.md) •
-  [Code of Conduct](docs/CODE_OF_CONDUCT.md)
+- **Security Issues**: [security@wemake.cx](mailto:security@wemake.cx)
 
 ### Community
 
