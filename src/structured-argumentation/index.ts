@@ -478,7 +478,7 @@ Parameters explained:
 const server = new Server(
   {
     name: "structured-argumentation-server",
-    version: "0.1.2"
+    version: "0.0.1"
   },
   {
     capabilities: {

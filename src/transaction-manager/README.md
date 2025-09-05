@@ -179,13 +179,13 @@ Facilitates visual thinking through creating and manipulating diagram elements.
 
 Add this to your `claude_desktop_config.json`:
 
-#### npx
+#### bunx
 
 ```json
 {
   "mcpServers": {
     "visual-reasoning": {
-      "command": "npx",
+      "command": "bunx",
       "args": ["-y", "@wemake.cx/visual-reasoning"]
     }
   }

@@ -219,5 +219,5 @@ To install Scientific Method Server for Claude Desktop automatically via
 [Smithery](https://smithery.ai/server/@wemake.cx/scientific-method):
 
 ```bash
-npx -y @smithery/cli install @wemake.cx/scientific-method --client claude
+bunx -y @smithery/cli install @wemake.cx/scientific-method --client claude
 ```

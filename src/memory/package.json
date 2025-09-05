@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/memory",
-  "version": "0.6.3",
+  "version": "0.0.1",
   "description": "MCP server for enabling memory for Claude through a knowledge graph",
   "license": "MIT",
   "type": "module",
@@ -28,6 +28,7 @@
   ],
   "scripts": {
     "build": "tsc && shx chmod +x dist/*.js",
+    "start": "node dist/index.js",
     "prepare": "bun run build",
     "watch": "tsc --watch"
   },

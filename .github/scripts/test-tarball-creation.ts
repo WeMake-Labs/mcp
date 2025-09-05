@@ -31,7 +31,7 @@ async function testTarballCreation(): Promise<void> {
     }
 
     // Test version extraction (simulate new version)
-    const testVersion = "0.1.3";
+    const testVersion = "0.0.1";
     console.log(`   Test version: '${testVersion}'`);
 
     // Test tarball name generation

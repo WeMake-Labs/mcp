@@ -9,7 +9,7 @@ Commands:
 Usage:
 
 ```bash
-npm run build --workspaces
+bun run build --workspaces
 node src/glass-scrolls-mcp/dist/index.js demo
 node src/glass-scrolls-mcp/dist/index.js replay
 ```

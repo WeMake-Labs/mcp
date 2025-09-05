@@ -158,13 +158,13 @@ Facilitates a detailed, dialectical argumentation process for rigorous reasoning
 
 Add this to your `claude_desktop_config.json`:
 
-#### npx
+#### bunx
 
 ```json
 {
   "mcpServers": {
     "structured-argumentation": {
-      "command": "npx",
+      "command": "bunx",
       "args": ["-y", "@wemake.cx/structured-argumentation"]
     }
   }

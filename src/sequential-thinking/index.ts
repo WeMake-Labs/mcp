@@ -2,13 +2,9 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-  Tool,
-} from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema, Tool } from "@modelcontextprotocol/sdk/types.js";
 // Fixed chalk import for ESM
-import chalk from 'chalk';
+import chalk from "chalk";
 
 interface ThoughtData {
   thought: string;
@@ -34,17 +30,17 @@ class SequentialThinkingServer {
   private validateThoughtData(input: unknown): ThoughtData {
     const data = input as Record<string, unknown>;
 
-    if (!data.thought || typeof data.thought !== 'string') {
-      throw new Error('Invalid thought: must be a string');
+    if (!data.thought || typeof data.thought !== "string") {
+      throw new Error("Invalid thought: must be a string");
     }
-    if (!data.thoughtNumber || typeof data.thoughtNumber !== 'number') {
-      throw new Error('Invalid thoughtNumber: must be a number');
+    if (!data.thoughtNumber || typeof data.thoughtNumber !== "number") {
+      throw new Error("Invalid thoughtNumber: must be a number");
     }
-    if (!data.totalThoughts || typeof data.totalThoughts !== 'number') {
-      throw new Error('Invalid totalThoughts: must be a number');
+    if (!data.totalThoughts || typeof data.totalThoughts !== "number") {
+      throw new Error("Invalid totalThoughts: must be a number");
     }
-    if (typeof data.nextThoughtNeeded !== 'boolean') {
-      throw new Error('Invalid nextThoughtNeeded: must be a boolean');
+    if (typeof data.nextThoughtNeeded !== "boolean") {
+      throw new Error("Invalid nextThoughtNeeded: must be a boolean");
     }
 
     return {
@@ -56,29 +52,30 @@ class SequentialThinkingServer {
       revisesThought: data.revisesThought as number | undefined,
       branchFromThought: data.branchFromThought as number | undefined,
       branchId: data.branchId as string | undefined,
-      needsMoreThoughts: data.needsMoreThoughts as boolean | undefined,
+      needsMoreThoughts: data.needsMoreThoughts as boolean | undefined
     };
   }
 
   private formatThought(thoughtData: ThoughtData): string {
-    const { thoughtNumber, totalThoughts, thought, isRevision, revisesThought, branchFromThought, branchId } = thoughtData;
+    const { thoughtNumber, totalThoughts, thought, isRevision, revisesThought, branchFromThought, branchId } =
+      thoughtData;
 
-    let prefix = '';
-    let context = '';
+    let prefix = "";
+    let context = "";
 
     if (isRevision) {
-      prefix = chalk.yellow('🔄 Revision');
+      prefix = chalk.yellow("🔄 Revision");
       context = ` (revising thought ${revisesThought})`;
     } else if (branchFromThought) {
-      prefix = chalk.green('🌿 Branch');
+      prefix = chalk.green("🌿 Branch");
       context = ` (from thought ${branchFromThought}, ID: ${branchId})`;
     } else {
-      prefix = chalk.blue('💭 Thought');
-      context = '';
+      prefix = chalk.blue("💭 Thought");
+      context = "";
     }
 
     const header = `${prefix} ${thoughtNumber}/${totalThoughts}${context}`;
-    const border = '─'.repeat(Math.max(header.length, thought.length) + 4);
+    const border = "─".repeat(Math.max(header.length, thought.length) + 4);
 
     return `
 ┌${border}┐
@@ -111,26 +108,38 @@ class SequentialThinkingServer {
       }
 
       return {
-        content: [{
-          type: "text",
-          text: JSON.stringify({
-            thoughtNumber: validatedInput.thoughtNumber,
-            totalThoughts: validatedInput.totalThoughts,
-            nextThoughtNeeded: validatedInput.nextThoughtNeeded,
-            branches: Object.keys(this.branches),
-            thoughtHistoryLength: this.thoughtHistory.length
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              {
+                thoughtNumber: validatedInput.thoughtNumber,
+                totalThoughts: validatedInput.totalThoughts,
+                nextThoughtNeeded: validatedInput.nextThoughtNeeded,
+                branches: Object.keys(this.branches),
+                thoughtHistoryLength: this.thoughtHistory.length
+              },
+              null,
+              2
+            )
+          }
+        ]
       };
     } catch (error) {
       return {
-        content: [{
-          type: "text",
-          text: JSON.stringify({
-            error: error instanceof Error ? error.message : String(error),
-            status: 'failed'
-          }, null, 2)
-        }],
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              {
+                error: error instanceof Error ? error.message : String(error),
+                status: "failed"
+              },
+              null,
+              2
+            )
+          }
+        ],
         isError: true
       };
     }
@@ -244,19 +253,19 @@ You should:
 const server = new Server(
   {
     name: "sequential-thinking-server",
-    version: "0.2.0",
+    version: "0.0.1"
   },
   {
     capabilities: {
-      tools: {},
-    },
+      tools: {}
+    }
   }
 );
 
 const thinkingServer = new SequentialThinkingServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [SEQUENTIAL_THINKING_TOOL],
+  tools: [SEQUENTIAL_THINKING_TOOL]
 }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -265,10 +274,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 
   return {
-    content: [{
-      type: "text",
-      text: `Unknown tool: ${request.params.name}`
-    }],
+    content: [
+      {
+        type: "text",
+        text: `Unknown tool: ${request.params.name}`
+      }
+    ],
     isError: true
   };
 });

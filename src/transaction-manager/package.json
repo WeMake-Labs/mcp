@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/transaction-manager",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "MCP meta-server for managing stateful interactions via transaction tokens",
   "license": "MIT",
   "type": "module",
@@ -30,6 +30,8 @@
   ],
   "scripts": {
     "build": "tsc && shx chmod +x dist/*.js",
+    "start": "node dist/index.js",
+    "prepare": "bun run build",
     "watch": "tsc --watch"
   },
   "dependencies": {
