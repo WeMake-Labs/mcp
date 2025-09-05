@@ -1,58 +1,231 @@
 # Visual Reasoning MCP Server
 
-## Motivation
+The Visual Reasoning MCP Server provides structured spatial and visual reasoning capabilities for language models. It
+enables systematic analysis of visual elements, spatial relationships, geometric transformations, and coordinate-based
+operations through ASCII visualization and mathematical computation.
 
-Language models fundamentally operate on text, which limits their ability to reason through problems that humans
-typically solve using spatial, diagrammatic, or visual thinking. Current models struggle with:
+## Overview and Purpose
 
-1. Maintaining and manipulating complex spatial relationships
-2. Visualizing multi-step transformations or processes
-3. Creating and updating visual representations of abstract concepts
-4. Reasoning about systems with many interconnected components
-5. Identifying patterns that are obvious in visual form but obscure in text
+### Core Concepts
 
-The Visual Reasoning Server provides models with the ability to create, manipulate, and reason with explicit visual
-representations. By externalizing visual thinking, models can solve complex problems that benefit from diagrammatic
-reasoning, much like how mathematical notation extends human calculation abilities beyond plain text.
+**Visual Element Management**
 
-## Technical Specification
+- Support for geometric primitives: points, lines, rectangles, circles, polygons, and text
+- Coordinate-based positioning with properties like dimensions, colors, and metadata
+- Canvas-based coordinate system with configurable dimensions and scaling
 
-### Tool Interface
+**Spatial Reasoning Framework**
+
+- Distance calculations and proximity analysis between visual elements
+- Overlap detection and containment relationships
+- Alignment analysis for layout optimization
+- Multi-step geometric transformations (translate, scale, rotate)
+
+**Visual Analysis Capabilities**
+
+- ASCII diagram generation for spatial visualization
+- Coordinate-based mathematical analysis
+- Descriptive spatial relationship reporting
+- Canvas state management and element tracking
+
+## Capabilities
+
+### Tools
+
+#### `visualReasoning`
+
+**Description**: Performs visual reasoning operations on spatial elements with coordinate-based analysis and ASCII
+visualization.
+
+**Input Schema**:
+
+```json
+{
+  "operation": "create | move | resize | rotate | delete | query | analyze",
+  "elements": [
+    {
+      "id": "string",
+      "type": "point | line | rectangle | circle | polygon | text",
+      "position": { "x": "number", "y": "number" },
+      "properties": {
+        "width": "number (optional)",
+        "height": "number (optional)",
+        "radius": "number (optional)",
+        "color": "string (optional)",
+        "text": "string (optional)",
+        "vertices": "array of {x, y} (optional)"
+      },
+      "metadata": "object (optional)"
+    }
+  ],
+  "canvas": {
+    "width": "number",
+    "height": "number",
+    "scale": "number (optional)"
+  },
+  "transformations": [
+    {
+      "type": "translate | scale | rotate",
+      "parameters": "object with transformation values"
+    }
+  ],
+  "spatialQueries": [
+    {
+      "type": "distance | overlap | containment | alignment",
+      "elementIds": "array of element IDs"
+    }
+  ],
+  "visualizationMode": "ascii | coordinates | description",
+  "nextOperationNeeded": "boolean"
+}
+```
+
+**Output**: Visual analysis results with ASCII diagrams, spatial calculations, and element state updates.
+
+**Error Cases**: Invalid coordinates, unsupported element types, canvas boundary violations, transformation failures.
+
+## Setup
+
+### bunx
+
+```json
+{
+  "mcpServers": {
+    "Visual Reasoning": {
+      "command": "bunx",
+      "args": ["@wemake.cx/visual-reasoning@alpha"]
+    }
+  }
+}
+```
+
+### Environment Variables
+
+- `VISUAL_CANVAS_WIDTH` (default: "800"): Default canvas width in pixels
+- `VISUAL_CANVAS_HEIGHT` (default: "600"): Default canvas height in pixels
+- `VISUAL_ASCII_SCALE` (default: "10"): Scale factor for ASCII visualization
+- `VISUAL_PRECISION` (default: "2"): Decimal precision for coordinate calculations
+- `VISUAL_MAX_ELEMENTS` (default: "100"): Maximum elements per canvas
+- `VISUAL_LOG_LEVEL` (default: "info"): Logging level (debug, info, warn, error)
+
+### System Prompt Template
+
+```markdown
+You have access to a Visual Reasoning MCP Server that provides spatial analysis and visual reasoning capabilities.
+
+Use this server to:
+
+- Analyze spatial relationships between visual elements
+- Perform geometric transformations and calculations
+- Generate ASCII visualizations of spatial layouts
+- Solve coordinate-based positioning problems
+- Validate spatial constraints and alignments
+
+The server supports points, lines, rectangles, circles, polygons, and text elements with full coordinate-based
+positioning and property management.
+```
+
+## Example
 
 ```typescript
-interface VisualElement {
-  id: string;
-  type: "node" | "edge" | "container" | "annotation";
-  label?: string;
-  properties: {
-    [key: string]: any; // Position, size, color, etc.
-  };
-  // For edges
-  source?: string; // ID of source element
-  target?: string; // ID of target element
-  // For containers
-  contains?: string[]; // IDs of contained elements
-}
+// Creating a spatial layout analysis for UI components
+const layoutAnalysis = {
+  operation: "create",
+  elements: [
+    {
+      id: "header",
+      type: "rectangle",
+      position: { x: 0, y: 0 },
+      properties: {
+        width: 800,
+        height: 80,
+        color: "blue"
+      },
+      metadata: { component: "navigation" }
+    },
+    {
+      id: "sidebar",
+      type: "rectangle",
+      position: { x: 0, y: 80 },
+      properties: {
+        width: 200,
+        height: 520,
+        color: "gray"
+      },
+      metadata: { component: "menu" }
+    },
+    {
+      id: "main-content",
+      type: "rectangle",
+      position: { x: 200, y: 80 },
+      properties: {
+        width: 600,
+        height: 520,
+        color: "white"
+      },
+      metadata: { component: "content" }
+    },
+    {
+      id: "logo",
+      type: "circle",
+      position: { x: 50, y: 40 },
+      properties: {
+        radius: 25,
+        color: "red"
+      },
+      metadata: { component: "branding" }
+    }
+  ],
+  canvas: {
+    width: 800,
+    height: 600,
+    scale: 1.0
+  },
+  spatialQueries: [
+    {
+      type: "overlap",
+      elementIds: ["header", "sidebar"]
+    },
+    {
+      type: "containment",
+      elementIds: ["header", "logo"]
+    },
+    {
+      type: "alignment",
+      elementIds: ["sidebar", "main-content"]
+    }
+  ],
+  visualizationMode: "ascii",
+  nextOperationNeeded: false
+};
 
-interface VisualOperationData {
-  // Operation details
-  operation: "create" | "update" | "delete" | "transform" | "observe";
-  elements?: VisualElement[];
-  transformationType?: "rotate" | "move" | "resize" | "recolor" | "regroup";
-
-  // Visual diagram metadata
-  diagramId: string;
-  diagramType: "graph" | "flowchart" | "stateDiagram" | "conceptMap" | "treeDiagram" | "custom";
-  iteration: number;
-
-  // Reasoning about the diagram
-  observation?: string;
-  insight?: string;
-  hypothesis?: string;
-
-  // Next steps
-  nextOperationNeeded: boolean;
-}
+// Performing geometric transformation
+const transformOperation = {
+  operation: "move",
+  elements: [
+    {
+      id: "logo",
+      type: "circle",
+      position: { x: 100, y: 40 }, // New position
+      properties: {
+        radius: 25,
+        color: "red"
+      }
+    }
+  ],
+  transformations: [
+    {
+      type: "translate",
+      parameters: {
+        deltaX: 50,
+        deltaY: 0,
+        elementId: "logo"
+      }
+    }
+  ],
+  visualizationMode: "coordinates",
+  nextOperationNeeded: false
+};
 ```
 
 ### Process Flow
@@ -150,69 +323,3 @@ ideas.
 
 When analyzing data, models can create visual representations to identify patterns that might be difficult to detect in
 text.
-
-## Implementation
-
-The server is implemented using TypeScript with:
-
-- A core VisualReasoningServer class
-- A flexible visual element representation system
-- Multiple rendering backends (ASCII, SVG, DOT)
-- State history tracking for iterative refinement
-- Standard MCP server connection via stdin/stdout
-
-The implementation leverages existing graph visualization libraries (like Graphviz for DOT output or custom ASCII art
-generation) to provide rich visual feedback within the constraints of text-based interfaces.
-
-This server significantly enhances model capabilities for domains where visual or spatial thinking provides a natural
-advantage over purely textual reasoning.
-
-## Tool
-
-### visualReasoning
-
-Facilitates visual thinking through creating and manipulating diagram elements.
-
-## Configuration
-
-### Usage with Claude Desktop
-
-Add this to your `claude_desktop_config.json`:
-
-#### bunx
-
-```json
-{
-  "mcpServers": {
-    "visual-reasoning": {
-      "command": "bunx",
-      "args": ["-y", "@wemake.cx/visual-reasoning"]
-    }
-  }
-}
-```
-
-#### docker
-
-```json
-{
-  "mcpServers": {
-    "visual-reasoning": {
-      "command": "docker",
-      "args": ["run", "--rm", "-i", "cognitive-enhancement-mcp/visual-reasoning"]
-    }
-  }
-}
-```
-
-## Building
-
-Docker:
-
-```sh
-docker build -t cognitive-enhancement-mcp/visual-reasoning -f packages/visual-reasoning/Dockerfile .
-```
-
-## License
-
-This MCP server is licensed under the MIT License.

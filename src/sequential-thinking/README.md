@@ -1,137 +1,171 @@
 # Sequential Thinking MCP Server
 
-An MCP server implementation that provides a tool for dynamic and reflective problem-solving through a structured
-thinking process.
+A Model Context Protocol server that provides structured sequential thinking capabilities for complex reasoning tasks,
+enabling systematic problem breakdown and iterative refinement.
 
-## Features
+## Overview and Purpose
 
-- Break down complex problems into manageable steps
-- Revise and refine thoughts as understanding deepens
-- Branch into alternative paths of reasoning
-- Adjust the total number of thoughts dynamically
-- Generate and verify solution hypotheses
+The Sequential Thinking server addresses limitations in language models' ability to maintain coherent reasoning chains
+across complex, multi-step problems. It provides a framework for systematic thought progression, ensuring logical
+consistency and context preservation throughout extended reasoning processes.
 
-## Tool
+### Core Concepts
 
-### sequential_thinking
+#### Sequential Reasoning Framework
 
-Facilitates a detailed, step-by-step thinking process for problem-solving and analysis.
+- **Step-by-step progression**: Systematic breakdown of complex problems into manageable sequential steps
+- **Logical dependencies**: Clear relationships between reasoning steps and conclusions
+- **Context preservation**: Maintaining coherent context throughout multi-step processes
+- **Iterative refinement**: Support for revising and improving reasoning chains based on new insights
 
-**Inputs:**
+#### Reasoning Approaches
 
-- `thought` (string): The current thinking step
-- `nextThoughtNeeded` (boolean): Whether another thought step is needed
-- `thoughtNumber` (integer): Current thought number
-- `totalThoughts` (integer): Estimated total thoughts needed
-- `isRevision` (boolean, optional): Whether this revises previous thinking
-- `revisesThought` (integer, optional): Which thought is being reconsidered
-- `branchFromThought` (integer, optional): Branching point thought number
-- `branchId` (string, optional): Branch identifier
-- `needsMoreThoughts` (boolean, optional): If more thoughts are needed
+- **Analytical**: Systematic, logical analysis with clear cause-and-effect relationships
+- **Creative**: Exploratory thinking with divergent and convergent phases
+- **Diagnostic**: Problem identification and solution development through systematic elimination
+- **Strategic**: Long-term planning with sequential decision points and contingencies
 
-## Usage
+#### Thought Validation
 
-The Sequential Thinking tool is designed for:
+- **Consistency checking**: Ensuring logical coherence across reasoning chains
+- **Assumption tracking**: Identifying and validating underlying assumptions
+- **Evidence evaluation**: Assessing the strength of supporting evidence for each step
+- **Alternative consideration**: Exploring alternative reasoning paths and conclusions
 
-- Breaking down complex problems into steps
-- Planning and design with room for revision
-- Analysis that might need course correction
-- Problems where the full scope might not be clear initially
-- Tasks that need to maintain context over multiple steps
-- Situations where irrelevant information needs to be filtered out
+## Capabilities
 
-## Configuration
+### Tools
 
-### Usage with Claude Desktop
+#### `sequential_thinking`
 
-Add this to your `claude_desktop_config.json`:
+Structured sequential thinking tool for complex reasoning tasks.
 
-#### bunx
+**Input Schema:**
+
+```json
+{
+  "task": "string - The problem or question to analyze",
+  "thoughts": [
+    {
+      "step": "number - Sequential step number",
+      "content": "string - The thought or reasoning step",
+      "reasoning": "string - Explanation of the reasoning behind this step",
+      "assumptions": ["string - List of assumptions made in this step"],
+      "evidence": ["string - Supporting evidence or data"],
+      "confidence": "number - Confidence level (0.0-1.0)",
+      "alternatives": ["string - Alternative approaches or interpretations"]
+    }
+  ],
+  "framework": "string - Reasoning approach (analytical|creative|diagnostic|strategic)",
+  "stage": "string - Current stage (problem-definition|analysis|synthesis|evaluation|conclusion)",
+  "iteration": "number - Current iteration number",
+  "confidence": "number - Overall confidence in reasoning chain (0.0-1.0)",
+  "nextThoughtNeeded": "boolean - Whether additional thoughts are required",
+  "suggestedNextSteps": ["string - Recommended next reasoning steps"]
+}
+```
+
+**Output:** Structured reasoning analysis with validated thought progression, logical consistency assessment, and
+recommendations for next steps.
+
+**Error Cases:**
+
+- Invalid framework type
+- Missing required reasoning steps
+- Logical inconsistencies in thought progression
+- Insufficient evidence for conclusions
+
+## Setup
+
+### bunx
 
 ```json
 {
   "mcpServers": {
     "sequential-thinking": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/sequential-thinking"]
+      "args": ["-y", "@wemake.cx/sequential-thinking@alpha"]
     }
   }
 }
 ```
 
-#### docker
+### Environment Variables
 
-```json
-{
-  "mcpServers": {
-    "sequential-thinking": {
-      "command": "docker",
-      "args": ["run", "--rm", "-i", "mcp/sequential-thinking"]
+- `REASONING_DEPTH`: Set maximum reasoning depth (default: "10")
+- `VALIDATION_STRICTNESS`: Set validation level ("lenient" | "standard" | "strict", default: "standard")
+- `FRAMEWORK_FLEXIBILITY`: Allow framework switching mid-process ("true" | "false", default: "true")
+- `CONFIDENCE_THRESHOLD`: Minimum confidence for step acceptance (default: "0.6")
+
+### System Prompt Template
+
+```markdown
+You are an expert in sequential thinking and systematic reasoning. Use the sequential thinking tool to:
+
+1. Break down complex problems into logical, sequential steps
+2. Maintain coherent reasoning chains with clear dependencies
+3. Validate assumptions and evidence at each step
+4. Consider alternative approaches and interpretations
+5. Provide confidence assessments for each reasoning step
+6. Suggest next steps for continued analysis
+
+Always specify the reasoning framework that best fits the problem type:
+
+- Analytical: For systematic, logical analysis
+- Creative: For exploratory and innovative thinking
+- Diagnostic: For problem identification and troubleshooting
+- Strategic: For long-term planning and decision-making
+
+Ensure each thought builds logically on previous steps and contributes to the overall reasoning objective.
+```
+
+## Example
+
+```typescript
+// Analyze a complex business problem using sequential thinking
+const businessAnalysis = await sequentialthinking({
+  task: "Determine the best market entry strategy for a new SaaS product targeting small businesses",
+  thoughts: [
+    {
+      step: 1,
+      content: "Define the target market characteristics and size",
+      reasoning: "Understanding the market is fundamental to any entry strategy",
+      assumptions: ["Small businesses are defined as 1-50 employees", "SaaS adoption is growing in this segment"],
+      evidence: [
+        "Market research shows 32M small businesses in target regions",
+        "SaaS adoption rate of 73% among small businesses"
+      ],
+      confidence: 0.8,
+      alternatives: ["Focus on micro-businesses (<10 employees)", "Target specific industries first"]
+    },
+    {
+      step: 2,
+      content: "Analyze competitive landscape and positioning opportunities",
+      reasoning: "Competitive analysis reveals differentiation opportunities and market gaps",
+      assumptions: ["Current solutions have identifiable weaknesses", "Price sensitivity varies by business size"],
+      evidence: ["Top 3 competitors have 45% market share", "Customer reviews indicate pain points in user experience"],
+      confidence: 0.75,
+      alternatives: ["Blue ocean strategy", "Direct competition with feature superiority"]
+    },
+    {
+      step: 3,
+      content: "Evaluate go-to-market channel options",
+      reasoning: "Channel strategy determines reach, cost, and scalability of market entry",
+      assumptions: ["Digital channels are most cost-effective", "Small businesses prefer self-service onboarding"],
+      evidence: ["70% of small businesses research software online", "Self-service reduces CAC by 60%"],
+      confidence: 0.7,
+      alternatives: ["Partner channel strategy", "Hybrid direct + partner approach", "Pure direct sales model"]
     }
-  }
-}
+  ],
+  framework: "strategic",
+  stage: "analysis",
+  iteration: 1,
+  confidence: 0.75,
+  nextThoughtNeeded: true,
+  suggestedNextSteps: [
+    "Develop pricing strategy based on market analysis",
+    "Create detailed implementation timeline",
+    "Identify key success metrics and milestones"
+  ]
+});
 ```
-
-To disable logging of thought information set env var: `DISABLE_THOUGHT_LOGGING` to `true`. Comment
-
-### Usage with VS Code
-
-For quick installation, click one of the installation buttons below...
-
-[![Install with NPX in VS Code](https://img.shields.io/badge/VS_Code-NPM-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=sequential-thinking&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40modelcontextprotocol%2Fserver-sequential-thinking%22%5D%7D)
-[![Install with NPX in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-NPM-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=sequential-thinking&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40modelcontextprotocol%2Fserver-sequential-thinking%22%5D%7D&quality=insiders)
-
-[![Install with Docker in VS Code](https://img.shields.io/badge/VS_Code-Docker-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=sequential-thinking&config=%7B%22command%22%3A%22docker%22%2C%22args%22%3A%5B%22run%22%2C%22--rm%22%2C%22-i%22%2C%22mcp%2Fsequential-thinking%22%5D%7D)
-[![Install with Docker in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Docker-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=sequential-thinking&config=%7B%22command%22%3A%22docker%22%2C%22args%22%3A%5B%22run%22%2C%22--rm%22%2C%22-i%22%2C%22mcp%2Fsequential-thinking%22%5D%7D&quality=insiders)
-
-For manual installation, you can configure the MCP server using one of these methods:
-
-**Method 1: User Configuration (Recommended)** Add the configuration to your user-level MCP configuration file. Open the
-Command Palette (`Ctrl + Shift + P`) and run `MCP: Open User Configuration`. This will open your user `mcp.json` file
-where you can add the server configuration.
-
-**Method 2: Workspace Configuration** Alternatively, you can add the configuration to a file called `.vscode/mcp.json`
-in your workspace. This will allow you to share the configuration with others.
-
-> For more details about MCP configuration in VS Code, see the
-> [official VS Code MCP documentation](https://code.visualstudio.com/docs/copilot/mcp).
-
-For bunx installation:
-
-```json
-{
-  "servers": {
-    "sequential-thinking": {
-      "command": "bunx",
-      "args": ["-y", "@wemake.cx/sequential-thinking"]
-    }
-  }
-}
-```
-
-For Docker installation:
-
-```json
-{
-  "servers": {
-    "sequential-thinking": {
-      "command": "docker",
-      "args": ["run", "--rm", "-i", "mcp/sequential-thinking"]
-    }
-  }
-}
-```
-
-## Building
-
-Docker:
-
-```sh
-docker build -t mcp/sequential-thinking -f src/sequential-thinking/Dockerfile .
-```
-
-## License
-
-This MCP server is licensed under the MIT License. This means you are free to use, modify, and distribute the software,
-subject to the terms and conditions of the MIT License. For more details, please see the LICENSE file in the project
-repository.
