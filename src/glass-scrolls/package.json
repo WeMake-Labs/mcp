@@ -1,5 +1,5 @@
 {
-  "name": "@wemake.cx/glass-scrolls-mcp",
+  "name": "@wemake.cx/glass-scrolls",
   "version": "0.0.1",
   "description": "Glass Scrolls MCP server with trace & replay",
   "license": "MIT",
@@ -7,13 +7,13 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/WeMake-AI/mcp.git",
-    "directory": "src/glass-scrolls-mcp"
+    "directory": "src/glass-scrolls"
   },
   "publishConfig": {
     "access": "public",
     "tag": "alpha"
   },
-  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/glass-scrolls-mcp",
+  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/glass-scrolls",
   "author": "heyFlorentin",
   "keywords": [
     "mcp",

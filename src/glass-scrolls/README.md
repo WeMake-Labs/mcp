@@ -10,6 +10,6 @@ Usage:
 
 ```bash
 bun run build --workspaces
-node src/glass-scrolls-mcp/dist/index.js demo
-node src/glass-scrolls-mcp/dist/index.js replay
+node src/glass-scrolls/dist/index.js demo
+node src/glass-scrolls/dist/index.js replay
 ```
