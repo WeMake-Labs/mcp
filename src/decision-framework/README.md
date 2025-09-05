@@ -1,203 +1,176 @@
 # Decision Framework MCP Server
 
-## Motivation
+A detailed tool for structured decision analysis and rational choice. This tool helps models systematically evaluate
+options, criteria, and outcomes using multiple decision frameworks.
 
-Language models often struggle with structured decision-making, particularly when multiple options, uncertain outcomes,
-and complex value trade-offs are involved. Current models frequently:
+## Core Concepts
 
-1. Fail to systematically enumerate all available options
-2. Make inconsistent judgments about outcome probabilities
-3. Conflate preference and probability in evaluating options
-4. Do not systematically identify and weigh decision criteria
-5. Neglect to account for risk tolerance in recommendations
-6. Miss opportunities for gathering additional information
+### Decision Components
 
-The Decision Framework Server addresses these limitations by providing a structured framework for decision analysis. By
-externalizing the decision-making process, models can provide more rigorous, transparent, and personalized decision
-support.
+The decision framework operates on several key components:
 
-## Technical Specification
+- **Options**: Available alternatives or choices
+- **Criteria**: Standards for evaluating options
+- **Outcomes**: Possible results with probabilities and values
+- **Stakeholders**: People or groups affected by the decision
+- **Constraints**: Limitations on the decision
 
-### Tool Interface
+Example option:
 
-```typescript
-interface Option {
-  id: string;
-  name: string;
-  description: string;
-}
-
-interface Outcome {
-  id: string;
-  description: string;
-  probability: number; // 0.0-1.0
-  optionId: string;
-  value: number; // Utility value, can be positive or negative
-  confidenceInEstimate: number; // 0.0-1.0
-}
-
-interface Criterion {
-  id: string;
-  name: string;
-  description: string;
-  weight: number; // 0.0-1.0, with all weights summing to 1.0
-  evaluationMethod: "quantitative" | "qualitative" | "boolean";
-}
-
-interface CriterionEvaluation {
-  criterionId: string;
-  optionId: string;
-  score: number; // 0.0-1.0 for normalized scores
-  justification: string;
-}
-
-interface InformationGap {
-  description: string;
-  impact: number; // 0.0-1.0, how much it affects the decision
-  researchMethod: string;
-}
-
-interface DecisionAnalysisData {
-  // Core decision elements
-  decisionStatement: string;
-  options: Option[];
-  criteria?: Criterion[];
-  criteriaEvaluations?: CriterionEvaluation[];
-  possibleOutcomes?: Outcome[];
-  informationGaps?: InformationGap[];
-
-  // Decision context
-  stakeholders: string[];
-  constraints: string[];
-  timeHorizon: string;
-  riskTolerance: "risk-averse" | "risk-neutral" | "risk-seeking";
-
-  // Analysis results
-  expectedValues?: Record<string, number>; // optionId -> expected value
-  multiCriteriaScores?: Record<string, number>; // optionId -> weighted score
-  sensitivityInsights?: string[];
-  recommendation?: string;
-
-  // Process metadata
-  decisionId: string;
-  analysisType: "expected-utility" | "multi-criteria" | "maximin" | "minimax-regret" | "satisficing";
-  stage: "problem-definition" | "options" | "criteria" | "evaluation" | "analysis" | "recommendation";
-  iteration: number;
-
-  // Next steps
-  nextStageNeeded: boolean;
-  suggestedNextStage?: string;
+```json
+{
+  "id": "option_a",
+  "name": "Cloud Migration",
+  "description": "Migrate existing infrastructure to cloud platform"
 }
 ```
 
-### Process Flow
+### Decision Analysis Types
 
-```mermaid
-sequenceDiagram
-    participant Model
-    participant DecServer as Decision Framework Server
-    participant State as Decision State
+The server supports multiple analysis frameworks:
 
-    Model->>DecServer: Define decision problem
-    DecServer->>State: Store problem definition
-    DecServer-->>Model: Return decision state
+- **Expected Utility**: Probability-weighted value calculations
+- **Multi-Criteria**: Weighted scoring across multiple criteria
+- **Maximin**: Choose option with best worst-case outcome
+- **Minimax Regret**: Minimize maximum regret across scenarios
+- **Satisficing**: Find first option meeting minimum criteria
 
-    Model->>DecServer: Enumerate options
-    DecServer->>State: Store available options
-    DecServer-->>Model: Return updated state
+### Evaluation Process
 
-    Model->>DecServer: Define evaluation criteria
-    DecServer->>State: Store criteria with weights
-    DecServer-->>Model: Return updated state
+Decisions progress through structured stages:
 
-    Model->>DecServer: Evaluate options against criteria
-    DecServer->>State: Store evaluations, calculate scores
-    DecServer-->>Model: Return updated state with scores
+1. **Problem Definition**: Clear statement of decision to be made
+2. **Options**: Identification of available alternatives
+3. **Criteria**: Definition of evaluation standards
+4. **Evaluation**: Scoring options against criteria
+5. **Analysis**: Application of decision framework
+6. **Recommendation**: Final recommendation with justification
 
-    Model->>DecServer: Add outcome probabilities
-    DecServer->>State: Store outcomes, calculate expected values
-    DecServer-->>Model: Return updated state with expected values
+## API
 
-    Model->>DecServer: Generate recommendation
-    DecServer->>State: Store recommendation with justification
-    DecServer-->>Model: Return final decision analysis
+### Tools
+
+- **decisionFramework**
+  - Systematic decision analysis and rational choice evaluation
+  - Input: Comprehensive decision analysis data structure
+    - `decisionStatement` (string): Clear statement of the decision to be made
+    - `options` (array): Available options or alternatives
+      - Each option contains:
+        - `id` (string): Unique identifier
+        - `name` (string): Option name
+        - `description` (string): Detailed description
+    - `criteria` (array): Criteria for evaluating options
+      - Each criterion contains:
+        - `id` (string): Unique identifier
+        - `name` (string): Criterion name
+        - `description` (string): Detailed description
+        - `weight` (number): Importance weight (0.0-1.0)
+        - `evaluationMethod` (enum): "quantitative" | "qualitative" | "boolean"
+    - `criteriaEvaluations` (array): Evaluations of options against criteria
+      - Each evaluation contains:
+        - `criterionId` (string): Reference to criterion
+        - `optionId` (string): Reference to option
+        - `score` (number): Score (0.0-1.0)
+        - `justification` (string): Reasoning for the score
+    - `possibleOutcomes` (array): Possible outcomes with probabilities
+      - Each outcome contains:
+        - `id` (string): Unique identifier
+        - `description` (string): Outcome description
+        - `probability` (number): Likelihood (0.0-1.0)
+        - `optionId` (string): Associated option
+        - `value` (number): Utility value
+        - `confidenceInEstimate` (number): Confidence level (0.0-1.0)
+    - `informationGaps` (array): Missing information affecting the decision
+    - `stakeholders` (string[]): Affected parties
+    - `constraints` (string[]): Decision limitations
+    - `timeHorizon` (string): Decision timeframe
+    - `riskTolerance` (enum): "risk-averse" | "risk-neutral" | "risk-seeking"
+    - `analysisType` (enum): Type of analysis to perform
+    - `stage` (enum): Current stage of decision process
+    - `iteration` (number): Current iteration number
+    - `nextStageNeeded` (boolean): Whether further analysis is required
+  - Returns structured decision analysis with recommendations
+  - Supports iterative refinement through multiple stages
+
+## Setup
+
+### bunx
+
+```json
+{
+  "mcpServers": {
+    "Decision Framework": {
+      "command": "bunx",
+      "args": ["-y", "@wemake.cx/decision-framework@alpha"]
+    }
+  }
+}
 ```
 
-## Key Features
+#### bunx with custom settings
 
-### 1. Structured Decision Formulation
+The server can be configured using the following environment variables:
 
-The server enforces clear problem definition:
+```json
+{
+  "mcpServers": {
+    "Decision Framework": {
+      "command": "bunx",
+      "args": ["-y", "@wemake.cx/decision-framework@alpha"],
+      "env": {
+        "DECISION_MAX_OPTIONS": "10",
+        "DECISION_MAX_CRITERIA": "15",
+        "DECISION_MIN_CONFIDENCE": "0.1"
+      }
+    }
+  }
+}
+```
 
-- **Decision statement**: Explicit framing of the decision
-- **Options**: Comprehensive enumeration of alternatives
-- **Constraints**: Explicit boundaries on viable options
-- **Stakeholders**: Who is affected by the decision
+- `DECISION_MAX_OPTIONS`: Maximum number of options per decision (default: 20)
+- `DECISION_MAX_CRITERIA`: Maximum number of criteria per decision (default: 20)
+- `DECISION_MIN_CONFIDENCE`: Minimum confidence threshold for outcomes (default: 0.0)
 
-### 2. Multi-Method Decision Analysis
+## System Prompt
 
-The server supports various decision frameworks:
+The prompt for utilizing decision framework should encourage systematic analysis:
 
-- **Expected Utility**: Probability � value calculations
-- **Multi-Criteria Analysis**: Weighted scoring across criteria
-- **Maximin/Maximax**: Focus on worst/best possible outcomes
-- **Minimax Regret**: Minimizing maximum potential regret
-- **Satisficing**: Finding options that meet minimum thresholds
+```markdown
+Follow these steps for structured decision making:
 
-### 3. Probability and Value Separation
+1. Problem Definition:
+   - Clearly articulate the decision to be made
+   - Identify the decision maker and key stakeholders
+   - Define the time horizon and constraints
+   - Establish the context and background
 
-The server maintains clear distinction between:
+2. Option Generation:
+   - Brainstorm comprehensive list of alternatives
+   - Include creative and unconventional options
+   - Ensure options are mutually exclusive and collectively exhaustive
+   - Document assumptions and feasibility constraints
 
-- **Probability assessments**: Likelihood of outcomes
-- **Value judgments**: Desirability of outcomes
-- **Confidence levels**: Certainty of estimates
+3. Criteria Development:
+   - Identify all relevant evaluation criteria
+   - Assign appropriate weights based on importance
+   - Choose suitable evaluation methods for each criterion
+   - Validate criteria with stakeholders
 
-### 4. Information Value Analysis
+4. Systematic Evaluation:
+   - Score each option against every criterion
+   - Provide clear justification for scores
+   - Consider uncertainty and confidence levels
+   - Document key assumptions and trade-offs
 
-The server identifies:
+5. Analysis and Recommendation:
+   - Apply appropriate decision analysis framework
+   - Conduct sensitivity analysis on key parameters
+   - Identify information gaps and their impact
+   - Provide clear recommendation with rationale
 
-- **Information gaps**: What we don't know
-- **Research value**: Worth of gathering more information
-- **Decision robustness**: How sensitive recommendations are to assumptions
-
-### 5. Visual Representation
-
-The server visualizes decision analysis:
-
-- Decision trees for expected utility analysis
-- Heat maps for multi-criteria analysis
-- Sensitivity graphs showing how changes affect recommendations
-
-## Usage Examples
-
-### Personal Decision Support
-
-For major life decisions (career, education, relocation), the model can structure options, criteria, and uncertainties
-to provide personalized guidance.
-
-### Business Strategy
-
-When evaluating business initiatives, the model can analyze options across multiple criteria with explicit weighting of
-factors.
-
-### Risk Management
-
-For decisions with significant uncertainties, the model can provide expected value calculations with confidence
-intervals.
-
-### Policy Analysis
-
-When evaluating policy options, the model can systematically account for impacts across different stakeholders.
-
-## Implementation
-
-The server is implemented using TypeScript with:
-
-- A core DecisionFrameworkServer class
-- Decision analysis calculation engines
-- Visualization components for different analysis types
-- Sensitivity analysis utilities
-- Standard MCP server connection via stdin/stdout
-
-This server enhances model capabilities for complex decision support, particularly in domains requiring systematic
-comparison of options, explicit trade-off analysis, and structured handling of uncertainty.
+6. Implementation Planning:
+   - Consider implementation challenges and risks
+   - Develop contingency plans for key uncertainties
+   - Establish monitoring and review mechanisms
+   - Plan for decision communication and buy-in
+```
