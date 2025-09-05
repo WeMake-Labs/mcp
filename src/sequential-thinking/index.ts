@@ -10,11 +10,11 @@ interface ThoughtData {
   thought: string;
   thoughtNumber: number;
   totalThoughts: number;
-  isRevision?: boolean;
-  revisesThought?: number;
-  branchFromThought?: number;
-  branchId?: string;
-  needsMoreThoughts?: boolean;
+  isRevision?: boolean | undefined;
+  revisesThought?: number | undefined;
+  branchFromThought?: number | undefined;
+  branchId?: string | undefined;
+  needsMoreThoughts?: boolean | undefined;
   nextThoughtNeeded: boolean;
 }
 
@@ -48,11 +48,11 @@ class SequentialThinkingServer {
       thoughtNumber: data.thoughtNumber,
       totalThoughts: data.totalThoughts,
       nextThoughtNeeded: data.nextThoughtNeeded,
-      isRevision: data.isRevision as boolean | undefined,
-      revisesThought: data.revisesThought as number | undefined,
-      branchFromThought: data.branchFromThought as number | undefined,
-      branchId: data.branchId as string | undefined,
-      needsMoreThoughts: data.needsMoreThoughts as boolean | undefined
+      isRevision: typeof data.isRevision === "boolean" ? data.isRevision : undefined,
+      revisesThought: typeof data.revisesThought === "number" ? data.revisesThought : undefined,
+      branchFromThought: typeof data.branchFromThought === "number" ? data.branchFromThought : undefined,
+      branchId: typeof data.branchId === "string" ? data.branchId : undefined,
+      needsMoreThoughts: typeof data.needsMoreThoughts === "boolean" ? data.needsMoreThoughts : undefined
     };
   }
 
