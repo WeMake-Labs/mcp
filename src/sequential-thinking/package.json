@@ -1,10 +1,12 @@
 {
   "name": "@wemake.cx/sequential-thinking",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "MCP server for sequential thinking and problem solving",
   "license": "MIT",
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/WeMake-AI/mcp.git",

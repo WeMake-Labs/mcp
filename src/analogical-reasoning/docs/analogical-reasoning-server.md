@@ -37,7 +37,7 @@ interface AnalogicalMapping {
 
 interface AnalogicalReasoningData {
   // Core analogy components
-  sourceDoamin: {
+  sourceDomain: {
     name: string;
     elements: DomainElement[];
   };

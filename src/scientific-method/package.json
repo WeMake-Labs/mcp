@@ -1,10 +1,12 @@
 {
   "name": "@wemake.cx/scientific-method",
-  "version": "0.2.2",
-  "description": "MCP server for diagrammatic thinking and spatial representation",
+  "version": "0.2.3",
+  "description": "MCP server for hypothesis-driven experiments and scientific inquiry (scientific method)",
   "license": "MIT",
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/WeMake-AI/mcp.git",

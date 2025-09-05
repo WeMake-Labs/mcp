@@ -1,10 +1,12 @@
 {
   "name": "@wemake.cx/focus-group",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "MCP server for LLM focus groups to analyze and critique other MCP servers",
   "license": "MIT",
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/WeMake-AI/mcp.git",

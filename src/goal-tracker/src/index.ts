@@ -49,7 +49,7 @@ const GOAL_TRACKER_TOOL = {
   }
 };
 
-const server = new Server({ name: "goal-tracker-server", version: "0.2.2" }, { capabilities: { tools: {} } });
+const server = new Server({ name: "goal-tracker-server", version: "0.2.3" }, { capabilities: { tools: {} } });
 const tracker = new GoalTracker();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [GOAL_TRACKER_TOOL] }));
