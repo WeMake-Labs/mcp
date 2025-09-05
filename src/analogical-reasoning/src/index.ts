@@ -602,7 +602,7 @@ export default function createServer(_: { config: z.infer<typeof configSchema> }
   const server = new Server(
     {
       name: "analogical-reasoning-server",
-      version: "0.2.9"
+      version: "0.2.10"
     },
     {
       capabilities: {

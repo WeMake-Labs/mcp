@@ -147,7 +147,7 @@ const ETHICAL_REASONING_TOOL: Tool = {
   }
 };
 
-const server = new Server({ name: "ethical-reasoning-server", version: "0.2.7" }, { capabilities: { tools: {} } });
+const server = new Server({ name: "ethical-reasoning-server", version: "0.2.10" }, { capabilities: { tools: {} } });
 const ethicalServer = new EthicalReasoningServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ETHICAL_REASONING_TOOL] }));
