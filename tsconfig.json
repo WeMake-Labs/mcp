@@ -1,11 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
+
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "types": ["bun-types"],
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "lib": ["ESNext"],
     "strict": true,
     "skipLibCheck": true,
