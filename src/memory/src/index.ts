@@ -8,7 +8,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 // Define memory file path using environment variable with fallback
-const defaultMemoryPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "memory.json");
+const defaultMemoryPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "memory.jsonl");
 
 // If MEMORY_FILE_PATH is just a filename, put it in the same directory as the script
 const MEMORY_FILE_PATH = process.env.MEMORY_FILE_PATH
@@ -200,7 +200,7 @@ const knowledgeGraphManager = new KnowledgeGraphManager();
 const server = new Server(
   {
     name: "memory-server",
-    version: "0.0.1"
+    version: "0.0.2"
   },
   {
     capabilities: {
