@@ -163,33 +163,12 @@ Add this to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "structured-argumentation": {
-      "command": "npx",
-      "args": ["-y", "@wemake.cx/structured-argumentation"]
+    "Structured Argumentation": {
+      "command": "bunx",
+      "args": ["-y", "@wemake.cx/structured-argumentation@latest"]
     }
   }
 }
-```
-
-#### docker
-
-```json
-{
-  "mcpServers": {
-    "structured-argumentation": {
-      "command": "docker",
-      "args": ["run", "--rm", "-i", "@wemake.cx/structured-argumentation"]
-    }
-  }
-}
-```
-
-## Building
-
-Docker:
-
-```bash
-docker build -t cognitive-enhancement-mcp/structured-argumentation -f packages/structured-argumentation/Dockerfile .
 ```
 
 ## License

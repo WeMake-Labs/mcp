@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/structured-argumentation",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "MCP server for diagrammatic thinking and spatial representation",
   "license": "MIT",
   "type": "module",
@@ -13,7 +13,7 @@
     "access": "public",
     "tag": "latest"
   },
-  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/metacognitive-monitoring",
+  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/structured-argumentation",
   "author": "heyFlorentin",
   "engines": {
     "bun": ">=1.2.0"
