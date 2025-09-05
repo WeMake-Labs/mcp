@@ -1,0 +1,42 @@
+{
+  "name": "@wemake.cx/memory",
+  "version": "0.6.3",
+  "description": "MCP server for enabling memory for Claude through a knowledge graph",
+  "license": "MIT",
+  "type": "module",
+  "module": "index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WeMake-AI/mcp.git",
+    "directory": "src/analogical-reasoning"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
+  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/analogical-reasoning",
+  "author": "heyFlorentin",
+  "keywords": [
+    "model-context-protocol",
+    "memory"
+  ],
+  "bin": {
+    "mcp-server-memory": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && shx chmod +x dist/*.js",
+    "prepare": "bun run build",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "shx": "^0.3.4",
+    "typescript": "^5.6.2"
+  }
+}
