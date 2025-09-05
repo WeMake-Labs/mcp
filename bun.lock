@@ -11,7 +11,6 @@
         "@wemake.cx/decision-framework": "*",
         "@wemake.cx/ethical-reasoning": "*",
         "@wemake.cx/focus-group": "*",
-        "@wemake.cx/glass-scrolls": "*",
         "@wemake.cx/goal-tracker": "*",
         "@wemake.cx/memory": "*",
         "@wemake.cx/metacognitive-monitoring": "*",
@@ -155,24 +154,6 @@
       "devDependencies": {
         "@types/node": "^18.15.5",
         "typescript": "^5.0.2",
-      },
-    },
-    "src/glass-scrolls": {
-      "name": "@wemake.cx/glass-scrolls",
-      "version": "0.2.1",
-      "bin": {
-        "mcp-server-glass-scrolls": "dist/index.js",
-      },
-      "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.17.4",
-        "chalk": "^5.3.0",
-        "yargs": "^17.7.2",
-      },
-      "devDependencies": {
-        "@types/node": "^22",
-        "@types/yargs": "^17.0.32",
-        "shx": "^0.3.4",
-        "typescript": "^5.3.3",
       },
     },
     "src/goal-tracker": {
@@ -751,8 +732,6 @@
     "@wemake.cx/ethical-reasoning": ["@wemake.cx/ethical-reasoning@workspace:src/ethical-reasoning"],
 
     "@wemake.cx/focus-group": ["@wemake.cx/focus-group@workspace:src/focus-group"],
-
-    "@wemake.cx/glass-scrolls": ["@wemake.cx/glass-scrolls@workspace:src/glass-scrolls"],
 
     "@wemake.cx/goal-tracker": ["@wemake.cx/goal-tracker@workspace:src/goal-tracker"],
 
