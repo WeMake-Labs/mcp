@@ -1,196 +1,174 @@
 # Collaborative Reasoning MCP Server
 
-## Motivation
+A sophisticated MCP server for simulating expert collaboration with diverse perspectives to tackle complex problems
+through structured multi-persona reasoning.
 
-Complex problems often benefit from diverse perspectives and expertise. While language models can attempt to simulate
-different viewpoints, they often:
+## Core Concepts
 
-1. Fail to maintain consistent, distinct perspectives throughout an analysis
-2. Struggle to create genuine productive tension between viewpoints
-3. Blend different expertise domains in unrealistic ways
-4. Neglect to systematically integrate insights from different perspectives
-5. Miss opportunities for creative synthesis that emerges from diverse thinking
+### Expert Personas
 
-The Collaborative Reasoning Server addresses these limitations by creating a structured environment for multiple
-simulated experts to collaborate on complex problems. By externalizing collaborative thinking, models can leverage
-diverse perspectives more systematically and effectively.
+The server creates and manages expert personas with distinct characteristics:
 
-## Technical Specification
+- **Identity**: Unique ID, name, and background
+- **Expertise**: Specific areas of knowledge and experience
+- **Perspective**: Unique viewpoint and approach to problems
+- **Biases**: Acknowledged limitations and potential blind spots
+- **Communication Style**: Tone and approach to interaction
 
-### Tool Interface
+Example persona:
 
-```typescript
-interface Persona {
-  id: string;
-  name: string;
-  expertise: string[];
-  background: string;
-  perspective: string;
-  biases: string[];
-  communication: {
-    style: string;
-    tone: string;
-  };
-}
-
-interface Contribution {
-  personaId: string;
-  content: string;
-  type: "observation" | "question" | "insight" | "concern" | "suggestion" | "challenge" | "synthesis";
-  referencesIds?: string[]; // IDs of previous contributions this builds upon
-  confidence: number; // 0.0-1.0
-}
-
-interface Disagreement {
-  topic: string;
-  positions: Array<{
-    personaId: string;
-    position: string;
-    arguments: string[];
-  }>;
-  resolution?: {
-    type: "consensus" | "compromise" | "integration" | "tabled";
-    description: string;
-  };
-}
-
-interface CollaborativeReasoningData {
-  // Core collaboration components
-  topic: string;
-  personas: Persona[];
-  contributions: Contribution[];
-  disagreements?: Disagreement[];
-
-  // Process structure
-  stage: "problem-definition" | "ideation" | "critique" | "integration" | "decision" | "reflection";
-  activePersonaId: string;
-  nextPersonaId?: string;
-
-  // Collaboration output
-  keyInsights?: string[];
-  consensusPoints?: string[];
-  openQuestions?: string[];
-  finalRecommendation?: string;
-
-  // Process metadata
-  sessionId: string;
-  iteration: number;
-
-  // Next steps
-  nextContributionNeeded: boolean;
-  suggestedContributionTypes?: string[];
+```json
+{
+  "id": "tech-lead",
+  "name": "Sarah Chen",
+  "expertise": ["software architecture", "scalability", "team leadership"],
+  "background": "15 years in enterprise software development",
+  "perspective": "Pragmatic focus on maintainable, scalable solutions",
+  "biases": ["over-engineering tendency", "preference for proven technologies"],
+  "communication": {
+    "style": "analytical",
+    "tone": "direct"
+  }
 }
 ```
 
-### Process Flow
+### Collaborative Process
 
-```mermaid
-sequenceDiagram
-    participant Model
-    participant ColServer as Collaborative Reasoning Server
-    participant State as Collaboration State
+The reasoning process follows structured stages:
 
-    Model->>ColServer: Define problem and personas
-    ColServer->>State: Initialize collaboration with personas
-    ColServer-->>Model: Return initial state with first active persona
+1. **Problem Definition**: Clarify the challenge and scope
+2. **Ideation**: Generate diverse ideas and approaches
+3. **Critique**: Evaluate and challenge proposed solutions
+4. **Integration**: Synthesize insights from different perspectives
+5. **Decision**: Reach consensus or identify trade-offs
+6. **Reflection**: Extract learnings and next steps
 
-    Model->>ColServer: Submit contribution as Persona A
-    ColServer->>State: Store contribution
-    ColServer-->>Model: Return updated state with next persona prompt
+### Contribution Types
 
-    Model->>ColServer: Submit contribution as Persona B
-    ColServer->>State: Store contribution, identify disagreement
-    ColServer-->>Model: Return updated state highlighting disagreement
+Personas contribute through various interaction types:
 
-    Model->>ColServer: Submit contribution as Persona C addressing disagreement
-    ColServer->>State: Store contribution, update disagreement status
-    ColServer-->>Model: Return updated state
+- **Observation**: Factual insights or data points
+- **Question**: Clarifying or probing inquiries
+- **Insight**: Novel connections or understanding
+- **Concern**: Potential risks or limitations
+- **Suggestion**: Proposed solutions or approaches
+- **Challenge**: Constructive disagreement or alternative view
+- **Synthesis**: Integration of multiple perspectives
 
-    Model->>ColServer: Submit synthesis contribution integrating perspectives
-    ColServer->>State: Store synthesis, update consensus points
-    ColServer-->>Model: Return updated state
+### Disagreement Management
 
-    Model->>ColServer: Generate final recommendation
-    ColServer->>State: Store recommendation with multi-perspective justification
-    ColServer-->>Model: Return final collaboration output
+The system tracks and resolves disagreements through:
+
+- **Position Mapping**: Clear articulation of different viewpoints
+- **Argument Tracking**: Supporting evidence for each position
+- **Resolution Types**: Consensus, compromise, integration, or tabling
+- **Productive Conflict**: Leveraging disagreement for better outcomes
+
+## API
+
+### Tools
+
+- **collaborativeReasoning**
+  - Simulates expert collaboration with diverse perspectives
+  - Input: Comprehensive collaboration data structure
+    - `topic` (string): The problem or challenge being addressed
+    - `personas` (array): Expert personas with expertise, background, and communication style
+    - `contributions` (array): Contributions from personas with type, content, and confidence
+    - `disagreements` (array, optional): Points of disagreement and their resolution
+    - `stage` (enum): Current collaboration stage (problem-definition, ideation, critique, integration, decision,
+      reflection)
+    - `activePersonaId` (string): Currently active persona
+    - `nextPersonaId` (string, optional): Next persona to contribute
+    - `keyInsights` (array, optional): Key insights from the collaboration
+    - `consensusPoints` (array, optional): Points of agreement
+    - `openQuestions` (array, optional): Unresolved questions
+    - `finalRecommendation` (string, optional): Final collaborative recommendation
+    - `sessionId` (string): Unique session identifier
+    - `iteration` (number): Current iteration number
+    - `nextContributionNeeded` (boolean): Whether more input is needed
+    - `suggestedContributionTypes` (array, optional): Suggested next contribution types
+  - Output: Structured collaboration analysis with visual representation
+    - Formatted display of personas, contributions, disagreements, and insights
+    - Progress tracking and next steps
+    - Confidence levels and consensus points
+  - Validates all input data and maintains session history
+  - Provides colorized visual output for better readability
+
+## Setup
+
+### bunx
+
+```json
+{
+  "mcpServers": {
+    "Collaborative Reasoning": {
+      "command": "bunx",
+      "args": ["-y", "@wemake.cx/collaborative-reasoning@alpha"]
+    }
+  }
+}
 ```
 
-## Key Features
+#### bunx with custom settings
 
-### 1. Multi-Persona Simulation
+The server supports various configuration options:
 
-The server enables creation and management of diverse personas:
+```json
+{
+  "mcpServers": {
+    "Collaborative Reasoning": {
+      "command": "bunx",
+      "args": ["-y", "@wemake.cx/collaborative-reasoning@alpha"],
+      "env": {
+        "COLLABORATION_MAX_PERSONAS": "8",
+        "COLLABORATION_MAX_ITERATIONS": "20",
+        "COLLABORATION_CONFIDENCE_THRESHOLD": "0.7",
+        "COLLABORATION_VISUAL_OUTPUT": "true"
+      }
+    }
+  }
+}
+```
 
-- **Expertise profiles**: Defined knowledge domains
-- **Perspectives**: Unique viewpoints and priorities
-- **Communication styles**: Consistent voice for each persona
-- **Explicit biases**: Acknowledged limitations in each perspective
+- `COLLABORATION_MAX_PERSONAS`: Maximum number of personas per session (default: 8)
+- `COLLABORATION_MAX_ITERATIONS`: Maximum collaboration iterations (default: 20)
+- `COLLABORATION_CONFIDENCE_THRESHOLD`: Minimum confidence for consensus (default: 0.7)
+- `COLLABORATION_VISUAL_OUTPUT`: Enable colorized visual output (default: true)
 
-### 2. Structured Collaboration Process
+## System Prompt
 
-The server guides a systematic collaborative process:
+The prompt for utilizing collaborative reasoning should encourage diverse perspective integration:
 
-- **Problem definition**: Framing the challenge from multiple perspectives
-- **Ideation**: Generating diverse approaches
-- **Critique**: Systematic evaluation from different viewpoints
-- **Integration**: Synthesizing insights across perspectives
-- **Decision**: Reaching reasoned conclusions
+```markdown
+Follow these steps for collaborative reasoning:
 
-### 3. Disagreement Management
+1. Problem Framing:
+   - Define the challenge clearly and comprehensively
+   - Identify key stakeholders and their interests
+   - Establish success criteria and constraints
+   - Set up diverse expert personas with complementary expertise
 
-The server provides mechanisms for productive disagreement:
+2. Multi-Perspective Analysis:
+   - Engage each persona to contribute their unique viewpoint
+   - Encourage different types of contributions (observations, insights, concerns)
+   - Surface assumptions and biases explicitly
+   - Promote constructive disagreement and debate
 
-- **Disagreement tracking**: Explicitly documenting differing views
-- **Position mapping**: Clarifying where perspectives diverge
-- **Resolution strategies**: Methods for handling disagreements
-- **Structured debate**: Focused exploration of key differences
+3. Synthesis and Integration:
+   - Identify points of consensus and disagreement
+   - Explore creative combinations of different approaches
+   - Address concerns and limitations raised by personas
+   - Build on insights through cross-pollination of ideas
 
-### 4. Cross-Pollination Tracking
+4. Decision and Recommendation:
+   - Evaluate trade-offs between different approaches
+   - Seek win-win solutions that address multiple perspectives
+   - Document remaining uncertainties and risks
+   - Provide clear, actionable recommendations
 
-The server tracks how ideas evolve across personas:
-
-- **Reference links**: How contributions build on each other
-- **Insight evolution**: Tracing how ideas transform
-- **Integration patterns**: How diverse inputs combine
-
-### 5. Visual Representation
-
-The server visualizes the collaborative process:
-
-- Contribution networks showing idea evolution
-- Perspective maps highlighting agreements and disagreements
-- Synthesis visualizations showing integrated insights
-
-## Usage Examples
-
-### Complex Problem Solving
-
-For multifaceted problems, the model can simulate perspectives from different domains (technical, ethical, business,
-legal) to develop comprehensive solutions.
-
-### Product Design
-
-When designing products, the model can incorporate perspectives of engineers, designers, marketers, and users to
-identify optimal approaches.
-
-### Strategic Planning
-
-For organizational strategy, the model can simulate perspectives of different stakeholders and departments to create
-more robust plans.
-
-### Ethical Dilemma Analysis
-
-When analyzing ethical questions, the model can represent diverse philosophical, cultural, and stakeholder perspectives.
-
-## Implementation
-
-The server is implemented using TypeScript with:
-
-- A core CollaborativeReasoningServer class
-- Persona management system
-- Contribution and disagreement tracking
-- Facilitation algorithms to guide productive collaboration
-- Standard MCP server connection via stdin/stdout
-
-This server enhances model capabilities for complex problems requiring diverse expertise and perspectives, allowing for
-more thorough exploration of solution spaces and more robust final recommendations.
+5. Reflection and Learning:
+   - Extract key insights and lessons learned
+   - Identify areas for further exploration
+   - Document the reasoning process for future reference
+   - Plan next steps and follow-up actions
+```
