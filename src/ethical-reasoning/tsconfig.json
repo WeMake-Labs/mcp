@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "docs": "https://bun.sh/docs/typescript",
+  "extends": "../../tsconfig.json",
+
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": true,
+
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "./dist/types",
+    "noEmit": false
+  },
+
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

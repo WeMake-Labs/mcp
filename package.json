@@ -31,6 +31,7 @@
     "publish:metacognitive-monitoring": "bun publish --cwd='./src/metacognitive-monitoring'",
     "publish:focus-group": "bun publish --cwd='./src/focus-group'",
     "publish:structured-argumentation": "bun publish --cwd='./src/structured-argumentation'",
+    "publish:ethical-reasoning": "bun publish --cwd='./src/ethical-reasoning'",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
@@ -55,7 +56,8 @@
     "@wemake.cx/analogical-reasoning": "*",
     "@wemake.cx/collaborative-reasoning": "*",
     "@wemake.cx/metacognitive-monitoring": "*",
-    "@wemake.cx/structured-argumentation": "*"
+    "@wemake.cx/structured-argumentation": "*",
+    "@wemake.cx/ethical-reasoning": "*"
   },
   "devDependencies": {
     "@nx/eslint": "21.4.1",
