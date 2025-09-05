@@ -200,7 +200,7 @@ const knowledgeGraphManager = new KnowledgeGraphManager();
 const server = new Server(
   {
     name: "memory-server",
-    version: "0.2.1"
+    version: "0.2.2"
   },
   {
     capabilities: {
