@@ -23,8 +23,9 @@
   },
   "packageManager": "bun@1.2.0",
   "scripts": {
-    "build": "bun run build --workspaces",
-    "watch": "bun run watch --workspaces",
+    "start": "bun run --filter='./src/*' start",
+    "build": "bun run --filter='./src/*' build",
+    "watch": "bun run --filter='./src/*' watch",
     "publish-all": "bun publish --workspaces --access alpha",
     "link-all": "bun link --workspaces",
     "demo": "node src/glass-scrolls-mcp/dist/index.js demo",
