@@ -67,7 +67,7 @@ scalability.
 
 ```sh
 # Clone the repository
-git clone https://github.com/wemake-ai/mcp.git
+git clone https://github.com/WeMake-AI/mcp.git
 cd mcp
 
 # Install dependencies with Bun
