@@ -187,7 +187,7 @@ bun test --reporter=junit --reporter-outfile=junit.xml
 All MCP server READMEs must follow the standardized template at the top of each package README:
 
 - Include sections: Title, Executive Summary, Overview and Purpose, Capabilities (Tools), Installation and Setup,
-  Configuration, Usage, System Prompt Template, Security and Compliance, Versioning and Changelog, License.
+  Configuration, Usage, System Prompt Template.
 - Provide a concrete Example section that mirrors the template with real values.
 - Describe each tool with: description, input schema (JSON), output description, and error cases.
 - List environment variables with default values and example configuration.
