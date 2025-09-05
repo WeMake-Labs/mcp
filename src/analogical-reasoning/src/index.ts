@@ -1,3 +1,5 @@
+#!/usr/bin/env bun
+
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
@@ -600,7 +602,7 @@ export default function createServer(_: { config: z.infer<typeof configSchema> }
   const server = new Server(
     {
       name: "analogical-reasoning-server",
-      version: "0.2.7"
+      version: "0.2.8"
     },
     {
       capabilities: {

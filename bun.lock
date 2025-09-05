@@ -38,7 +38,7 @@
     },
     "src/analogical-reasoning": {
       "name": "@wemake.cx/analogical-reasoning",
-      "version": "0.2.7",
+      "version": "0.2.8",
       "bin": {
         "mcp-server-analogical-reasoning": "dist/index.js",
       },
