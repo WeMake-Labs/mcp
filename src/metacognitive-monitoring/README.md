@@ -1,186 +1,210 @@
 # Metacognitive Monitoring MCP Server
 
-## Motivation
+A systematic framework for self-monitoring knowledge boundaries, claim certainty, and reasoning quality to enhance
+metacognitive awareness and calibrated confidence.
 
-Language models often struggle with metacognition - the ability to accurately monitor and evaluate their own knowledge,
-reasoning processes, and confidence. Current models frequently:
+## Core Concepts
 
-1. Express overconfidence in domains where they have limited knowledge
-2. Fail to explicitly track reasoning quality across complex chains of thought
-3. Do not systematically identify potential biases in their reasoning
-4. Struggle to distinguish between facts, inferences, and speculation
-5. Lack awareness of when they're operating outside their knowledge boundaries
+### Knowledge Assessment
 
-The Metacognitive Monitoring Server addresses these limitations by providing a structured framework for models to
-evaluate their own cognitive processes. By externalizing metacognition, models can achieve greater accuracy,
-reliability, and transparency in their reasoning.
+Knowledge assessments evaluate understanding within specific domains. Each assessment includes:
 
-## Technical Specification
+- Domain identification and scope
+- Self-assessed knowledge level (expert to none)
+- Confidence calibration (0.0-1.0)
+- Supporting evidence for the assessment
+- Known limitations and gaps
+- Relevant training data cutoffs
 
-### Tool Interface
+Example:
 
-```typescript
-interface KnowledgeAssessment {
-  domain: string;
-  knowledgeLevel: "expert" | "proficient" | "familiar" | "basic" | "minimal" | "none";
-  confidenceScore: number; // 0.0-1.0
-  supportingEvidence: string;
-  knownLimitations: string[];
-  relevantTrainingCutoff?: string; // e.g., "2021-09"
-}
-
-interface ClaimAssessment {
-  claim: string;
-  status: "fact" | "inference" | "speculation" | "uncertain";
-  confidenceScore: number; // 0.0-1.0
-  evidenceBasis: string;
-  alternativeInterpretations?: string[];
-  falsifiabilityCriteria?: string;
-}
-
-interface ReasoningAssessment {
-  step: string;
-  potentialBiases: string[];
-  assumptions: string[];
-  logicalValidity: number; // 0.0-1.0
-  inferenceStrength: number; // 0.0-1.0
-}
-
-interface MetacognitiveMonitoringData {
-  // Current focus
-  task: string;
-  stage: "knowledge-assessment" | "planning" | "execution" | "monitoring" | "evaluation" | "reflection";
-
-  // Assessments
-  knowledgeAssessment?: KnowledgeAssessment;
-  claims?: ClaimAssessment[];
-  reasoningSteps?: ReasoningAssessment[];
-
-  // Overall evaluation
-  overallConfidence: number; // 0.0-1.0
-  uncertaintyAreas: string[];
-  recommendedApproach: string;
-
-  // Monitoring metadata
-  monitoringId: string;
-  iteration: number;
-
-  // Next steps
-  nextAssessmentNeeded: boolean;
-  suggestedAssessments?: Array<"knowledge" | "claim" | "reasoning" | "overall">;
+```json
+{
+  "domain": "Machine Learning Optimization",
+  "knowledgeLevel": "proficient",
+  "confidenceScore": 0.75,
+  "supportingEvidence": "Familiar with gradient descent, Adam optimizer, and regularization techniques",
+  "knownLimitations": ["Limited experience with advanced meta-learning algorithms"],
+  "relevantTrainingCutoff": "2021-09"
 }
 ```
 
-### Process Flow
+### Claim Assessment
 
-```mermaid
-sequenceDiagram
-    participant Model
-    participant MetaServer as Metacognitive Server
-    participant State as Metacognitive State
+Claim assessments classify and evaluate specific statements. They include:
 
-    Model->>MetaServer: Assess domain knowledge
-    MetaServer->>State: Store knowledge assessment
-    MetaServer-->>Model: Return metacognitive state
+- Statement classification (fact, inference, speculation, uncertain)
+- Confidence scoring for the claim
+- Evidence basis supporting the claim
+- Alternative interpretations
+- Falsifiability criteria
 
-    Model->>MetaServer: Plan approach based on knowledge level
-    MetaServer->>State: Store planning assessment
-    MetaServer-->>Model: Return updated state with recommendations
+Example:
 
-    Model->>MetaServer: Execute and track claim certainty
-    MetaServer->>State: Store claim assessments
-    MetaServer-->>Model: Return updated metacognitive state
-
-    Model->>MetaServer: Monitor reasoning quality
-    MetaServer->>State: Store reasoning assessments
-    MetaServer-->>Model: Return updated metacognitive state
-
-    Model->>MetaServer: Evaluate overall confidence
-    MetaServer->>State: Update with overall assessment
-    MetaServer-->>Model: Return final metacognitive state
-
-    Model->>MetaServer: Reflect on process (optional)
-    MetaServer->>State: Store reflective assessment
-    MetaServer-->>Model: Return updated metacognitive state
+```json
+{
+  "claim": "Transformer models require quadratic memory with sequence length",
+  "status": "fact",
+  "confidenceScore": 0.9,
+  "evidenceBasis": "Self-attention mechanism computes all pairwise token interactions",
+  "alternativeInterpretations": ["Linear attention variants exist but with trade-offs"],
+  "falsifiabilityCriteria": "Discovery of attention mechanism with linear complexity and equivalent performance"
+}
 ```
 
-## Key Features
+### Reasoning Assessment
 
-### 1. Knowledge Boundary Tracking
+Reasoning assessments evaluate individual reasoning steps. They contain:
 
-The server enforces explicit assessment of knowledge:
+- Description of the reasoning step
+- Potential cognitive biases
+- Underlying assumptions
+- Logical validity scoring (0.0-1.0)
+- Inference strength evaluation (0.0-1.0)
 
-- **Domain expertise**: Self-rating knowledge level in relevant domains
-- **Evidence basis**: Justification for claimed knowledge
-- **Known limitations**: Explicit boundaries of knowledge
-- **Training relevance**: Awareness of potential training data limitations
+Example:
 
-### 2. Claim Classification
+```json
+{
+  "step": "Since the model performs well on training data, it will generalize to new data",
+  "potentialBiases": ["Confirmation bias", "Overfitting neglect"],
+  "assumptions": ["Training data is representative", "Model complexity is appropriate"],
+  "logicalValidity": 0.3,
+  "inferenceStrength": 0.4
+}
+```
 
-Claims must be explicitly categorized:
+## API
 
-- **Facts**: Information the model has high confidence in
-- **Inferences**: Reasonable conclusions from facts
-- **Speculations**: Possibilities with limited evidence
-- **Uncertainties**: Areas where knowledge is insufficient
+### Tools
 
-### 3. Reasoning Quality Monitoring
+- **metacognitiveMonitoring**
+  - Systematic self-monitoring of knowledge and reasoning quality
+  - Input: Comprehensive metacognitive monitoring data structure
+    - `task` (string): The task or question being addressed
+    - `stage` (enum): Current monitoring stage - "knowledge-assessment" | "planning" | "execution" | "monitoring" |
+      "evaluation" | "reflection"
+    - `knowledgeAssessment` (object, optional): Domain knowledge evaluation
+      - `domain` (string): Knowledge domain being assessed
+      - `knowledgeLevel` (enum): "expert" | "proficient" | "familiar" | "basic" | "minimal" | "none"
+      - `confidenceScore` (number): Confidence in assessment (0.0-1.0)
+      - `supportingEvidence` (string): Evidence for knowledge level claim
+      - `knownLimitations` (string[]): Known knowledge gaps
+      - `relevantTrainingCutoff` (string, optional): Training data cutoff date
+    - `claims` (array, optional): Specific claim assessments
+      - `claim` (string): Statement being assessed
+      - `status` (enum): "fact" | "inference" | "speculation" | "uncertain"
+      - `confidenceScore` (number): Confidence in claim (0.0-1.0)
+      - `evidenceBasis` (string): Supporting evidence
+      - `alternativeInterpretations` (string[], optional): Alternative explanations
+      - `falsifiabilityCriteria` (string, optional): Criteria for falsification
+    - `reasoningSteps` (array, optional): Reasoning step evaluations
+      - `step` (string): Description of reasoning step
+      - `potentialBiases` (string[]): Identified cognitive biases
+      - `assumptions` (string[]): Underlying assumptions
+      - `logicalValidity` (number): Logical validity score (0.0-1.0)
+      - `inferenceStrength` (number): Inference strength score (0.0-1.0)
+    - `overallConfidence` (number): Overall confidence in conclusions (0.0-1.0)
+    - `uncertaintyAreas` (string[]): Areas of significant uncertainty
+    - `recommendedApproach` (string): Recommended approach based on assessment
+    - `monitoringId` (string): Unique identifier for monitoring session
+    - `iteration` (number): Current iteration of monitoring process
+    - `nextAssessmentNeeded` (boolean): Whether further assessment is required
+    - `suggestedAssessments` (array, optional): Suggested next assessments - "knowledge" | "claim" | "reasoning" |
+      "overall"
+  - Returns structured metacognitive analysis with visual confidence indicators
+  - Supports iterative refinement of self-awareness and calibration
+  - Tracks knowledge boundaries and reasoning quality over time
 
-The server tracks reasoning process quality:
+## Setup
 
-- **Potential biases**: Self-monitoring for cognitive biases
-- **Hidden assumptions**: Surfacing implicit assumptions
-- **Logical validity**: Assessing deductive reasoning quality
-- **Inference strength**: Evaluating inductive/abductive reasoning
+### bunx
 
-### 4. Uncertainty Management
+```json
+{
+  "mcpServers": {
+    "Metacognitive Monitoring": {
+      "command": "bunx",
+      "args": ["-y", "@wemake.cx/metacognitive-monitoring@alpha"]
+    }
+  }
+}
+```
 
-The server provides tools for handling uncertainty:
+#### bunx with custom settings
 
-- **Confidence calibration**: Explicit confidence scoring
-- **Uncertainty areas**: Identified gaps in knowledge or reasoning
-- **Alternative interpretations**: Tracking multiple possible views
-- **Falsifiability**: Criteria that would prove claims wrong
+The server can be configured using the following environment variables:
 
-### 5. Visual Representation
+```json
+{
+  "mcpServers": {
+    "Metacognitive Monitoring": {
+      "command": "bunx",
+      "args": ["-y", "@wemake.cx/metacognitive-monitoring@alpha"],
+      "env": {
+        "MONITORING_HISTORY_LIMIT": "100",
+        "CONFIDENCE_THRESHOLD": "0.7"
+      }
+    }
+  }
+}
+```
 
-The server visualizes metacognitive state:
+- `MONITORING_HISTORY_LIMIT`: Maximum number of monitoring sessions to retain (default: 50)
+- `CONFIDENCE_THRESHOLD`: Minimum confidence threshold for high-confidence claims (default: 0.8)
 
-- Confidence heat maps for different claims
-- Knowledge boundary diagrams
-- Reasoning quality evaluations with identified weak points
+## System Prompt
+
+The prompt for utilizing metacognitive monitoring should encourage systematic self-assessment:
+
+```markdown
+Follow these steps for metacognitive monitoring:
+
+1. Knowledge Boundary Assessment:
+   - Explicitly assess your knowledge level in the relevant domain
+   - Identify specific areas of strength and limitation
+   - Calibrate confidence based on evidence and experience
+   - Acknowledge training data cutoffs and their implications
+
+2. Claim Classification:
+   - Distinguish between facts, inferences, speculation, and uncertainty
+   - Provide evidence basis for each significant claim
+   - Consider alternative interpretations of evidence
+   - Establish falsifiability criteria where appropriate
+
+3. Reasoning Quality Monitoring:
+   - Evaluate each reasoning step for logical validity
+   - Identify potential cognitive biases affecting judgment
+   - Make underlying assumptions explicit
+   - Assess inference strength and confidence
+
+4. Uncertainty Management:
+   - Identify areas of significant uncertainty
+   - Recommend approaches based on confidence levels
+   - Suggest additional assessments when needed
+   - Iterate on understanding as new information emerges
+
+5. Calibration and Iteration:
+   - Track confidence calibration over time
+   - Refine assessments based on feedback
+   - Maintain awareness of knowledge boundaries
+   - Continuously improve metacognitive accuracy
+```
 
 ## Usage Examples
 
-### Technical Advising
+### Technical Domain Assessment
 
-When providing technical recommendations, the model can accurately represent its confidence in different aspects and
-highlight areas that require external verification.
+When working in specialized technical domains, systematically assess knowledge boundaries and claim confidence levels.
 
-### Scientific Analysis
+### Complex Reasoning Chains
 
-For analyzing scientific claims, the model can distinguish between established facts and inferences, with appropriate
-confidence calibration.
+For multi-step reasoning, evaluate each step for biases, assumptions, and logical validity.
 
-### Decision Support
+### Uncertain Scenarios
 
-When supporting decisions with uncertain information, the model can provide transparent confidence assessments and
-identify critical knowledge gaps.
+In high-uncertainty situations, explicitly track confidence levels and identify areas requiring additional information.
 
-### Educational Content
+### Evidence Evaluation
 
-For explaining complex topics, the model can accurately represent its knowledge boundaries and distinguish between
-consensus views and areas of debate.
-
-## Implementation
-
-The server is implemented using TypeScript with:
-
-- A core MetacognitiveMonitoringServer class
-- Knowledge and confidence tracking components
-- Bias detection algorithms
-- Confidence calibration utilities
-- Standard MCP server connection via stdin/stdout
-
-This server enhances model reliability in domains requiring careful distinction between facts and speculations, accurate
-confidence assessment, and awareness of knowledge limitations.
+When evaluating evidence, distinguish between different types of claims and their evidential basis.
