@@ -1,13 +1,12 @@
 {
   "name": "mcp",
-  "version": "0.2.6",
   "author": "WeMake (https://wemake.cx)",
   "repository": {
     "type": "git",
     "url": "https://github.com/WeMake-AI/mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/wemake-ai/mcp/issues"
+    "url": "https://github.com/WeMake-AI/mcp/issues"
   },
   "description": "WeMake Model Context Protocol (MCP) servers",
   "homepage": "https://wemake.cx",
@@ -19,7 +18,7 @@
   "private": true,
   "engines": {
     "bun": ">=1.2.0",
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "packageManager": "bun@1.2.0",
   "scripts": {
