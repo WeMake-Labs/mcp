@@ -8,6 +8,7 @@
         "@wemake.cx/analogical-reasoning": "*",
         "@wemake.cx/collaborative-reasoning": "*",
         "@wemake.cx/metacognitive-monitoring": "*",
+        "@wemake.cx/structured-argumentation": "*",
       },
       "devDependencies": {
         "@nx/eslint": "21.4.1",
@@ -71,6 +72,20 @@
       "version": "0.0.3",
       "bin": {
         "mcp-server-metacognitive-monitoring": "dist/index.js",
+      },
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.17.4",
+      },
+      "devDependencies": {
+        "@types/node": "^22.17.2",
+        "typescript": "^5.9.2",
+      },
+    },
+    "src/structured-argumentation": {
+      "name": "@wemake.cx/structured-argumentation",
+      "version": "0.0.3",
+      "bin": {
+        "mcp-server-structured-argumentation": "dist/index.js",
       },
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.17.4",
@@ -507,6 +522,8 @@
     "@wemake.cx/focus-group": ["@wemake.cx/focus-group@workspace:src/focus-group"],
 
     "@wemake.cx/metacognitive-monitoring": ["@wemake.cx/metacognitive-monitoring@workspace:src/metacognitive-monitoring"],
+
+    "@wemake.cx/structured-argumentation": ["@wemake.cx/structured-argumentation@workspace:src/structured-argumentation"],
 
     "@yarnpkg/lockfile": ["@yarnpkg/lockfile@1.1.0", "", {}, "sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ=="],
 
