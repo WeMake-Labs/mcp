@@ -1,6 +1,6 @@
 {
   "name": "mcp",
-  "version": "0.1.5",
+  "version": "0.0.1",
   "author": "WeMake (https://wemake.cx)",
   "repository": {
     "type": "git",
@@ -18,46 +18,23 @@
   ],
   "private": true,
   "engines": {
-    "bun": ">=1.2.0"
+    "bun": ">=1.2.0",
+    "node": ">=18.0.0"
   },
   "packageManager": "bun@1.2.0",
   "scripts": {
     "dev": "bun run --filter='./src/*' dev",
     "start": "bun run --filter='./src/*' start",
     "build": "bun run --filter='./src/*' build",
-    "publish": "bun run publish:analogical-reasoning && bun run publish:collaborative-reasoning",
-    "publish:analogical-reasoning": "bun publish --cwd='./src/analogical-reasoning'",
-    "publish:collaborative-reasoning": "bun publish --cwd='./src/collaborative-reasoning'",
-    "publish:metacognitive-monitoring": "bun publish --cwd='./src/metacognitive-monitoring'",
-    "publish:focus-group": "bun publish --cwd='./src/focus-group'",
-    "publish:structured-argumentation": "bun publish --cwd='./src/structured-argumentation'",
-    "publish:ethical-reasoning": "bun publish --cwd='./src/ethical-reasoning'",
+    "publish:example": "bun publish --cwd='./src/example'",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
-    "check": "tsc --noEmit",
-    "test": "bun test",
-    "test:coverage": "bun test --coverage",
-    "test:watch": "bun test --watch",
-    "test:ci": "bun test --reporter=junit --reporter-outfile=test-results.xml --coverage",
-    "test:collaborative-reasoning": "bun test ./src/collaborative-reasoning/tests/",
-    "test:collaborative-reasoning:unit": "bun test ./src/collaborative-reasoning/tests/unit/",
-    "test:collaborative-reasoning:integration": "bun test ./src/collaborative-reasoning/tests/integration/",
-    "test:collaborative-reasoning:e2e": "bun test ./src/collaborative-reasoning/tests/e2e/",
-    "test:collaborative-reasoning:security": "bun test ./src/collaborative-reasoning/tests/security/",
-    "test:collaborative-reasoning:performance": "bun test ./src/collaborative-reasoning/tests/performance/",
-    "test:collaborative-reasoning:coverage": "bun test ./src/collaborative-reasoning/tests/ --coverage",
-    "test:collaborative-reasoning:ci": "bun test ./src/collaborative-reasoning/tests/ --reporter=junit --reporter-outfile=collaborative-reasoning-test-results.xml --coverage",
-    "deploy:production": "bun run --filter='./src/*' deploy:production",
-    "deploy:enterprise": "bun run --filter='./src/*' deploy:enterprise"
+    "check": "tsc --noEmit"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
-    "@wemake.cx/analogical-reasoning": "*",
-    "@wemake.cx/collaborative-reasoning": "*",
-    "@wemake.cx/metacognitive-monitoring": "*",
-    "@wemake.cx/structured-argumentation": "*",
-    "@wemake.cx/ethical-reasoning": "*"
+    "@wemake.cx/example": "*"
   },
   "devDependencies": {
     "@nx/eslint": "21.4.1",

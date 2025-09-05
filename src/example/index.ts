@@ -729,8 +729,8 @@ export class AnalogicalReasoningServer {
 // Create an MCP server
 const server = new Server(
   {
-    name: "analogical-reasoning",
-    version: "0.1.5"
+    name: "example",
+    version: "0.0.1"
   },
   {
     capabilities: {

@@ -5,11 +5,7 @@
       "name": "mcp",
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.17.4",
-        "@wemake.cx/analogical-reasoning": "*",
-        "@wemake.cx/collaborative-reasoning": "*",
-        "@wemake.cx/ethical-reasoning": "*",
-        "@wemake.cx/metacognitive-monitoring": "*",
-        "@wemake.cx/structured-argumentation": "*",
+        "@wemake.cx/example": "*",
       },
       "devDependencies": {
         "@nx/eslint": "21.4.1",
@@ -25,81 +21,11 @@
         "vite-tsconfig-paths": "^5.1.4",
       },
     },
-    "src/analogical-reasoning": {
-      "name": "@wemake.cx/analogical-reasoning",
-      "version": "0.1.5",
+    "src/example": {
+      "name": "@wemake.cx/example",
+      "version": "0.0.1",
       "bin": {
-        "mcp-server-analogical-reasoning": "dist/index.js",
-      },
-      "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.17.4",
-      },
-      "devDependencies": {
-        "@types/node": "^22.17.2",
-        "typescript": "^5.9.2",
-      },
-    },
-    "src/collaborative-reasoning": {
-      "name": "@wemake.cx/collaborative-reasoning",
-      "version": "0.1.5",
-      "bin": {
-        "mcp-server-collaborative-reasoning": "dist/index.js",
-      },
-      "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.17.4",
-      },
-      "devDependencies": {
-        "@types/node": "^22.17.2",
-        "typescript": "^5.9.2",
-      },
-    },
-    "src/ethical-reasoning": {
-      "name": "@wemake.cx/ethical-reasoning",
-      "version": "0.1.5",
-      "bin": {
-        "mcp-server-ethical-reasoning": "dist/index.js",
-      },
-      "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.17.4",
-      },
-      "devDependencies": {
-        "@types/node": "^22.17.2",
-        "typescript": "^5.9.2",
-      },
-    },
-    "src/focus-group": {
-      "name": "@wemake.cx/focus-group",
-      "version": "0.1.5",
-      "bin": {
-        "mcp-server-focus-group": "dist/index.js",
-      },
-      "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.17.4",
-      },
-      "devDependencies": {
-        "@types/node": "^22.17.2",
-        "typescript": "^5.9.2",
-      },
-    },
-    "src/metacognitive-monitoring": {
-      "name": "@wemake.cx/metacognitive-monitoring",
-      "version": "0.1.5",
-      "bin": {
-        "mcp-server-metacognitive-monitoring": "dist/index.js",
-      },
-      "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.17.4",
-      },
-      "devDependencies": {
-        "@types/node": "^22.17.2",
-        "typescript": "^5.9.2",
-      },
-    },
-    "src/structured-argumentation": {
-      "name": "@wemake.cx/structured-argumentation",
-      "version": "0.1.5",
-      "bin": {
-        "mcp-server-structured-argumentation": "dist/index.js",
+        "mcp-server-example": "dist/index.js",
       },
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.17.4",
@@ -437,17 +363,7 @@
 
     "@typescript-eslint/visitor-keys": ["@typescript-eslint/visitor-keys@8.42.0", "", { "dependencies": { "@typescript-eslint/types": "8.42.0", "eslint-visitor-keys": "^4.2.1" } }, "sha512-3WbiuzoEowaEn8RSnhJBrxSwX8ULYE9CXaPepS2C2W3NSA5NNIvBaslpBSBElPq0UGr0xVJlXFWOAKIkyylydQ=="],
 
-    "@wemake.cx/analogical-reasoning": ["@wemake.cx/analogical-reasoning@workspace:src/analogical-reasoning"],
-
-    "@wemake.cx/collaborative-reasoning": ["@wemake.cx/collaborative-reasoning@workspace:src/collaborative-reasoning"],
-
-    "@wemake.cx/ethical-reasoning": ["@wemake.cx/ethical-reasoning@workspace:src/ethical-reasoning"],
-
-    "@wemake.cx/focus-group": ["@wemake.cx/focus-group@workspace:src/focus-group"],
-
-    "@wemake.cx/metacognitive-monitoring": ["@wemake.cx/metacognitive-monitoring@workspace:src/metacognitive-monitoring"],
-
-    "@wemake.cx/structured-argumentation": ["@wemake.cx/structured-argumentation@workspace:src/structured-argumentation"],
+    "@wemake.cx/example": ["@wemake.cx/example@workspace:src/example"],
 
     "@yarnpkg/lockfile": ["@yarnpkg/lockfile@1.1.0", "", {}, "sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ=="],
 
@@ -1029,7 +945,7 @@
 
     "sprintf-js": ["sprintf-js@1.0.3", "", {}, "sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g=="],
 
-    "statuses": ["statuses@2.0.2", "", {}, "sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw=="],
+    "statuses": ["statuses@2.0.1", "", {}, "sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ=="],
 
     "string-width": ["string-width@4.2.3", "", { "dependencies": { "emoji-regex": "^8.0.0", "is-fullwidth-code-point": "^3.0.0", "strip-ansi": "^6.0.1" } }, "sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g=="],
 
@@ -1168,8 +1084,6 @@
     "front-matter/js-yaml": ["js-yaml@3.14.1", "", { "dependencies": { "argparse": "^1.0.7", "esprima": "^4.0.0" }, "bin": { "js-yaml": "bin/js-yaml.js" } }, "sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g=="],
 
     "hosted-git-info/lru-cache": ["lru-cache@10.4.3", "", {}, "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ=="],
-
-    "http-errors/statuses": ["statuses@2.0.1", "", {}, "sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ=="],
 
     "micromatch/picomatch": ["picomatch@2.3.1", "", {}, "sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA=="],
 

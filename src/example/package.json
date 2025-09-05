@@ -1,18 +1,19 @@
 {
-  "name": "@wemake.cx/focus-group",
-  "version": "0.1.5",
-  "description": "MCP server for LLM focus groups to analyze and critique other MCP servers",
+  "name": "@wemake.cx/example",
+  "version": "0.0.1",
+  "description": "MCP server for analogical reasoning: structured pattern mapping, domain-to-domain structure alignment, and explainable inference",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/WeMake-AI/mcp.git",
-    "directory": "src/focus-group"
+    "url": "https://github.com/wemake-ai/mcp.git",
+    "directory": "src/example"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "example"
   },
-  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/focus-group",
+  "homepage": "https://github.com/wemake-ai/mcp/tree/main/src/example",
   "author": "heyFlorentin",
   "engines": {
     "bun": ">=1.2.0",
@@ -21,16 +22,16 @@
   "packageManager": "bun@1.2.0",
   "keywords": [
     "model-context-protocol",
-    "focus-group"
+    "example"
   ],
   "bin": {
-    "mcp-server-focus-group": "dist/index.js"
+    "mcp-server-example": "dist/index.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "bun build --entrypoints ./src/index.ts --outdir ./dist --format esm --target=bun --sourcemap && (if ! head -1 dist/index.js | grep -q '^#!'; then echo '#!/usr/bin/env bun' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js; fi) && chmod +x dist/*.js",
+    "build": "bun build --entrypoints ./index.ts --outdir ./dist --format esm --target=bun --sourcemap && (if ! head -1 dist/index.js | grep -q '^#!'; then echo '#!/usr/bin/env bun' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js; fi) && chmod +x dist/*.js",
     "types": "bun tsc",
     "prepare": "bun run types && bun run build",
     "test": "bun test",

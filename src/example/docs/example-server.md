@@ -1,4 +1,4 @@
-# Analogical Reasoning MCP Server
+# Example MCP Server
 
 ## Motivation
 
