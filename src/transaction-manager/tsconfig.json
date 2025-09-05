@@ -4,9 +4,17 @@
 
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": ".",
+    "strict": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outFile": "./dist/types/index.d.ts",
+    "noEmit": false
   },
 
-  "include": ["./src/*.ts", "./src/lib/*.ts"],
-  "exclude": ["dist"]
+  "include": ["./**/*.ts", "./**/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

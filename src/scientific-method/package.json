@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/scientific-method",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "MCP server for hypothesis-driven experiments and scientific inquiry (scientific method)",
   "license": "MIT",
   "type": "module",

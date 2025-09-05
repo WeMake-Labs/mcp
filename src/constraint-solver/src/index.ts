@@ -94,7 +94,7 @@ class ConstraintSolverServer {
   }
 }
 
-const server = new Server({ name: "constraint-solver-server", version: "0.2.6" }, { capabilities: { tools: {} } });
+const server = new Server({ name: "constraint-solver-server", version: "0.2.7" }, { capabilities: { tools: {} } });
 const constraintServer = new ConstraintSolverServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [CONSTRAINT_SOLVER_TOOL] }));

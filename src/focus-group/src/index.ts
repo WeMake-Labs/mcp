@@ -750,7 +750,7 @@ Key features:
 const server = new Server(
   {
     name: "focus-group-server",
-    version: "0.2.6"
+    version: "0.2.7"
   },
   {
     capabilities: {
