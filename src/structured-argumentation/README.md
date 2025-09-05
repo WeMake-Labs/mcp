@@ -188,7 +188,7 @@ Add this to your `claude_desktop_config.json`:
 
 Docker:
 
-```bash
+```sh
 docker build -t cognitive-enhancement-mcp/structured-argumentation -f packages/structured-argumentation/Dockerfile .
 ```
 

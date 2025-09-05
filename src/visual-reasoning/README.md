@@ -209,7 +209,7 @@ Add this to your `claude_desktop_config.json`:
 
 Docker:
 
-```bash
+```sh
 docker build -t cognitive-enhancement-mcp/visual-reasoning -f packages/visual-reasoning/Dockerfile .
 ```
 

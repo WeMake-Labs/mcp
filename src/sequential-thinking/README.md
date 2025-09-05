@@ -126,7 +126,7 @@ For Docker installation:
 
 Docker:
 
-```bash
+```sh
 docker build -t mcp/sequential-thinking -f src/sequential-thinking/Dockerfile .
 ```
 
