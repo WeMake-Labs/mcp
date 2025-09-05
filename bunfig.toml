@@ -6,7 +6,12 @@
 exact = true
 
 # Registry configuration
-registry = { url = "https://registry.npmjs.org", token = "$npm_token" }
+registry = "https://registry.npmjs.org"
+
+[install.scopes]
+
+# Registry with token
+wemake.cx = { token = "$npm_token", url = "https://registry.npmjs.org" }
 
 # Development server configuration
 [dev]
