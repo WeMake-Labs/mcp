@@ -30,7 +30,8 @@
     "build": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked'",
     "start": "node dist/index.js",
     "prepare": "bun run build",
-    "watch": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked' --watch"
+    "watch": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked' --watch",
+    "publish": "bun publish"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
