@@ -26,7 +26,7 @@
     "start": "bun run --filter='./src/*' start",
     "build": "bun run --filter='./src/*' build",
     "watch": "bun run --filter='./src/*' watch",
-    "publish-all": "bun publish --workspaces --access alpha",
+    "publish-all": "bun publish --workspaces --access='alpha'",
     "link-all": "bun link --workspaces",
     "demo": "node src/glass-scrolls-mcp/dist/index.js demo",
     "replay": "node src/glass-scrolls-mcp/dist/index.js replay",
