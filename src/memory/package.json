@@ -12,7 +12,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "tag": "alpha"
+    "tag": "latest"
   },
   "engines": {
     "bun": ">=1.2.0"

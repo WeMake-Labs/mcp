@@ -93,7 +93,7 @@ visualization.
   "mcpServers": {
     "Visual Reasoning": {
       "command": "bunx",
-      "args": ["@wemake.cx/visual-reasoning@alpha"]
+      "args": ["@wemake.cx/visual-reasoning@latest"]
     }
   }
 }

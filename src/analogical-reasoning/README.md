@@ -94,7 +94,7 @@ Example:
   "mcpServers": {
     "Analogical Reasoning": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/analogical-reasoning@alpha"]
+      "args": ["-y", "@wemake.cx/analogical-reasoning@latest"]
     }
   }
 }
@@ -109,7 +109,7 @@ The server can be configured using the following environment variables:
   "mcpServers": {
     "Analogical Reasoning": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/analogical-reasoning@alpha"],
+      "args": ["-y", "@wemake.cx/analogical-reasoning@latest"],
       "env": {
         "ANALOGY_MAX_ELEMENTS": "50",
         "ANALOGY_MIN_CONFIDENCE": "0.3"

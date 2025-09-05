@@ -101,7 +101,7 @@ Each framework provides distinct analytical perspectives:
   "mcpServers": {
     "Ethical Reasoning": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/ethical-reasoning@alpha"]
+      "args": ["-y", "@wemake.cx/ethical-reasoning@latest"]
     }
   }
 }
@@ -116,7 +116,7 @@ The server can be configured using the following environment variables:
   "mcpServers": {
     "Ethical Reasoning": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/ethical-reasoning@alpha"],
+      "args": ["-y", "@wemake.cx/ethical-reasoning@latest"],
       "env": {
         "ETHICS_MIN_FRAMEWORKS": "2",
         "ETHICS_MAX_FRAMEWORKS": "5",

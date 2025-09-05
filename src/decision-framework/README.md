@@ -101,7 +101,7 @@ Decisions progress through structured stages:
   "mcpServers": {
     "Decision Framework": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/decision-framework@alpha"]
+      "args": ["-y", "@wemake.cx/decision-framework@latest"]
     }
   }
 }
@@ -116,7 +116,7 @@ The server can be configured using the following environment variables:
   "mcpServers": {
     "Decision Framework": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/decision-framework@alpha"],
+      "args": ["-y", "@wemake.cx/decision-framework@latest"],
       "env": {
         "DECISION_MAX_OPTIONS": "10",
         "DECISION_MAX_CRITERIA": "15",

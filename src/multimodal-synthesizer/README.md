@@ -72,7 +72,7 @@ Example output:
   "mcpServers": {
     "Multimodal Synthesizer": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/multimodal-synthesizer@alpha"]
+      "args": ["-y", "@wemake.cx/multimodal-synthesizer@latest"]
     }
   }
 }
@@ -87,7 +87,7 @@ The server can be configured using the following environment variables:
   "mcpServers": {
     "Multimodal Synthesizer": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/multimodal-synthesizer@alpha"],
+      "args": ["-y", "@wemake.cx/multimodal-synthesizer@latest"],
       "env": {
         "MAX_TEXT_ITEMS": "50",
         "MAX_IMAGE_ITEMS": "20",

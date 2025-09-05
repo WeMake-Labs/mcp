@@ -54,7 +54,7 @@ These words often signal overgeneralization or unsupported claims that may indic
   "mcpServers": {
     "Bias Detection": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/bias-detection@alpha"]
+      "args": ["-y", "@wemake.cx/bias-detection@latest"]
     }
   }
 }
@@ -70,7 +70,7 @@ versions may include:
   "mcpServers": {
     "Bias Detection": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/bias-detection@alpha"],
+      "args": ["-y", "@wemake.cx/bias-detection@latest"],
       "env": {
         "BIAS_SENSITIVITY": "medium",
         "CUSTOM_BIAS_WORDS": "path/to/custom-words.json"

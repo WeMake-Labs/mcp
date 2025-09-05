@@ -89,7 +89,7 @@ validation results.
   "mcpServers": {
     "transaction-manager": {
       "command": "bunx",
-      "args": ["@wemake.cx/transaction-manager@alpha"]
+      "args": ["@wemake.cx/transaction-manager@latest"]
     }
   }
 }

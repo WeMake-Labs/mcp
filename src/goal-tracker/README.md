@@ -124,7 +124,7 @@ The server supports comprehensive goal operations:
   "mcpServers": {
     "Goal Tracker": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/goal-tracker@alpha"]
+      "args": ["-y", "@wemake.cx/goal-tracker@latest"]
     }
   }
 }
@@ -139,7 +139,7 @@ The server can be configured using the following environment variables:
   "mcpServers": {
     "Goal Tracker": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/goal-tracker@alpha"],
+      "args": ["-y", "@wemake.cx/goal-tracker@latest"],
       "env": {
         "GOAL_MAX_ACTIVE": "20",
         "GOAL_AUTO_ARCHIVE": "true",

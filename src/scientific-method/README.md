@@ -119,7 +119,7 @@ Systematic approach to result interpretation:
   "mcpServers": {
     "Scientific Method": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/scientific-method@alpha"]
+      "args": ["-y", "@wemake.cx/scientific-method@latest"]
     }
   }
 }
@@ -132,7 +132,7 @@ Systematic approach to result interpretation:
   "mcpServers": {
     "Scientific Method": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/scientific-method@alpha"],
+      "args": ["-y", "@wemake.cx/scientific-method@latest"],
       "env": {
         "INQUIRY_DEPTH": "comprehensive",
         "STATISTICAL_RIGOR": "high",

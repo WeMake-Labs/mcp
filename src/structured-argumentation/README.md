@@ -81,7 +81,7 @@ assessment, and recommendations for next argumentative steps.
   "mcpServers": {
     "Structured Argumentation": {
       "command": "bunx",
-      "args": ["@wemake.cx/structured-argumentation@alpha"]
+      "args": ["@wemake.cx/structured-argumentation@latest"]
     }
   }
 }

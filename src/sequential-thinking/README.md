@@ -84,7 +84,7 @@ recommendations for next steps.
   "mcpServers": {
     "sequential-thinking": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/sequential-thinking@alpha"]
+      "args": ["-y", "@wemake.cx/sequential-thinking@latest"]
     }
   }
 }

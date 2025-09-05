@@ -125,7 +125,7 @@ Example:
   "mcpServers": {
     "Metacognitive Monitoring": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/metacognitive-monitoring@alpha"]
+      "args": ["-y", "@wemake.cx/metacognitive-monitoring@latest"]
     }
   }
 }
@@ -140,7 +140,7 @@ The server can be configured using the following environment variables:
   "mcpServers": {
     "Metacognitive Monitoring": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/metacognitive-monitoring@alpha"],
+      "args": ["-y", "@wemake.cx/metacognitive-monitoring@latest"],
       "env": {
         "MONITORING_HISTORY_LIMIT": "100",
         "CONFIDENCE_THRESHOLD": "0.7"
