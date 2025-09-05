@@ -161,7 +161,7 @@ async function handleTransactionCallback(args: TxnRequestArgs): Promise<CallTool
 export async function runServer(): Promise<void> {
   const mcpServer = new McpServer({
     name: "transaction-manager",
-    version: "0.2.4" // Updated version
+    version: "0.2.5" // Updated version
   });
 
   // Register the single tool
