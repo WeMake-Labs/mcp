@@ -30,6 +30,7 @@
     "publish:collaborative-reasoning": "bun publish --cwd='./src/collaborative-reasoning'",
     "publish:metacognitive-monitoring": "bun publish --cwd='./src/metacognitive-monitoring'",
     "publish:focus-group": "bun publish --cwd='./src/focus-group'",
+    "publish:structured-argumentation": "bun publish --cwd='./src/structured-argumentation'",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
@@ -53,7 +54,8 @@
     "@modelcontextprotocol/sdk": "1.17.4",
     "@wemake.cx/analogical-reasoning": "*",
     "@wemake.cx/collaborative-reasoning": "*",
-    "@wemake.cx/metacognitive-monitoring": "*"
+    "@wemake.cx/metacognitive-monitoring": "*",
+    "@wemake.cx/structured-argumentation": "*"
   },
   "devDependencies": {
     "@nx/eslint": "21.4.1",
