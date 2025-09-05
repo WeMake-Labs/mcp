@@ -1008,7 +1008,7 @@ Key features:
 const server = new Server(
   {
     name: "focus-group-server",
-    version: "0.0.3"
+    version: "0.1.5"
   },
   {
     capabilities: {

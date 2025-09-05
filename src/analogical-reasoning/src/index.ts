@@ -1,5 +1,3 @@
-#!/usr/bin/env bun
-
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -732,7 +730,7 @@ export class AnalogicalReasoningServer {
 const server = new Server(
   {
     name: "analogical-reasoning",
-    version: "0.1.3"
+    version: "0.1.5"
   },
   {
     capabilities: {

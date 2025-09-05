@@ -1,12 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
+  "docs": "https://bun.sh/docs/typescript",
   "extends": "../../tsconfig.json",
 
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": ".",
     "strict": true,
-    "lib": ["ESNext", "DOM"],
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -17,6 +17,6 @@
     "noEmit": false
   },
 
-  "include": ["*.ts", "tests/**/*.ts"],
-  "exclude": ["dist", "node_modules", "build", "coverage"]
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

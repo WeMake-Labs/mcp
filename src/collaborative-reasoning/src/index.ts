@@ -1,5 +1,3 @@
-#!/usr/bin/env bun
-
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, type Tool } from "@modelcontextprotocol/sdk/types.js";
@@ -1210,7 +1208,7 @@ Key features:
 const server = new Server(
   {
     name: "collaborative-reasoning-server",
-    version: "0.1.4"
+    version: "0.1.5"
   },
   {
     capabilities: {

@@ -4,7 +4,7 @@
  */
 
 import { describe, test, expect, beforeEach } from "bun:test";
-import { CollaborativeReasoningServer } from "../../index.js";
+import { CollaborativeReasoningServer } from "../../src/index.js";
 import {
   mockCollaborativeReasoningData,
   TestHelpers,

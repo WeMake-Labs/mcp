@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/collaborative-reasoning",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "MCP server for structured multi-persona collaborative reasoning",
   "license": "MIT",
   "type": "module",
@@ -10,21 +10,17 @@
     "directory": "src/collaborative-reasoning"
   },
   "publishConfig": {
-    "access": "public",
-    "tag": "latest"
+    "access": "public"
   },
   "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/collaborative-reasoning",
   "author": "heyFlorentin",
   "engines": {
-    "bun": ">=1.2.0"
+    "bun": ">=1.2.0",
+    "node": ">=18.0.0"
   },
   "packageManager": "bun@1.2.0",
   "keywords": [
-    "mcp",
     "model-context-protocol",
-    "thinking",
-    "model-enhancement",
-    "mcp-server",
     "collaborative-reasoning"
   ],
   "bin": {
@@ -34,7 +30,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun build --entrypoints ./index.ts --outdir ./dist --format esm --target=bun --sourcemap && (echo '#!/usr/bin/env bun' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js) && chmod +x dist/*.js",
+    "build": "bun build --entrypoints ./src/index.ts --outdir ./dist --format esm --target=bun --sourcemap && (echo '#!/usr/bin/env bun' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js) && chmod +x dist/*.js",
     "types": "bun tsc",
     "prepare": "bun run types && bun run build",
     "test": "bun test",

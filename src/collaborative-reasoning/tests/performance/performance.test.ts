@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, afterEach } from "bun:test";
-import { CollaborativeReasoningServer } from "../../index.js";
+import { CollaborativeReasoningServer } from "../../src/index.js";
 import { TestHelpers, performanceTestData } from "../utils/test-data.js";
 
 /**

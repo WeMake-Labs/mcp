@@ -3,7 +3,7 @@
  * Provides consistent test data and helper functions
  */
 
-import type { Persona, Contribution, Disagreement, CollaborativeReasoningData } from "../../index.js";
+import type { Persona, Contribution, Disagreement, CollaborativeReasoningData } from "../../src/index.js";
 
 /**
  * Runtime and environment detection utilities for consistent test behavior
