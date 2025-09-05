@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/focus-group",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "MCP server for LLM focus groups to analyze and critique other MCP servers",
   "license": "MIT",
   "type": "module",
@@ -40,11 +40,10 @@
     "release": "bun publish"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
-    "chalk": "^5.2.0"
+    "@modelcontextprotocol/sdk": "^1.17.4"
   },
   "devDependencies": {
-    "typescript": "^5.0.2",
-    "@types/node": "^18.15.5"
+    "@types/node": "^22",
+    "typescript": "^5.3.3"
   }
 }

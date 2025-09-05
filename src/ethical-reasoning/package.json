@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/ethical-reasoning",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "MCP server for structured ethical reasoning across multiple frameworks",
   "license": "MIT",
   "type": "module",
@@ -41,8 +41,7 @@
     "release": "bun publish"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
-    "chalk": "^5.3.0"
+    "@modelcontextprotocol/sdk": "^1.17.4"
   },
   "devDependencies": {
     "@types/node": "^22",

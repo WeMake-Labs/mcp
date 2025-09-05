@@ -58,7 +58,7 @@ class MultimodalSynthServer {
   }
 }
 
-const server = new Server({ name: "multimodal-synthesizer-server", version: "0.2.5" }, { capabilities: { tools: {} } });
+const server = new Server({ name: "multimodal-synthesizer-server", version: "0.2.6" }, { capabilities: { tools: {} } });
 const synthServer = new MultimodalSynthServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [MULTIMODAL_SYNTH_TOOL] }));

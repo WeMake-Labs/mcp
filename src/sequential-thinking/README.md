@@ -82,7 +82,7 @@ recommendations for next steps.
 ```json
 {
   "mcpServers": {
-    "sequential-thinking": {
+    "Sequential Thinking": {
       "command": "bunx",
       "args": ["-y", "@wemake.cx/sequential-thinking@latest"]
     }

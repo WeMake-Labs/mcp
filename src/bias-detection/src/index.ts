@@ -49,7 +49,7 @@ class BiasDetectionServer {
   }
 }
 
-const server = new Server({ name: "bias-detection-server", version: "0.2.5" }, { capabilities: { tools: {} } });
+const server = new Server({ name: "bias-detection-server", version: "0.2.6" }, { capabilities: { tools: {} } });
 const biasServer = new BiasDetectionServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [BIAS_DETECTION_TOOL] }));

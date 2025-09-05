@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/sequential-thinking",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "MCP server for sequential thinking and problem solving",
   "license": "MIT",
   "type": "module",
@@ -19,7 +19,7 @@
   "engines": {
     "bun": ">=1.2.0"
   },
-  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/sequential-reasoning",
+  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/sequential-thinking",
   "author": "heyFlorentin",
   "keywords": [
     "model-context-protocol",
@@ -39,13 +39,10 @@
     "release": "bun publish"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
-    "chalk": "^5.3.0",
-    "yargs": "^17.7.2"
+    "@modelcontextprotocol/sdk": "^1.17.4"
   },
   "devDependencies": {
     "@types/node": "^22",
-    "@types/yargs": "^17.0.32",
     "typescript": "^5.3.3"
   }
 }

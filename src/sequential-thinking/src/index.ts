@@ -253,7 +253,7 @@ You should:
 const server = new Server(
   {
     name: "sequential-thinking-server",
-    version: "0.2.5"
+    version: "0.2.6"
   },
   {
     capabilities: {

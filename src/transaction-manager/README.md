@@ -87,7 +87,7 @@ validation results.
 ```json
 {
   "mcpServers": {
-    "transaction-manager": {
+    "Transaction Manager": {
       "command": "bunx",
       "args": ["@wemake.cx/transaction-manager@latest"]
     }

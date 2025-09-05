@@ -804,7 +804,7 @@ Key features:
 const server = new Server(
   {
     name: "metacognitive-monitoring-server",
-    version: "0.2.5"
+    version: "0.2.6"
   },
   {
     capabilities: {
