@@ -1,0 +1,47 @@
+{
+  "name": "@wemake.cx/bias-detection",
+  "version": "0.0.1",
+  "description": "MCP server for simple bias detection in text",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WeMake-AI/mcp.git",
+    "directory": "src/bias-detection"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
+  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/bias-detection",
+  "author": "heyFlorentin",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "bias",
+    "model-enhancement"
+  ],
+  "bin": {
+    "mcp-server-bias-detection": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked'",
+    "start": "node dist/index.js",
+    "prepare": "bun run build",
+    "watch": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked' --watch",
+    "publish": "bun publish"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "shx": "^0.3.4",
+    "typescript": "^5.3.3"
+  }
+}

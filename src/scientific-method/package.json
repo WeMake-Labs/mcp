@@ -1,0 +1,49 @@
+{
+  "name": "@wemake.cx/scientific-method",
+  "version": "0.0.1",
+  "description": "MCP server for diagrammatic thinking and spatial representation",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WeMake-AI/mcp.git",
+    "directory": "src/scientific-method"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
+  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/scientific-method",
+  "author": "heyFlorentin",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "thinking",
+    "model-enhancement"
+  ],
+  "bin": {
+    "mcp-server-scientific-method": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked'",
+    "start": "node dist/index.js",
+    "prepare": "bun run build",
+    "watch": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked' --watch",
+    "publish": "bun publish"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "chalk": "^5.3.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/yargs": "^17.0.32",
+    "shx": "^0.3.4",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "@wemake.cx/focus-group",
+  "version": "0.0.1",
+  "description": "MCP server for LLM focus groups to analyze and critique other MCP servers",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WeMake-AI/mcp.git",
+    "directory": "src/focus-group"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
+  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/structured-argumentation",
+  "author": "heyFlorentin",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "focus-group"
+  ],
+  "bin": {
+    "mcp-server-structured-argumentation": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked'",
+    "start": "node dist/index.js",
+    "prepare": "bun run build",
+    "watch": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked' --watch",
+    "publish": "bun publish"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "chalk": "^5.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.2",
+    "@types/node": "^18.15.5"
+  }
+}
