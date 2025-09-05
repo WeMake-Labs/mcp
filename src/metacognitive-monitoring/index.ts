@@ -266,7 +266,7 @@ class MetacognitiveMonitoringServer {
     if (Array.isArray(data.suggestedAssessments)) {
       for (const assessment of data.suggestedAssessments) {
         if (typeof assessment === "string" && ["knowledge", "claim", "reasoning", "overall"].includes(assessment)) {
-          suggestedAssessments.push(assessment as any);
+          suggestedAssessments.push(assessment as "knowledge" | "claim" | "reasoning" | "overall");
         }
       }
     }

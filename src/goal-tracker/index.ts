@@ -20,13 +20,15 @@ class GoalTracker {
 
   handle(input: GoalInput): Result {
     switch (input.action) {
-      case "add":
+      case "add": {
         if (input.goal) this.goals.push({ goal: input.goal, completed: false });
         break;
-      case "complete":
+      }
+      case "complete": {
         const g = this.goals.find((x) => x.goal === input.goal);
         if (g) g.completed = true;
         break;
+      }
       case "status":
         break;
     }

@@ -305,7 +305,13 @@ class ArgumentationServer {
       if (suggestedNextTypes.length === 0 && validatedInput.nextArgumentNeeded) {
         switch (validatedInput.argumentType) {
           case "thesis":
-            suggestedNextTypes = ["antithesis", "objection"] as any;
+            suggestedNextTypes = ["antithesis", "objection"] as (
+              | "thesis"
+              | "antithesis"
+              | "synthesis"
+              | "objection"
+              | "rebuttal"
+            )[];
             break;
           case "antithesis":
             suggestedNextTypes = ["synthesis", "objection"];
@@ -317,7 +323,13 @@ class ArgumentationServer {
             suggestedNextTypes = ["synthesis"];
             break;
           default:
-            suggestedNextTypes = ["thesis", "objection"] as any;
+            suggestedNextTypes = ["thesis", "objection"] as (
+              | "thesis"
+              | "antithesis"
+              | "synthesis"
+              | "objection"
+              | "rebuttal"
+            )[];
         }
       }
 

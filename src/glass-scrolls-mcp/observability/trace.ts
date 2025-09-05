@@ -30,13 +30,14 @@ export class Trace {
 
     for (const ev of eventsArray) {
       // Minimal validation and normalization
+      const evUnknown = ev as unknown as Record<string, unknown>;
       const normalized: TraceEvent = {
         ts: typeof ev.ts === "number" ? ev.ts : Date.now(),
-        type: String((ev as any).type ?? "event"),
-        stepId: String((ev as any).stepId ?? ""),
-        toolName: String((ev as any).toolName ?? ""),
-        input: (ev as any).input,
-        output: (ev as any).output,
+        type: String(evUnknown.type ?? "event"),
+        stepId: String(evUnknown.stepId ?? ""),
+        toolName: String(evUnknown.toolName ?? ""),
+        input: evUnknown.input,
+        output: evUnknown.output,
         durationMs: typeof ev.durationMs === "number" ? ev.durationMs : 0
       };
       trace.record(normalized);

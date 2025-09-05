@@ -294,7 +294,9 @@ class AnalogicalReasoningServer {
             operation
           )
         ) {
-          suggestedOperations.push(operation as any);
+          suggestedOperations.push(
+            operation as "add-mapping" | "revise-mapping" | "draw-inference" | "evaluate-limitation" | "try-new-source"
+          );
         }
       }
     }
@@ -585,7 +587,8 @@ const AnalogicalReasoningSchema = z.object({
 });
 
 // Export createServer function for Smithery CLI
-export default function createServer({ config }: { config: z.infer<typeof configSchema> }): Server {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function createServer(_: { config: z.infer<typeof configSchema> }): Server {
   // Create a low-level Server instance
   const server = new Server(
     {
@@ -616,7 +619,7 @@ Use this tool to:
 - Draw insights through structural alignment
 - Generate predictions based on analogical transfer
 - Solve problems by applying known solutions to new contexts`,
-        inputSchema: zodToJsonSchema(AnalogicalReasoningSchema) as any
+        inputSchema: zodToJsonSchema(AnalogicalReasoningSchema) as Record<string, unknown>
       }
     ]
   }));

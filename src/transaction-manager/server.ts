@@ -4,13 +4,13 @@ import { CallToolResult, McpError, ErrorCode } from "@modelcontextprotocol/sdk/t
 import { z } from "zod";
 import chalk from "chalk";
 import { v4 as uuidv4 } from "uuid";
-import { redisClient, setWithTTL, get, del, expire } from "./lib/redis-helper.js";
+import { setWithTTL, get, del, expire } from "./lib/redis-helper.js";
 
 // -- Zod Schema for Input Validation --
 const TxnRequestSchema = z.object({
   action: z.enum(["start", "resume", "close"]),
   token: z.string().optional(),
-  payload: z.any().optional(), // Keep as any for flexibility
+  payload: z.unknown().optional(), // Use unknown for better type safety
   ttlSeconds: z.number().int().positive().optional()
 });
 
@@ -84,7 +84,7 @@ async function handleTransactionCallback(args: TxnRequestArgs): Promise<CallTool
           throw new McpError(ErrorCode.InvalidParams, `Transaction token "${requestToken}" not found or expired.`);
         }
 
-        let finalPayload = currentPayload;
+        let finalPayload: unknown = currentPayload;
         if (payload !== undefined) {
           await setWithTTL(requestToken, payload, effectiveTtl);
           finalPayload = payload;
@@ -125,13 +125,18 @@ async function handleTransactionCallback(args: TxnRequestArgs): Promise<CallTool
     return {
       content: [{ type: "text", text: JSON.stringify(responsePayload) }]
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(chalk.red("Error handling transaction:"), error);
     // Return error result
     const errorPayload: TxnResponse = {
       status: "error",
       token: requestToken ?? "unknown",
-      error: error instanceof McpError ? error.message : error.message || "An unexpected server error occurred.",
+      error:
+        error instanceof McpError
+          ? error.message
+          : error instanceof Error
+            ? error.message
+            : "An unexpected server error occurred.",
       expiresAt: null
     };
     const errorMessage = errorPayload.error;

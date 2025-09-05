@@ -17,7 +17,7 @@ interface VisualElement {
   id: string;
   type: "node" | "edge" | "container" | "annotation";
   label?: string;
-  properties: Record<string, any>; // Position, size, color, etc.
+  properties: Record<string, unknown>; // Position, size, color, etc.
   // For edges
   source?: string; // ID of source element
   target?: string; // ID of target element
@@ -341,11 +341,16 @@ class VisualReasoningServer {
             relationships.set(relationType, []);
           }
 
-          relationships.get(relationType)?.push({
+          const relationData: { source: string; target: string; label?: string } = {
             source: edge.source,
-            target: edge.target,
-            label: edge.properties.description
-          });
+            target: edge.target
+          };
+
+          if (typeof edge.properties === "object" && edge.properties !== null && "description" in edge.properties) {
+            relationData.label = String(edge.properties.description);
+          }
+
+          relationships.get(relationType)?.push(relationData);
         }
 
         // Render concept map by relationship type
@@ -369,7 +374,7 @@ class VisualReasoningServer {
         break;
       }
 
-      default:
+      default: {
         // Generic element listing for other diagram types
         const nodesByType = new Map<string, VisualElement[]>();
 
@@ -393,6 +398,8 @@ class VisualReasoningServer {
           }
           output += "\n";
         }
+        break;
+      }
     }
 
     return output;
