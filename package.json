@@ -23,9 +23,9 @@
   "packageManager": "bun@1.2.0",
   "scripts": {
     "start": "bun run --filter='./src/*' start",
-    "build": "bun run --filter='./src/*' build",
+    "build-all": "bun run --filter='./src/*' build",
     "watch": "bun run --filter='./src/*' watch",
-    "release": "bun run --filter='./src/*' release",
+    "publish-all": "bun run --filter='./src/*' publish",
     "link-all": "bun link --workspaces",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",

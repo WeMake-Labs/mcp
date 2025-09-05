@@ -6,7 +6,7 @@
 exact = true
 
 # Registry configuration
-registry = "https://registry.npmjs.org/"
+registry = { url = "https://registry.npmjs.org", token = "$npm_token" }
 
 # Development server configuration
 [dev]

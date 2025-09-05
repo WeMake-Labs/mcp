@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  id-token: write # Required for OIDC
+  id-token: write
   contents: read
 
 jobs:
@@ -21,6 +21,7 @@ jobs:
           node-version: "20"
 
       - run: bun install --frozen-lockfile
-      - run: bun run build
-      - run: bun run test
-      - run: bun run release
+      - run: bun run build-all
+      - run: bun run publish-all
+        env:
+          npm_token: ${{ secrets.NPM_TOKEN }}
