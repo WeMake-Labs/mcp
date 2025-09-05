@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/ethical-reasoning",
-  "version": "0.0.1",
+  "version": "0.2.1",
   "description": "MCP server for structured ethical reasoning across multiple frameworks",
   "license": "MIT",
   "type": "module",

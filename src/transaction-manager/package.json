@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/transaction-manager",
-  "version": "0.0.1",
+  "version": "0.2.1",
   "description": "MCP meta-server for managing stateful interactions via transaction tokens",
   "license": "MIT",
   "type": "module",

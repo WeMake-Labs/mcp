@@ -44,7 +44,7 @@ class NarrativePlannerServer {
   }
 }
 
-const server = new Server({ name: "narrative-planner-server", version: "0.0.1" }, { capabilities: { tools: {} } });
+const server = new Server({ name: "narrative-planner-server", version: "0.2.1" }, { capabilities: { tools: {} } });
 const narrativeServer = new NarrativePlannerServer();
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [NARRATIVE_PLANNER_TOOL] }));
