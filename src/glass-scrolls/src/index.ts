@@ -3,7 +3,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import path from "node:path";
 import fs from "node:fs/promises";
-import { Trace } from "./observability/trace.js";
+import { Trace } from "../observability/trace.js";
 import { run, replay, Plan } from "./loop.js";
 
 const TRACE_PATH = path.resolve(process.cwd(), "demos/bass/out/trace.json");

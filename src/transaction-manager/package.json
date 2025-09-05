@@ -4,6 +4,7 @@
   "description": "MCP meta-server for managing stateful interactions via transaction tokens",
   "license": "MIT",
   "type": "module",
+  "main": "./src/index.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/WeMake-AI/mcp.git",
@@ -26,13 +27,14 @@
     "mcp-server-transaction-manager": "dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "lib"
   ],
   "scripts": {
-    "build": "tsc && shx chmod +x dist/*.js",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked'",
     "start": "node dist/index.js",
     "prepare": "bun run build",
-    "watch": "tsc --watch"
+    "watch": "bun build ./src/index.ts --outdir='./dist' --target='node' --sourcemap='linked' --watch"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",

@@ -1,4 +1,4 @@
-import { Trace, TraceEvent } from "./observability/trace.js";
+import { Trace, TraceEvent } from "../observability/trace.js";
 
 export type PlanStep = {
   id: string;
