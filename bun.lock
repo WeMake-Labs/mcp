@@ -83,7 +83,7 @@
     },
     "src/structured-argumentation": {
       "name": "@wemake.cx/structured-argumentation",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "bin": {
         "mcp-server-structured-argumentation": "dist/index.js",
       },
