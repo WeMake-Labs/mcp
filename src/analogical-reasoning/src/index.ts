@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
@@ -602,7 +603,7 @@ export default function createServer(_: { config: z.infer<typeof configSchema> }
   const server = new Server(
     {
       name: "analogical-reasoning-server",
-      version: "0.2.10"
+      version: "0.2.11"
     },
     {
       capabilities: {
@@ -650,4 +651,26 @@ Use this tool to:
   });
 
   return server;
+}
+
+// Main execution - start the server when run directly
+if (import.meta.main) {
+  const server = createServer({ config: {} });
+
+  // Create stdio transport for MCP communication
+  const transport = new StdioServerTransport();
+
+  // Connect server to transport
+  server.connect(transport);
+
+  // Handle graceful shutdown
+  process.on("SIGINT", async () => {
+    await server.close();
+    process.exit(0);
+  });
+
+  process.on("SIGTERM", async () => {
+    await server.close();
+    process.exit(0);
+  });
 }
