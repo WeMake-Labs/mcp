@@ -22,10 +22,8 @@
   "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/analogical-reasoning",
   "author": "heyFlorentin",
   "keywords": [
-    "mcp",
     "model-context-protocol",
-    "thinking",
-    "model-enhancement"
+    "analogical-reasoning"
   ],
   "bin": {
     "mcp-server-analogical-reasoning": "dist/index.js"
