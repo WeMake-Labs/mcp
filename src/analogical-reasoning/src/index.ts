@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
@@ -602,7 +603,7 @@ export default function createServer(_: { config: z.infer<typeof configSchema> }
   const server = new Server(
     {
       name: "analogical-reasoning-server",
-      version: "0.2.10"
+      version: "0.2.12"
     },
     {
       capabilities: {
@@ -650,4 +651,63 @@ Use this tool to:
   });
 
   return server;
+}
+
+/**
+ * Starts the MCP stdio server for local CLI use.
+ * Installs signal and error handlers for robust shutdown.
+ */
+if (import.meta.main) {
+  const server = createServer({ config: {} });
+  let transport: StdioServerTransport | null = null;
+
+  /**
+   * Robust shutdown procedure that properly closes server and transport.
+   */
+  async function shutdown(exitCode: number = 0): Promise<void> {
+    try {
+      if (server) {
+        await server.close();
+      }
+      if (transport) {
+        // Properly close the StdioServerTransport
+        if (typeof transport.close === "function") {
+          transport.close();
+        }
+      }
+    } catch (error) {
+      console.error("Error during shutdown:", error);
+      exitCode = exitCode || 1;
+    } finally {
+      process.exit(exitCode);
+    }
+  }
+
+  // Error handlers
+  process.on("unhandledRejection", (reason, promise) => {
+    console.error("Unhandled Rejection at:", promise, "reason:", reason);
+    shutdown(1);
+  });
+
+  process.on("uncaughtException", (error) => {
+    console.error("Uncaught Exception:", error);
+    shutdown(1);
+  });
+
+  // Signal handlers for graceful shutdown
+  process.on("SIGINT", () => shutdown(0));
+  process.on("SIGTERM", () => shutdown(0));
+
+  // Initialize and start server
+  try {
+    // Create transport before connecting
+    transport = new StdioServerTransport();
+
+    // Await server connection to ensure establishment
+    await server.connect(transport);
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    // Ensure startup errors trigger immediate cleanup
+    await shutdown(1);
+  }
 }
