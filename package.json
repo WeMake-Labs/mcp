@@ -53,27 +53,11 @@
     "test:report": "bun run scripts/generate-report.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.18.0",
-    "@wemake.cx/analogical-reasoning": "*",
-    "@wemake.cx/bias-detection": "*",
-    "@wemake.cx/constraint-solver": "*",
-    "@wemake.cx/decision-framework": "*",
-    "@wemake.cx/ethical-reasoning": "*",
-    "@wemake.cx/focus-group": "*",
-    "@wemake.cx/goal-tracker": "*",
-    "@wemake.cx/memory": "*",
-    "@wemake.cx/metacognitive-monitoring": "*",
-    "@wemake.cx/multimodal-synthesizer": "*",
-    "@wemake.cx/narrative-planner": "*",
-    "@wemake.cx/scientific-method": "*",
-    "@wemake.cx/sequential-thinking": "*",
-    "@wemake.cx/structured-argumentation": "*",
-    "@wemake.cx/transaction-manager": "*",
-    "@wemake.cx/visual-reasoning": "*"
+    "@modelcontextprotocol/sdk": "1.18.0"
   },
   "devDependencies": {
     "0x": "6.0.0",
-    "@nx/eslint": "21.4.1",
+    "@nx/eslint": "21.5.2",
     "@tsconfig/bun": "1.0.8",
     "@types/bun": "1.2.21",
     "@typescript-eslint/eslint-plugin": "8.43.0",
@@ -83,7 +67,7 @@
     "eslint": "9.35.0",
     "license-checker": "25.0.1",
     "markdownlint": "0.38.0",
-    "nx": "21.4.1",
+    "nx": "21.5.2",
     "prettier": "3.6.2",
     "snyk": "1.1299.0",
     "typescript": "5.9.2",
