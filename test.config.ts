@@ -1,4 +1,30 @@
-import type { Config } from "@wemake.cx/test-framework";
+// Define Config
+type Config = {
+  coverage: {
+    statements: number;
+    functions: number;
+    lines: number;
+  };
+  retries: {
+    unit: number;
+    integration: number;
+    e2e: number;
+  };
+  performance: {
+    timeout: number;
+    memoryLimit: string;
+    benchmarkIterations: number;
+  };
+  security: {
+    vulnerabilityThreshold: string;
+    licenseCheck: boolean;
+    secretScanning: boolean;
+  };
+  parallel: {
+    workers: string | number;
+    maxWorkers: number;
+  };
+};
 
 export const testConfig: Config = {
   // Coverage thresholds aligned with enterprise standards
