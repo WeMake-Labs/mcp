@@ -19,6 +19,7 @@
         "@wemake.cx/scientific-method": "*",
         "@wemake.cx/sequential-thinking": "*",
         "@wemake.cx/structured-argumentation": "*",
+        "@wemake.cx/test-framework": "*",
         "@wemake.cx/transaction-manager": "*",
         "@wemake.cx/visual-reasoning": "*",
       },
@@ -275,6 +276,16 @@
       "devDependencies": {
         "@types/node": "^22",
         "typescript": "^5.3.3",
+      },
+    },
+    "test/test-framework": {
+      "name": "@wemake.cx/test-framework",
+      "version": "0.0.1",
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
       },
     },
   },
@@ -636,6 +647,8 @@
     "@wemake.cx/sequential-thinking": ["@wemake.cx/sequential-thinking@workspace:src/sequential-thinking"],
 
     "@wemake.cx/structured-argumentation": ["@wemake.cx/structured-argumentation@workspace:src/structured-argumentation"],
+
+    "@wemake.cx/test-framework": ["@wemake.cx/test-framework@workspace:test/test-framework"],
 
     "@wemake.cx/transaction-manager": ["@wemake.cx/transaction-manager@workspace:src/transaction-manager"],
 

@@ -13,7 +13,8 @@
   "license": "BUSL-1.1",
   "type": "module",
   "workspaces": [
-    "src/*"
+    "src/*",
+    "test/*"
   ],
   "private": true,
   "engines": {
@@ -35,6 +36,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
+    "@wemake.cx/test-framework": "*",
     "@wemake.cx/analogical-reasoning": "*",
     "@wemake.cx/bias-detection": "*",
     "@wemake.cx/constraint-solver": "*",
