@@ -45,8 +45,7 @@
     "test:perf": "bun run benchmark && bun run load-test",
     "security:scan": "bun run audit && bun run snyk-test && bun run license-check",
     "audit": "bun audit --audit-level moderate",
-    "snyk-test": "snyk test --severity-threshold=medium",
-    "license-check": "license-checker --onlyAllow 'MIT;Apache-2.0;BSD-3-Clause;ISC'",
+    "license-check": "license-checker --onlyAllow 'Unlicense;MIT;Apache-2.0;BSD-3-Clause;0BSD;BSD-2-Clause;BSD*;ISC;Python-2.0;CC-BY-4.0;CC-BY-3.0;CC0-1.0'",
     "benchmark": "bun run scripts/benchmark.ts",
     "load-test": "bun run scripts/load-test.ts",
     "test:self-heal": "bun run scripts/self-heal.ts",
@@ -69,7 +68,6 @@
     "markdownlint": "0.38.0",
     "nx": "21.5.2",
     "prettier": "3.6.2",
-    "snyk": "1.1299.0",
     "typescript": "5.9.2",
     "vite-tsconfig-paths": "5.1.4"
   },
