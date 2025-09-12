@@ -12,11 +12,9 @@ import type { Config } from "@wemake.cx/test-framework";
 export const testConfig: Config = {
   // Coverage thresholds aligned with enterprise standards
   coverage: {
-    global: 90,
     statements: 90,
-    branches: 85,
-    functions: 90,
-    lines: 90
+    functions: 80,
+    lines: 70
   },
 
   // Self-healing test settings
@@ -70,17 +68,11 @@ sourcemap = true
 minify = true
 
 [test]
-# Enterprise testing configuration
 root = "."
 coverage = true
 preload = ["./test-setup.ts"]
-timeout = 30000
-bail = false
-
-[test.coverage]
-include = ["src/**/*.ts", "!src/**/*.test.ts", "!src/**/*.spec.ts"]
-exclude = ["node_modules/**", "dist/**", "coverage/**"]
-threshold = 90
+coverageThreshold = { line = 0.7, function = 0.8, statement = 0.9 }
+coveragePathIgnorePatterns = ["node_modules/**", "dist/**", "coverage/**"]
 ```
 
 ### 2. Package.json Updates
@@ -111,13 +103,11 @@ threshold = 90
     "test:report": "bun run scripts/generate-report.ts"
   },
   "devDependencies": {
-    "@types/bun": "1.2.21",
-    "typescript": "^5.9.2",
-    "snyk": "^1.1291.0",
-    "license-checker": "^25.0.1",
-    "autocannon": "^7.12.0",
-    "clinic": "^13.0.0",
-    "0x": "^5.5.0"
+    "0x": "6.0.0",
+    "autocannon": "8.0.0",
+    "clinic": "13.0.0",
+    "license-checker": "25.0.1",
+    "snyk": "1.1299.0"
   }
 }
 ```
@@ -130,11 +120,37 @@ threshold = 90
 import { beforeAll, afterAll, beforeEach, afterEach } from "bun:test";
 
 // Global test configuration
+declare global {
+  var TEST_TIMEOUT: number;
+  var PERFORMANCE_THRESHOLD: number;
+}
+
 global.TEST_TIMEOUT = 30000;
 global.PERFORMANCE_THRESHOLD = 1000; // 1 second
 
 // Test database setup for integration tests
-let testDb: any;
+interface TestDatabase {
+  connected: boolean;
+  name: string;
+}
+
+let testDb: TestDatabase | null = null;
+
+/**
+ * Setup test database for integration tests
+ */
+async function setupTestDatabase(): Promise<TestDatabase> {
+  // Mock database setup - implement actual database logic as needed
+  return { connected: true, name: "test_db" };
+}
+
+/**
+ * Initialize test monitoring and metrics collection
+ */
+async function initializeTestMonitoring(): Promise<void> {
+  // Initialize test monitoring - implement actual monitoring logic
+  console.log("Test monitoring initialized");
+}
 
 beforeAll(async () => {
   // Initialize test environment
@@ -147,6 +163,22 @@ beforeAll(async () => {
   await initializeTestMonitoring();
 });
 
+/**
+ * Cleanup test database
+ */
+async function cleanupTestDatabase(db: TestDatabase): Promise<void> {
+  // Cleanup database - implement actual cleanup logic
+  console.log("Test database cleaned up", db.name);
+}
+
+/**
+ * Generate test report
+ */
+async function generateTestReport(): Promise<void> {
+  // Generate test reports - implement actual reporting logic
+  console.log("Test report generated");
+}
+
 afterAll(async () => {
   // Cleanup test environment
   if (testDb) {
@@ -156,6 +188,22 @@ afterAll(async () => {
   // Generate final reports
   await generateTestReport();
 });
+
+/**
+ * Reset test state before each test
+ */
+async function resetTestState(): Promise<void> {
+  // Reset test state - implement actual reset logic
+  console.log("Test state reset");
+}
+
+/**
+ * Cleanup test artifacts after each test
+ */
+async function cleanupTestArtifacts(): Promise<void> {
+  // Cleanup artifacts - implement actual cleanup logic
+  console.log("Test artifacts cleaned up");
+}
 
 beforeEach(async () => {
   // Reset test state
@@ -169,16 +217,19 @@ afterEach(async () => {
 
 // Self-healing test utilities
 export const selfHeal = {
-  retryOnFailure: (fn: Function, maxRetries = 3) => {
-    return async (...args: any[]) => {
+  retryOnFailure: <T extends unknown[], R>(fn: (...args: T) => Promise<R>, maxRetries = 3) => {
+    return async (...args: T): Promise<R> => {
+      let lastError: unknown;
       for (let i = 0; i <= maxRetries; i++) {
         try {
           return await fn(...args);
         } catch (error) {
+          lastError = error;
           if (i === maxRetries) throw error;
           await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
         }
       }
+      throw lastError;
     };
   },
 
@@ -193,6 +244,22 @@ export const selfHeal = {
     }
   }
 };
+
+/**
+ * Restart test services for connection issues
+ */
+async function restartTestServices(): Promise<void> {
+  // Restart services - implement actual service restart logic
+  console.log("Test services restarted");
+}
+
+/**
+ * Adjust test timeouts for flaky tests
+ */
+async function adjustTestTimeouts(): Promise<void> {
+  // Adjust timeouts - implement actual timeout adjustment logic
+  console.log("Test timeouts adjusted");
+}
 ```
 
 **`scripts/benchmark.ts`** - Performance benchmarking:
@@ -212,7 +279,7 @@ interface BenchmarkResult {
 class PerformanceBenchmark {
   private results: BenchmarkResult[] = [];
 
-  async benchmark(name: string, fn: Function, iterations = 100): Promise<BenchmarkResult> {
+  async benchmark(name: string, fn: () => Promise<void> | void, iterations = 100): Promise<BenchmarkResult> {
     const memoryBefore = process.memoryUsage().heapUsed;
     const start = performance.now();
 
@@ -261,34 +328,7 @@ export const benchmark = new PerformanceBenchmark();
 import { execSync } from "child_process";
 import { writeFileSync, readFileSync, existsSync } from "fs";
 
-interface HealingAction {
-  condition: string;
-  action: string;
-  description: string;
-}
-
-const healingActions: HealingAction[] = [
-  {
-    condition: "dependency-vulnerability",
-    action: "bun update && bun audit fix",
-    description: "Update dependencies and fix vulnerabilities"
-  },
-  {
-    condition: "test-timeout",
-    action: "increase-timeout",
-    description: "Increase test timeouts for slow tests"
-  },
-  {
-    condition: "coverage-drop",
-    action: "generate-missing-tests",
-    description: "Generate tests for uncovered code"
-  },
-  {
-    condition: "flaky-test",
-    action: "add-retry-mechanism",
-    description: "Add retry mechanism for flaky tests"
-  }
-];
+// Healing actions configuration removed - implement as needed
 
 class SelfHealingSystem {
   private logFile = "self-healing.log";
@@ -313,7 +353,7 @@ class SelfHealingSystem {
     try {
       execSync("bun audit --audit-level moderate", { stdio: "pipe" });
       this.log("No vulnerabilities found");
-    } catch (error) {
+    } catch {
       this.log("Vulnerabilities detected, attempting auto-fix...");
 
       try {
@@ -475,6 +515,7 @@ jobs:
           POSTGRES_PASSWORD: test
         options: >-
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 

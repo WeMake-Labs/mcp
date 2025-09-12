@@ -13,8 +13,7 @@
   "license": "BUSL-1.1",
   "type": "module",
   "workspaces": [
-    "src/*",
-    "test/*"
+    "src/*"
   ],
   "private": true,
   "engines": {
@@ -32,11 +31,29 @@
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit",
-    "cleanup": "find . -name 'node_modules' -type d -exec rm -rf {} + 2>/dev/null || true && find . -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true"
+    "cleanup": "find . -name 'node_modules' -type d -exec rm -rf {} + 2>/dev/null || true && find . -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true",
+    "test": "bun test",
+    "test:unit": "bun test --name-pattern='*.unit.*'",
+    "test:integration": "bun test --name-pattern='*.integration.*'",
+    "test:e2e": "bun test --name-pattern='*.e2e.*'",
+    "test:performance": "bun run test:perf",
+    "test:security": "bun run security:scan",
+    "test:coverage": "bun test --coverage",
+    "test:ci": "bun test --reporter=junit --reporter-outfile=test-results.xml --coverage --bail=false",
+    "test:watch": "bun test --watch",
+    "test:debug": "bun test --inspect",
+    "test:perf": "bun run benchmark && bun run load-test",
+    "security:scan": "bun run audit && bun run snyk-test && bun run license-check",
+    "audit": "bun audit --audit-level moderate",
+    "snyk-test": "snyk test --severity-threshold=medium",
+    "license-check": "license-checker --onlyAllow 'MIT;Apache-2.0;BSD-3-Clause;ISC'",
+    "benchmark": "bun run scripts/benchmark.ts",
+    "load-test": "bun run scripts/load-test.ts",
+    "test:self-heal": "bun run scripts/self-heal.ts",
+    "test:report": "bun run scripts/generate-report.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
-    "@wemake.cx/test-framework": "*",
     "@wemake.cx/analogical-reasoning": "*",
     "@wemake.cx/bias-detection": "*",
     "@wemake.cx/constraint-solver": "*",
@@ -55,15 +72,20 @@
     "@wemake.cx/visual-reasoning": "*"
   },
   "devDependencies": {
+    "0x": "6.0.0",
     "@nx/eslint": "21.4.1",
     "@tsconfig/bun": "^1.0.8",
     "@types/bun": "1.2.21",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
+    "autocannon": "8.0.0",
+    "clinic": "13.0.0",
     "eslint": "^9.34.0",
+    "license-checker": "25.0.1",
     "markdownlint": "^0.38.0",
     "nx": "21.4.1",
     "prettier": "^3.6.2",
+    "snyk": "1.1299.0",
     "typescript": "^5.9.2",
     "vite-tsconfig-paths": "^5.1.4"
   },
