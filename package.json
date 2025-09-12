@@ -53,7 +53,7 @@
     "test:report": "bun run scripts/generate-report.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
+    "@modelcontextprotocol/sdk": "1.18.0",
     "@wemake.cx/analogical-reasoning": "*",
     "@wemake.cx/bias-detection": "*",
     "@wemake.cx/constraint-solver": "*",
@@ -74,20 +74,20 @@
   "devDependencies": {
     "0x": "6.0.0",
     "@nx/eslint": "21.4.1",
-    "@tsconfig/bun": "^1.0.8",
+    "@tsconfig/bun": "1.0.8",
     "@types/bun": "1.2.21",
-    "@typescript-eslint/eslint-plugin": "^8.40.0",
-    "@typescript-eslint/parser": "^8.40.0",
+    "@typescript-eslint/eslint-plugin": "8.43.0",
+    "@typescript-eslint/parser": "8.43.0",
     "autocannon": "8.0.0",
     "clinic": "13.0.0",
-    "eslint": "^9.34.0",
+    "eslint": "9.35.0",
     "license-checker": "25.0.1",
-    "markdownlint": "^0.38.0",
+    "markdownlint": "0.38.0",
     "nx": "21.4.1",
-    "prettier": "^3.6.2",
+    "prettier": "3.6.2",
     "snyk": "1.1299.0",
-    "typescript": "^5.9.2",
-    "vite-tsconfig-paths": "^5.1.4"
+    "typescript": "5.9.2",
+    "vite-tsconfig-paths": "5.1.4"
   },
   "prettier": {
     "trailingComma": "none",
