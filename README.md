@@ -99,11 +99,11 @@ individual server directories for detailed setup and configuration instructions.
 
 ## 📜 License
 
-This project is licensed under the Business Source License 1.1 (BSL-1.1). See the [LICENSE](LICENSE) file for details.
+This project is licensed under MIT. See the [LICENSE](LICENSE) file for details.
 
 ### Enterprise Licensing
 
-- **Open Source**: BSL-1.1 for development and non-commercial use
+- **Open Source**: MIT for development and non-commercial use
 - **Enterprise License**: Commercial license available for production deployments
 - **Custom Licensing**: Tailored licensing for specific enterprise requirements
 
