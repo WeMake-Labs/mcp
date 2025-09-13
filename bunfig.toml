@@ -4,8 +4,8 @@
 exact = true
 registry = "https://registry.npmjs.org"
 
-[install.scopes]
-wemake.cx = { token = "$npm_token", url = "https://registry.npmjs.org" }
+[install.scopes]  
+wemake.cx = { token = "$NPM_TOKEN", url = "https://registry.npmjs.org" }  
 
 [dev]
 hmr = true

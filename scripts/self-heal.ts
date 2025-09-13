@@ -1,71 +1,81 @@
 #!/usr/bin/env bun
-import { execSync } from "child_process";
-import { writeFileSync, readFileSync, existsSync } from "fs";
+import { existsSync } from "fs";
+
+// Bun type declarations
+declare const Bun: {
+  write(path: string, data: string | Uint8Array, options?: { append?: boolean }): Promise<number>;
+  shell: {
+    (template: TemplateStringsArray, ...args: unknown[]): Promise<{ exitCode: number; stdout: string; stderr: string }>;
+  };
+};
+
+declare const $: typeof Bun.shell;
 
 // Healing actions configuration removed - implement as needed
 
 class SelfHealingSystem {
   private logFile = "self-healing.log";
 
-  log(message: string): void {
+  async log(message: string): Promise<void> {
     const timestamp = new Date().toISOString();
     const logEntry = `[${timestamp}] ${message}\n`;
 
-    if (existsSync(this.logFile)) {
-      const existing = readFileSync(this.logFile, "utf-8");
-      writeFileSync(this.logFile, existing + logEntry);
-    } else {
-      writeFileSync(this.logFile, logEntry);
-    }
+    // Prefer append semantics
+    await Bun.write(this.logFile, logEntry, { append: true });
 
     console.log(`🔧 ${message}`);
   }
 
   async healDependencyVulnerabilities(): Promise<void> {
-    this.log("Checking for dependency vulnerabilities...");
+    await this.log("Checking for dependency vulnerabilities...");
 
     try {
-      execSync("bun audit --audit-level moderate", { stdio: "pipe" });
-      this.log("No vulnerabilities found");
+      await $`bun audit --audit-level moderate`;
+      await this.log("No vulnerabilities found");
     } catch {
-      this.log("Vulnerabilities detected, attempting auto-fix...");
+      await this.log("Vulnerabilities detected, attempting auto-fix...");
 
+      // Avoid mutating lockfiles in CI
+      if (process.env.CI === "true") {
+        await this.log("CI detected; skipping 'bun update'. Open an issue instead.");
+        return;
+      }
       try {
-        execSync("bun update");
-        this.log("Dependencies updated successfully");
+        await $`bun update`;
+        await this.log("Dependencies updated successfully");
       } catch (updateError) {
-        this.log(`Failed to update dependencies: ${updateError}`);
+        await this.log(`Failed to update dependencies: ${updateError}`);
       }
     }
   }
 
   async healTestTimeouts(): Promise<void> {
-    this.log("Analyzing test timeouts...");
+    await this.log("Analyzing test timeouts...");
 
     // Read test results and identify slow tests
     if (existsSync("test-results.xml")) {
       // Parse JUnit XML and identify slow tests
       // Automatically increase timeouts for consistently slow tests
-      this.log("Timeout healing completed");
+      await this.log("Timeout healing completed");
     }
   }
 
   async generateMissingTests(): Promise<void> {
-    this.log("Analyzing test coverage gaps...");
+    await this.log("Analyzing test coverage gaps...");
 
     // Use coverage reports to identify uncovered code
     // Generate basic test templates for uncovered functions
-    this.log("Test generation completed");
+    await this.log("Test generation completed");
   }
 
   async run(): Promise<void> {
-    this.log("Starting self-healing process...");
+    await this.log("Starting self-healing process...");
 
     await this.healDependencyVulnerabilities();
     await this.healTestTimeouts();
     await this.generateMissingTests();
 
-    this.log("Self-healing process completed");
+    await this.log("Self-healing process completed");
   }
 }
 

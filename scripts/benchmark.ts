@@ -1,6 +1,9 @@
 #!/usr/bin/env bun
-import { performance } from "perf_hooks";
-import { writeFileSync } from "fs";
+// Bun provides global `performance` and `Bun.write`
+
+declare const Bun: {
+  write(path: string, data: string | Uint8Array): Promise<number>;
+};
 
 interface BenchmarkResult {
   name: string;
@@ -34,18 +37,20 @@ class PerformanceBenchmark {
     return result;
   }
 
-  generateReport(): void {
+  async generateReport(): Promise<void> {
     const report = {
       timestamp: new Date().toISOString(),
       results: this.results,
       summary: {
         totalTests: this.results.length,
-        averageDuration: this.results.reduce((sum, r) => sum + r.duration, 0) / this.results.length,
+        averageDuration: this.results.length
+          ? this.results.reduce((sum, r) => sum + r.duration, 0) / this.results.length
+          : 0,
         totalMemory: this.results.reduce((sum, r) => sum + r.memory, 0)
       }
     };
 
-    writeFileSync("benchmark-report.json", JSON.stringify(report, null, 2));
+    await Bun.write("benchmark-report.json", JSON.stringify(report, null, 2));
     console.log("📊 Benchmark report generated: benchmark-report.json");
   }
 }

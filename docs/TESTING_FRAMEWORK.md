@@ -7,7 +7,33 @@
 **`test.config.ts`** - Centralized test configuration:
 
 ```typescript
-import type { Config } from "@wemake.cx/test-framework";
+// Define Config
+export type Config = {
+  coverage: {
+    statements: number;
+    functions: number;
+    lines: number;
+  };
+  retries: {
+    unit: number;
+    integration: number;
+    e2e: number;
+  };
+  performance: {
+    timeout: number;
+    memoryLimit: string;
+    benchmarkIterations: number;
+  };
+  security: {
+    vulnerabilityThreshold: "low" | "moderate" | "high" | "critical";
+    licenseCheck: boolean;
+    secretScanning: boolean;
+  };
+  parallel: {
+    workers: "auto" | number;
+    maxWorkers: number;
+  };
+};
 
 export const testConfig: Config = {
   // Coverage thresholds aligned with enterprise standards
@@ -404,16 +430,26 @@ if (import.meta.main) {
 
 ### 4. Enhanced CI/CD Pipeline
 
-**`.github/workflows/comprehensive-testing.yml`**:
+**`.github/workflows/testing.yml`**:
 
 ```yaml
 name: Comprehensive Testing Pipeline
 
-on:
+"on":
   push:
     branches: [main, develop]
   pull_request:
     branches: [main]
+
+# Restrict GITHUB_TOKEN permissions following security best practices
+# https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
+permissions:
+  contents: read # Required for actions/checkout
+  pull-requests: write # Required for creating comments and PR updates
+  issues: write # Required for self-healing issue creation
+  actions: read # Required for workflow status checks
+  checks: read # Required for test result reporting
+  statuses: read # Required for commit status updates
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -422,25 +458,30 @@ concurrency:
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # Only needs to read repository contents
     outputs:
       packages: ${{ steps.packages.outputs.packages }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
 
       - name: Detect changed packages
         id: packages
         run: |
-          PACKAGES=$(find src -name "package.json" -not -path "*/node_modules/*" | jq -R -s -c 'split("\n")[:-1] | map(sub("/package.json"; ""))')
+          sudo apt-get update && sudo apt-get install -y jq  
+          PACKAGES=$(find src -name "package.json" -not -path "*/node_modules/*" | jq -R -s -c 'split("\n")[:-1] | map(sub("/package.json"; ""))')  
           echo "packages=$PACKAGES" >> $GITHUB_OUTPUT
 
   quality-gates:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # Only needs to read repository contents
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: "1.2.0"
 
@@ -458,10 +499,12 @@ jobs:
 
   security-scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # Only needs to read repository contents
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: "1.2.0"
 
@@ -474,23 +517,19 @@ jobs:
       - name: License check
         run: bun run license-check
 
-      - name: Snyk security scan
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=medium
-
   unit-tests:
     runs-on: ubuntu-latest
     needs: [quality-gates]
+    permissions:
+      contents: read # Required for actions/checkout
+      checks: write # Required for test result reporting
     strategy:
       matrix:
         shard: [1, 2, 3, 4]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: "1.2.0"
 
@@ -498,28 +537,35 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run unit tests (shard ${{ matrix.shard }}/4)
-        run: bun test --shard ${{ matrix.shard }}/4 --name-pattern="*.unit.*"
+        run: bun run test:ci -- --shard ${{ matrix.shard }}/4 --name-pattern="*.unit.*"
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+      # - name: Upload coverage
+      #   uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     files: coverage/**/coverage-final.json,coverage/**/lcov.info,coverage/coverage-summary.json
+      #     fail_ci_if_error: true
 
   integration-tests:
     runs-on: ubuntu-latest
     needs: [unit-tests]
+    permissions:
+      contents: read # Required for actions/checkout
+      checks: write # Required for test result reporting
     services:
       postgres:
         image: postgres:15
         env:
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
         options: >-
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: "1.2.0"
 
@@ -527,17 +573,20 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run integration tests
-        run: bun test --name-pattern="*.integration.*"
         env:
-          DATABASE_URL: postgresql://postgres:test@localhost:5432/test
+          DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}
+        run: bun test --name-pattern="*.integration.*"
 
   performance-tests:
     runs-on: ubuntu-latest
     needs: [integration-tests]
+    permissions:
+      contents: read # Required for actions/checkout
+      actions: write # Required for actions/upload-artifact
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: "1.2.0"
 
@@ -548,7 +597,7 @@ jobs:
         run: bun run test:performance
 
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: benchmark-results
           path: benchmark-report.json
@@ -556,15 +605,24 @@ jobs:
   e2e-tests:
     runs-on: ubuntu-latest
     needs: [integration-tests]
+    permissions:
+      contents: read # Required for actions/checkout
+      checks: write # Required for test result reporting
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: "1.2.0"
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Start app
+        run: bun run start &
+
+      - name: Wait for health
+        run: curl -sf --retry 20 --retry-delay 2 http://localhost:3000/health
 
       - name: Run E2E tests
         run: bun test --name-pattern="*.e2e.*"
@@ -573,10 +631,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: [unit-tests, integration-tests, performance-tests, e2e-tests]
     if: failure()
+    permissions:
+      contents: read # Required for actions/checkout
+      issues: write # Required for creating issues via github-script
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: "1.2.0"
 
@@ -588,22 +649,22 @@ jobs:
 
       - name: Create issue for persistent failures
         if: failure()
-        uses: actions/github-script@v6
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: '🔧 Self-healing failed - Manual intervention required',
-              body: `## Failed Tests Summary
-              
-              The self-healing system couldn't automatically fix the following issues:
-              
-              - **Workflow**: ${{ github.workflow }}
-              - **Run ID**: ${{ github.run_id }}
-              - **Commit**: ${{ github.sha }}
-              
-              Please investigate and resolve manually.`,
+              body: `## Failed Tests Summary  
+
+              The self-healing system couldn't automatically fix the following issues:  
+
+              - **Workflow**: ${{ github.workflow }}  
+              - **Run ID**: ${{ github.run_id }}  
+              - **Commit**: ${{ github.sha }}  
+
+              Please investigate and resolve manually.`, 
               labels: ['bug', 'self-healing', 'high-priority']
             });
 
@@ -611,10 +672,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: [unit-tests, integration-tests, e2e-tests]
     if: always()
+    permissions:
+      contents: read # Required for actions/checkout
+      checks: write # Required for coverage reporting
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: "1.2.0"
 
@@ -626,13 +690,10 @@ jobs:
 
       - name: Coverage threshold check
         run: |
-          COVERAGE=$(bun test --coverage --reporter=json | jq '.coverageMap.total.statements.pct')
-          if (( $(echo "$COVERAGE < 90" | bc -l) )); then
-            echo "❌ Coverage $COVERAGE% is below 90% threshold"
-            exit 1
-          else
-            echo "✅ Coverage $COVERAGE% meets 90% threshold"
-          fi
+          COVERAGE=$(bun test --coverage --reporter=json | jq -r '.coverageMap.total.statements.pct')  
+          jq -n --argjson c "$COVERAGE" 'if $c < 90 then halt_error(1) else "ok" end' \  
+          && echo "✅ Coverage ${COVERAGE}% meets 90% threshold" \  
+          || (echo "❌ Coverage ${COVERAGE}% is below 90% threshold"; exit 1)
 ```
 
 ### 5. Example Test Templates

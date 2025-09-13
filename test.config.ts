@@ -1,5 +1,5 @@
 // Define Config
-type Config = {
+export type Config = {
   coverage: {
     statements: number;
     functions: number;
@@ -16,12 +16,12 @@ type Config = {
     benchmarkIterations: number;
   };
   security: {
-    vulnerabilityThreshold: string;
+    vulnerabilityThreshold: "low" | "moderate" | "high" | "critical";
     licenseCheck: boolean;
     secretScanning: boolean;
   };
   parallel: {
-    workers: string | number;
+    workers: "auto" | number;
     maxWorkers: number;
   };
 };

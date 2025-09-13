@@ -70,3 +70,4 @@ ignores:
   - ".wrangler/**"
   - "coverage/**"
   - ".cursor/rules/*.mdc"
+  - ".nx/**"

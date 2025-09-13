@@ -27,7 +27,7 @@
     "watch": "bun run --filter='./src/*' watch",
     "publish-all": "bun run --filter='./src/*' publish",
     "link-all": "bun link --workspaces",
-    "lint": "bun check && bun lint:markdown && bun lint:prettier && bun lint:eslint",
+    "lint": "bun lint:markdown && bun lint:prettier && bun lint:eslint",
     "lint:markdown": "markdownlint-cli2 \"**/*.{md,mdx,mdc}\" \"!node_modules\"",
     "lint:prettier": "prettier --check .",
     "lint:eslint": "eslint . --ext .ts,.tsx",

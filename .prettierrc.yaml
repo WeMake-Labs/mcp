@@ -7,9 +7,6 @@ printWidth: 120
 proseWrap: always
 endOfLine: lf
 overrides:
-  - files: "**/*"
-    excludeFiles:
-      - "*.jsonl"
   - files: |
       "*.yaml"
       "*.yml"

@@ -1,3 +1,4 @@
+/// <reference types="bun-types" />
 import { beforeAll, afterAll, beforeEach, afterEach } from "bun:test";
 
 // Global test configuration
@@ -6,8 +7,8 @@ declare global {
   var PERFORMANCE_THRESHOLD: number;
 }
 
-global.TEST_TIMEOUT = 30000;
-global.PERFORMANCE_THRESHOLD = 1000; // 1 second
+globalThis.TEST_TIMEOUT = 30000;
+globalThis.PERFORMANCE_THRESHOLD = 1000; // 1 second
 
 // Test database setup for integration tests
 interface TestDatabase {
@@ -96,7 +97,9 @@ afterEach(async () => {
   await cleanupTestArtifacts();
 });
 
-// Self-healing test utilities
+/**
+ * Self-healing utilities for flaky tests.
+ */
 export const selfHeal = {
   retryOnFailure: <T extends unknown[], R>(fn: (...args: T) => Promise<R>, maxRetries = 3) => {
     return async (...args: T): Promise<R> => {

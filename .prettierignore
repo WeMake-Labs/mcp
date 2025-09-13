@@ -4,6 +4,8 @@ build
 coverage
 .next
 .turbo
+.nx
+.wrangler
 .env
 .env.local
 .env.development.local
@@ -12,3 +14,4 @@ coverage
 .git
 bun.lock
 bun.lockb
+.DS_Store
