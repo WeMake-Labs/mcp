@@ -17,8 +17,9 @@
   ],
   "private": true,
   "engines": {
-    "bun": ">=1.2.0",
-    "node": ">=20.0.0"
+    "node": "24.5.0",
+    "npm": "please-use-bun",
+    "bun": ">=1.2.0"
   },
   "packageManager": "bun@1.2.0",
   "scripts": {
@@ -43,7 +44,7 @@
     "test:performance": "bun run test:perf",
     "test:security": "bun run security:scan",
     "test:coverage": "bun test --coverage",
-    "test:ci": "bun test --reporter=junit --reporter-outfile=test-results.xml --coverage --bail=false",
+    "test:ci": "bun test --reporter=junit --reporter-outfile=${JUNIT_OUTFILE:-test-results.xml} --coverage",
     "test:watch": "bun test --watch",
     "test:debug": "bun test --inspect",
     "test:perf": "bun run benchmark && bun run load-test",
