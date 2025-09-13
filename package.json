@@ -27,11 +27,15 @@
     "watch": "bun run --filter='./src/*' watch",
     "publish-all": "bun run --filter='./src/*' publish",
     "link-all": "bun link --workspaces",
-    "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
+    "lint": "bun check && bun lint:markdown && bun lint:prettier && bun lint:eslint",
+    "lint:markdown": "markdownlint-cli2 \"**/*.{md,mdx,mdc}\" \"!node_modules\"",
+    "lint:prettier": "prettier --check .",
+    "lint:eslint": "eslint . --ext .ts,.tsx",
+    "commitlint": "commitlint",
+    "format": "prettier --write . && markdownlint-cli2 --fix \"**/*.{md,mdx,mdc}\" \"!node_modules\" && eslint . --ext .ts,.tsx --fix",
     "prettier": "prettier --check .",
-    "lint": "eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit",
-    "cleanup": "find . -name 'node_modules' -type d -exec rm -rf {} + 2>/dev/null || true && find . -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true",
+    "clean": "find . -name 'node_modules' -type d -exec rm -rf {} + 2>/dev/null || true && find . -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true",
     "test": "bun test",
     "test:unit": "bun test --name-pattern='*.unit.*'",
     "test:integration": "bun test --name-pattern='*.integration.*'",
@@ -56,6 +60,10 @@
   },
   "devDependencies": {
     "0x": "6.0.0",
+    "@commitlint/cli": "19.8.1",
+    "@commitlint/config-conventional": "19.8.1",
+    "@commitlint/format": "19.8.1",
+    "@github/markdownlint-github": "0.8.0",
     "@nx/eslint": "21.5.2",
     "@tsconfig/bun": "1.0.8",
     "@types/bun": "1.2.21",
@@ -65,27 +73,18 @@
     "clinic": "13.0.0",
     "eslint": "9.35.0",
     "license-checker": "25.0.1",
+    "lint-staged": "16.1.6",
     "markdownlint": "0.38.0",
+    "markdownlint-cli2": "0.18.1",
+    "markdownlint-cli2-formatter-pretty": "0.0.8",
     "nx": "21.5.2",
     "prettier": "3.6.2",
+    "prettier-plugin-sh": "0.18.0",
     "typescript": "5.9.2",
     "vite-tsconfig-paths": "5.1.4"
   },
-  "prettier": {
-    "trailingComma": "none",
-    "printWidth": 120,
-    "proseWrap": "always",
-    "endOfLine": "lf",
-    "overrides": [
-      {
-        "files": [
-          ".github/workflows/*.yml"
-        ],
-        "options": {
-          "proseWrap": "never",
-          "objectWrap": "collapse"
-        }
-      }
-    ]
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,scss,md,mdx,mdc,sh}": "prettier --write --cache",
+    "*.{md,mdx,mdc}": "markdownlint-cli2 --fix"
   }
 }
