@@ -10,7 +10,7 @@
   },
   "description": "WeMake Model Context Protocol (MCP) servers",
   "homepage": "https://wemake.cx",
-  "license": "BUSL-1.1",
+  "license": "MIT",
   "type": "module",
   "workspaces": [
     "src/*"
