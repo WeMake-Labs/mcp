@@ -16,7 +16,10 @@ language: "en-US"
 
 # Set the tone of reviews and chat. Example: 'You must use talk like Mr. T. I pity the fool who doesn't!'
 # Default: ""
-tone_instructions: ""
+tone_instructions:
+  "Provide clear, actionable feedback focused on enterprise standards, security, and maintainability. Be direct and
+  specific about issues while offering concrete solutions. Prioritize code understanding and review quality over
+  generation speed."
 
 # Enable early-access features.
 # Default: false
@@ -39,9 +42,9 @@ reviews:
   # Default: "chill"
   profile: "assertive"
 
-  # Approve the review once CodeRabbit’s comments are resolved and no pre-merge checks are in an error state. Note: In GitLab, all discussions must be resolved.
+  # Approve the review once CodeRabbit's comments are resolved and no pre-merge checks are in an error state. Note: In GitLab, all discussions must be resolved.
   # Default: false
-  request_changes_workflow: false
+  request_changes_workflow: true
 
   # Generate a high level summary of the changes in the PR/MR description.
   # Default: true
@@ -61,7 +64,9 @@ reviews:
 
   # Auto Title Instructions - Custom instructions for auto-generating the PR/MR title.
   # Default: ""
-  auto_title_instructions: ""
+  auto_title_instructions:
+    "Title should be concise, descriptive, and follow conventional commit format. Include package name for monorepo
+    changes (e.g., 'feat(api): add user authentication endpoint')."
 
   # Post review details on each review. Additionally, post a review status when a review is skipped in certain cases.
   # Default: true
@@ -73,7 +78,7 @@ reviews:
 
   # Set the commit status to 'failure' when the PR cannot be reviewed by CodeRabbit for any reason.
   # Default: false
-  fail_commit_status: false
+  fail_commit_status: true
 
   # Generate walkthrough in a markdown collapsible section.
   # Default: false
@@ -109,7 +114,7 @@ reviews:
 
   # Automatically apply the suggested labels to the PR/MR.
   # Default: false
-  auto_apply_labels: false
+  auto_apply_labels: true
 
   # Suggest reviewers based on the changes in the pull request in the walkthrough.
   # Default: true
@@ -125,7 +130,32 @@ reviews:
 
   # Labeling Instructions - Provide guidelines for suggesting labels for the PR/MR. When specific labels or instructions are provided, only those labels are considered, though previous examples are still used to inform the suggestions. If no such labels are provided, suggestions are based solely on previous PR/MRs.
   # Default: []
-  labeling_instructions: []
+  labeling_instructions:
+    - label: "Bug Fix"
+      instructions: "Corrects an error, bug, or unintended behavior in existing code. Must include test coverage."
+    - label: "Chore"
+      instructions:
+        "Maintenance tasks, build process updates, dependency bumps, config changes. No user-facing changes."
+    - label: "Dependencies"
+      instructions:
+        "Updates to project dependencies, libraries, frameworks, or runtime versions. Include security updates."
+    - label: "Documentation"
+      instructions: "Changes solely related to documentation (READMEs, guides, code comments, API docs)."
+    - label: "Feature"
+      instructions: "Adds new user-facing functionality or capabilities. Must include tests and documentation."
+    - label: "Hotfix"
+      instructions: "Urgent fix for a critical production issue. Requires immediate review and deployment."
+    - label: "Improvement"
+      instructions:
+        "Enhances existing code, performance, reliability, or developer experience without changing behavior."
+    - label: "Performance"
+      instructions: "Optimizes performance or reduces resource usage. Include benchmarks and monitoring."
+    - label: "Refactor"
+      instructions: "Improves code structure or readability without changing behavior. Must maintain test coverage."
+    - label: "Security"
+      instructions: "Addresses a security vulnerability or improves security posture. Requires security review."
+    - label: "Testing"
+      instructions: "Adds or significantly updates tests (unit, integration, e2e). Must improve coverage."
 
   # Specify file patterns to include or exclude in a review using glob patterns (e.g., !dist/**, src/**). These patterns also apply to 'git sparse-checkout', including specified patterns and ignoring excluded ones (starting with '!') when cloning the repository.
   # Default: []
@@ -133,7 +163,62 @@ reviews:
 
   # Path Instructions - Provide specific additional guidelines for code review based on file paths.
   # Default: []
-  path_instructions: []
+  path_instructions:
+    - path: "src/*/src/*.ts"
+      instructions:
+        "MCP server source files must follow enterprise patterns: comprehensive JSDoc documentation, strict TypeScript
+        typing, proper error handling, input validation with Zod schemas, audit logging for sensitive operations, GDPR
+        compliance for data handling. Each function must explain business context and decision rationale."
+
+    - path: "src/*/tests/*.test.ts"
+      instructions:
+        "Test files must use bun:test framework with comprehensive coverage: unit tests for all functions, integration
+        tests for MCP server interactions, performance benchmarks for critical paths, security tests for authentication
+        and data handling. Follow naming convention: *.unit.test.ts, *.integration.test.ts, *.e2e.test.ts."
+
+    - path: "src/*/README.md"
+      instructions:
+        "README files must follow standardized template: Title, Executive Summary, Overview and Purpose, Capabilities
+        (Tools), Installation and Setup, Configuration, Usage, System Prompt Template, Example section with real values.
+        Include security notes, environment variables with defaults, and links to changelog and license."
+
+    - path: "src/*/package.json"
+      instructions:
+        "Package.json must use Bun-first configuration: 'bun' as packageManager, engines specify bun >=1.2.0, proper
+        workspace dependencies, exact versions for security. Include proper scripts for build, test, start, and
+        development workflows."
+
+    - path: "src/*/tsconfig.json"
+      instructions:
+        "TypeScript configuration must enforce strict mode: strict: true, noImplicitAny: true, strictNullChecks: true,
+        noUnusedLocals: true, noUnusedParameters: true. Include proper path mapping and module resolution for monorepo
+        structure."
+
+    - path: ".github/workflows/*.yml"
+      instructions:
+        "GitHub Actions workflows must follow security best practices: minimal permissions, proper secret handling,
+        comprehensive testing pipeline with quality gates, security scanning, performance benchmarking, self-healing
+        mechanisms. Include proper concurrency controls and failure handling."
+
+    - path: "scripts/*.ts"
+      instructions:
+        "Script files must use Bun-first patterns: Bun.$ for shell commands, Bun.file() for file operations, proper
+        error handling and logging. Include comprehensive JSDoc documentation and follow enterprise security patterns."
+
+    - path: "docs/*.md"
+      instructions:
+        "Documentation files must follow markdown standards: proper heading hierarchy, code blocks with language
+        specification, consistent formatting, comprehensive coverage of topics. Include security considerations and
+        compliance notes where relevant."
+
+    - path: "**/*.{ts,tsx,js,jsx}"
+      instructions: >
+        Use Bun's native APIs in app code (Bun.serve, bun:sqlite, Bun.redis, Bun.sql, Bun.file, Bun.$, Bun.password).  
+        Do not add Express/ws/pg/ioredis/execa/dotenv when Bun provides built-ins.  
+        Tests must import from bun:test and its Jest-compatible API.
+
+    - path: "**/*.md"
+      instructions: "Keep docs Bun-first (bunx, Bun.serve, bun:test). Avoid npm/yarn references."
 
   # Abort the in-progress review if the pull request is closed or merged.
   # Default: true
@@ -156,11 +241,11 @@ reviews:
 
     # Ignore reviewing if the title of the pull request contains any of these keywords (case-insensitive).
     # Default: []
-    ignore_title_keywords: []
+    ignore_title_keywords: ["wip", "draft", "temp"]
 
     # List of labels to control which PRs/MRs to review. Labels starting with '!' are negative matches. Examples: ['bug', 'feature'] - reviews PRs with 'bug' OR 'feature' label. ['!wip'] - reviews all PRs except those with 'wip' label. ['bug', '!wip'] - reviews PRs with 'bug' label but not if they have 'wip' label.
     # Default: []
-    labels: []
+    labels: ["!wip", "!draft"]
 
     # Review draft PRs/MRs.
     # Default: false
@@ -168,7 +253,7 @@ reviews:
 
     # Base branches (other than the default branch) to review. Accepts regex patterns. Use '.*' to match all branches.
     # Default: []
-    base_branches: []
+    base_branches: ["main", "develop"]
 
     # Ignore reviewing pull requests by these usernames. These should match the Git platform usernames exactly, not the email addresses.
     # Default: []
@@ -216,7 +301,9 @@ reviews:
 
       # Requirements - Requirements for the pull request title. Example: 'Title should be concise and descriptive, ideally under 50 characters.'
       # Default: ""
-      requirements: ""
+      requirements:
+        "Title must follow conventional commit format (type(scope): description) and be descriptive. Include package
+        name for monorepo changes (e.g., 'feat(decision-framework): add multi-criteria analysis')."
 
     # Description Check - Checks if the pull request description is appropriate and follows best practices.
     # Default: {}
@@ -236,7 +323,40 @@ reviews:
 
     # Custom Pre-merge Checks - Add unique checks to enforce your team's standards before merging a pull request. Each check must have a unique name (up to 50 characters) and clear instructions (up to 10000 characters). Use these to automatically verify coding, security, documentation, or business rules and maintain code quality.
     # Default: []
-    custom_checks: []
+    custom_checks:
+      - name: "Enterprise Standards"
+        instructions:
+          "Verify Bun-first patterns, TypeScript strict mode, MCP server enterprise patterns with proper tool discovery,
+          input validation using Zod, error handling, audit logging, GDPR compliance, and comprehensive JSDoc
+          documentation. Ensure proper monorepo structure with independent packages, exact dependency versions, and
+          proper build configuration."
+
+      - name: "Test & Coverage"
+        instructions:
+          "Ensure comprehensive test coverage: minimum 90% line/function/branch coverage using bun:test framework.
+          Include unit tests for all functions, integration tests for MCP server interactions, performance benchmarks
+          for critical paths, and security tests for authentication/data handling. Follow naming conventions: *.test.ts,
+          *.integration.test.ts, *.e2e.test.ts."
+
+      - name: "Security & Performance"
+        instructions:
+          "Verify security best practices: no hardcoded secrets, proper environment variables, input sanitization, SQL
+          injection prevention, XSS/CSRF protection, GDPR compliance with data minimization and consent management.
+          Check performance: response times under 200ms, memory optimization, proper async/await, no blocking
+          operations, optimized database queries with pagination and caching."
+
+      - name: "Documentation & CI/CD"
+        instructions:
+          "Verify comprehensive documentation following standardized README template with all required sections, JSDoc
+          comments explaining business context and decision rationale, API documentation with schemas and error cases.
+          Ensure CI/CD integration with GitHub Actions for testing, building, deployment, coverage reports, security
+          scans, performance tracking, and self-healing mechanisms."
+
+      - name: "Code Quality"
+        instructions:
+          "Enforce code quality standards: ESLint/Prettier compliance, TypeScript compilation success, proper typing, no
+          unused imports/variables, consistent naming conventions (camelCase variables, PascalCase classes, kebab-case
+          files), proper error handling patterns, and organized module structure."
 
   # Tools that provide additional context to code reviews.
   # Default: {}
@@ -272,7 +392,7 @@ reviews:
     ruff:
       # Enable Ruff - Ruff is a Python linter and code formatter. - Enable Ruff integration. - v0.12.2
       # Default: true
-      enabled: true
+      enabled: false
 
     # markdownlint-cli2 is a static analysis tool to enforce standards and consistency for Markdown files.
     # Default: {}
@@ -290,7 +410,7 @@ reviews:
 
       # Time in milliseconds to wait for all GitHub Checks to conclude. Default 90 seconds, max 15 minutes (900000ms).
       # Default: 90000
-      timeout_ms: 90000
+      timeout_ms: 300000
 
     # LanguageTool is a style and grammar checker for 30+ languages.
     # Default: {}
@@ -329,31 +449,28 @@ reviews:
     biome:
       # Enable Biome - Biome is a fast formatter, linter, and analyzer for web projects. - Enable Biome integration. - v2.1.2
       # Default: true
-      enabled: true
+      enabled: false
 
     # Hadolint is a Dockerfile linter.
     # Default: {}
     hadolint:
       # Enable Hadolint - Hadolint is a Dockerfile linter. - Enable Hadolint integration. - v2.12.0
       # Default: true
-      enabled: true
+      enabled: false
 
     # SwiftLint integration configuration object.
     # Default: {}
     swiftlint:
       # Enable SwiftLint - SwiftLint is a Swift linter. - Enable SwiftLint integration. - v0.57.0
       # Default: true
-      enabled: true
-
-      # Optional path to the SwiftLint configuration file relative to the repository. This is useful when the configuration file is named differently than the default '.swiftlint.yml' or '.swiftlint.yaml'.
-      config_file: "example-value"
+      enabled: false
 
     # PHPStan is a tool to analyze PHP code.
     # Default: {}
     phpstan:
       # Enable PHPStan - PHPStan requires [config file](https://phpstan.org/config-reference#config-file) in your repository root. Please ensure that this file contains the `paths:` parameter. - v2.1.17
       # Default: true
-      enabled: true
+      enabled: false
 
       # Level - Specify the [rule level](https://phpstan.org/user-guide/rule-levels) to run. This setting is ignored if your configuration file already has a `level:` parameter.
       # Options: default, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, max
@@ -365,24 +482,21 @@ reviews:
     phpmd:
       # Enable PHPMD - PHPMD is a tool to find potential problems in PHP code. - v2.15.0
       # Default: true
-      enabled: true
+      enabled: false
 
     # PHP CodeSniffer is a PHP linter and coding standard checker.
     # Default: {}
     phpcs:
       # Enable PHP CodeSniffer - PHP CodeSniffer is a PHP linter and coding standard checker. - v3.7.2
       # Default: true
-      enabled: true
+      enabled: false
 
     # golangci-lint is a fast linters runner for Go.
     # Default: {}
     golangci-lint:
       # Enable golangci-lint - golangci-lint is a fast linters runner for Go. - Enable golangci-lint integration. - v2.2.2
       # Default: true
-      enabled: true
-
-      # Optional path to the golangci-lint configuration file relative to the repository. Useful when the configuration file is named differently than the default '.golangci.yml', '.golangci.yaml', '.golangci.toml', '.golangci.json'.
-      config_file: "example-value"
+      enabled: false
 
     # YAMLlint is a linter for YAML files.
     # Default: {}
@@ -410,10 +524,7 @@ reviews:
     detekt:
       # Enable detekt - detekt is a static code analysis tool for Kotlin files. - v1.23.8
       # Default: true
-      enabled: true
-
-      # Optional path to the detekt configuration file relative to the repository.
-      config_file: "example-value"
+      enabled: false
 
     # ESLint is a static code analysis tool for JavaScript files.
     # Default: {}
@@ -427,28 +538,28 @@ reviews:
     flake8:
       # Enable Flake8 - Flake8 is a Python linter that wraps PyFlakes, pycodestyle and Ned Batchelder's McCabe script. - v7.2.0
       # Default: true
-      enabled: true
+      enabled: false
 
     # RuboCop is a Ruby static code analyzer (a.k.a. linter ) and code formatter.
     # Default: {}
     rubocop:
       # Enable RuboCop - RuboCop is a Ruby static code analyzer (a.k.a. linter ) and code formatter. - v1.76.1
       # Default: true
-      enabled: true
+      enabled: false
 
     # Buf offers linting for Protobuf files.
     # Default: {}
     buf:
       # Enable Buf - Buf offers linting for Protobuf files. - v1.55.1
       # Default: true
-      enabled: true
+      enabled: false
 
     # Regal is a linter and language server for Rego.
     # Default: {}
     regal:
       # Enable Regal - Regal is a linter and language server for Rego. - v0.35.1
       # Default: true
-      enabled: true
+      enabled: false
 
     # actionlint is a static checker for GitHub Actions workflow files.
     # Default: {}
@@ -462,17 +573,14 @@ reviews:
     pmd:
       # Enable PMD - PMD is an extensible multilanguage static code analyzer. It’s mainly concerned with Java. - v7.15.0
       # Default: true
-      enabled: true
-
-      # Optional path to the PMD configuration file relative to the repository.
-      config_file: "example-value"
+      enabled: false
 
     # Cppcheck is a static code analysis tool for the C and C++ programming languages.
     # Default: {}
     cppcheck:
       # Enable Cppcheck - Cppcheck is a static code analysis tool for the C and C++ programming languages. - v2.17.1
       # Default: true
-      enabled: true
+      enabled: false
 
     # Semgrep is a static analysis tool designed to scan code for security vulnerabilities and code quality issues.
     # Default: {}
@@ -480,9 +588,6 @@ reviews:
       # Enable Semgrep - Semgrep is a static analysis tool designed to scan code for security vulnerabilities and code quality issues. - Enable Semgrep integration. - v1.128.1
       # Default: true
       enabled: true
-
-      # Optional path to the Semgrep configuration file relative to the repository.
-      config_file: "example-value"
 
     # CircleCI tool is a static checker for CircleCI config files.
     # Default: {}
@@ -496,7 +601,7 @@ reviews:
     clippy:
       # Enable Clippy - Clippy is a collection of lints to catch common mistakes and improve your Rust code. - Enable Clippy integration.
       # Default: true
-      enabled: true
+      enabled: false
 
     # SQLFluff is an open source, dialect-flexible and configurable SQL linter.
     # Default: {}
@@ -517,28 +622,28 @@ reviews:
     pylint:
       # Enable Pylint - Pylint is a Python static code analysis tool. - v3.3.7
       # Default: true
-      enabled: true
+      enabled: false
 
     # Oxlint is a JavaScript/TypeScript linter for OXC written in Rust.
     # Default: {}
     oxc:
       # Enable Oxlint - Oxlint is a JavaScript/TypeScript linter for OXC written in Rust. - v0.16.10
       # Default: true
-      enabled: true
+      enabled: false
 
     # Configuration for Shopify Theme Check to ensure theme quality and best practices
     # Default: {}
     shopifyThemeCheck:
       # Enable Shopify Theme Check - A linter for Shopify themes that helps you follow Shopify theme & Liquid best practices - cli 3.77.1 - theme 3.58.2
       # Default: true
-      enabled: true
+      enabled: false
 
     # Configuration for Lua code linting to ensure code quality
     # Default: {}
     luacheck:
       # Enable Lua code linting - Luacheck helps maintain consistent and error-free Lua code - v1.2.0
       # Default: true
-      enabled: true
+      enabled: false
 
     # Brakeman is a static analysis security vulnerability scanner for Ruby on Rails applications. - v7.0.2
     # Default: {}
@@ -559,14 +664,14 @@ reviews:
     htmlhint:
       # Enable HTMLHint - HTMLHint is a static code analysis tool for HTML files. - Enable HTMLHint integration. - v1.5.0
       # Default: true
-      enabled: true
+      enabled: false
 
     # checkmake is a linter for Makefiles.
     # Default: {}
     checkmake:
       # Enable checkmake - checkmake is a linter for Makefiles. - v0.2.2
       # Default: true
-      enabled: true
+      enabled: false
 
     # OSV Scanner is a tool for vulnerability package scanning.
     # Default: {}
@@ -585,7 +690,7 @@ reviews:
 chat:
   # Generate art in response to chat messages. CodeRabbit expresses emotions as either ASCII or Emoji art.
   # Default: true
-  art: true
+  art: false
 
   # Enable the bot to reply automatically without requiring the user to tag it.
   # Default: true
@@ -600,7 +705,7 @@ chat:
       # Jira - Enable the Jira integration for opening issues, etc. 'auto' disables the integration for public repositories.
       # Options: auto, enabled, disabled
       # Default: "auto"
-      usage: "auto"
+      usage: "disabled"
 
     # Configuration for linear
     # Default: {}
@@ -608,7 +713,7 @@ chat:
       # Linear - Enable the Linear integration for opening issues, etc. 'auto' disables the integration for public repositories.
       # Options: auto, enabled, disabled
       # Default: "auto"
-      usage: "auto"
+      usage: "disabled"
 
 # =============================================================================
 # KNOWLEDGE BASE
@@ -638,7 +743,14 @@ knowledge_base:
 
     # File Patterns - Specify files for your coding guideline documents in this section. CodeRabbit will scan these files to understand your team's standards and apply them during code reviews. Multiple files supported. File names are case-sensitive. Common files like: (**/.cursorrules, .github/copilot-instructions.md, .github/instructions/*.instructions.md, **/CLAUDE.md, **/GEMINI.md, **/.cursor/rules/*, **/.windsurfrules, **/.clinerules/*, **/.rules/*, **/AGENT.md, **/AGENTS.md) are included by default.
     # Default: []
-    filePatterns: []
+    filePatterns:
+      - ".cursor/rules/*.mdc"
+      - "docs/*.md"
+      - "README.md"
+      - "package.json"
+      - "bunfig.toml"
+      - "tsconfig.json"
+      - ".github/workflows/*.yml"
 
   # Configuration for learnings
   # Default: {}
@@ -694,7 +806,7 @@ knowledge_base:
     # MCP - Enable the MCP knowledge base integration. 'auto' disables the integration for public repositories.
     # Options: auto, enabled, disabled
     # Default: "auto"
-    usage: "auto"
+    usage: "enabled"
 
     # MCP Disabled Servers - Specify MCP server labels to disable (case-insensitive). These servers will be excluded from reviews and knowledge base queries.
     # Default: []
@@ -718,11 +830,57 @@ code_generation:
 
     # Path Instructions - Provide additional guidelines for docstring generation based on file paths.
     # Default: []
-    path_instructions: []
+    path_instructions:
+      - path: "src/*/src/*.ts"
+        instructions:
+          "Generate comprehensive JSDoc documentation for MCP server functions. Include @param descriptions with types
+          and validation rules, @returns with detailed return type information, @throws for error conditions, @example
+          with realistic usage examples, @since for version information, @see for related functions. Explain business
+          context, decision rationale, and security considerations. Include GDPR compliance notes for data handling
+          functions."
+
+      - path: "src/*/lib/*.ts"
+        instructions:
+          "Generate detailed JSDoc for utility functions and helper modules. Include parameter descriptions, return
+          value details, error conditions, usage examples, and performance characteristics. Explain the purpose and
+          business logic behind each function. Include type information and validation requirements."
+
+      - path: "scripts/*.ts"
+        instructions:
+          "Generate JSDoc for script functions with clear descriptions of purpose, parameters, environment requirements,
+          and expected outcomes. Include examples of usage, error handling scenarios, and cleanup procedures. Document
+          any side effects or system changes made by the script."
+
+      - path: "src/*/server.ts"
+        instructions:
+          "Generate comprehensive JSDoc for MCP server implementation. Document server configuration, startup
+          procedures, tool registration, error handling, and shutdown processes. Include examples of server usage,
+          configuration options, and troubleshooting information. Document security considerations and audit logging
+          requirements."
 
   # Settings related to the generation of unit tests.
   # Default: {"path_instructions":[]}
   unit_tests:
     # Unit Test Generation - Provide additional guidelines for unit test generation based on file paths.
     # Default: []
-    path_instructions: []
+    path_instructions:
+      - path: "src/*/src/*.ts"
+        instructions:
+          "Generate comprehensive unit tests using bun:test framework. Include tests for all public functions with edge
+          cases, error conditions, and boundary values. Use proper mocking for external dependencies. Include
+          performance benchmarks for critical functions. Follow naming convention: describe blocks for classes/modules,
+          it blocks for individual functions. Include setup/teardown for test isolation. Test both success and failure
+          scenarios with proper assertions."
+
+      - path: "src/*/lib/*.ts"
+        instructions:
+          "Generate unit tests for utility functions and helper modules. Focus on testing pure functions with various
+          inputs, edge cases, and error conditions. Include tests for data validation, transformation functions, and
+          business logic. Use parameterized tests for multiple input scenarios. Ensure 100% branch coverage for critical
+          utility functions."
+
+      - path: "scripts/*.ts"
+        instructions:
+          "Generate unit tests for script functions with proper mocking of file system operations and shell commands.
+          Test error handling, logging, and cleanup procedures. Include tests for configuration validation and
+          environment setup. Mock external dependencies and test both success and failure paths."
