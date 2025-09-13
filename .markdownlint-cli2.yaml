@@ -54,8 +54,10 @@ config:
   no-empty-links: true
   no-duplicate-heading-in-section: true
 
-# Output formatting with pretty formatter and appendLink option
+# .gitignore
+gitignore: true
 
+# Output formatting
 outputFormatters:
   - - markdownlint-cli2-formatter-pretty
     - appendLink: true
@@ -67,3 +69,4 @@ ignores:
   - "build/**"
   - ".wrangler/**"
   - "coverage/**"
+  - ".cursor/rules/*.mdc"
