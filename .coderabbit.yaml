@@ -20,7 +20,7 @@ tone_instructions: ""
 
 # Enable early-access features.
 # Default: false
-early_access: false
+early_access: true
 
 # Enable free tier features for users not on a paid plan.
 # Default: true
@@ -121,7 +121,7 @@ reviews:
 
   # Generate a poem in the walkthrough comment.
   # Default: true
-  poem: true
+  poem: false
 
   # Labeling Instructions - Provide guidelines for suggesting labels for the PR/MR. When specific labels or instructions are provided, only those labels are considered, though previous examples are still used to inform the suggestions. If no such labels are provided, suggestions are based solely on previous PR/MRs.
   # Default: []
