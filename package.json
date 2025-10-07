@@ -28,6 +28,8 @@
     "publish-all": "bun run --filter='./src/*' publish",
     "link-all": "bun link --workspaces",
     "format": "prettier --write . && eslint . --ext .ts,.tsx --fix",
+    "format:yaml": "prettier --write '**/*.{yml,yaml}'",
+    "lint:yaml": "prettier --check '**/*.{yml,yaml}'",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx",
     "check": "tsc --noEmit",

@@ -1,4 +1,29 @@
-name: Publish Package
+# Build, Test, and Publish Workflow
+#
+# This workflow automatically builds, tests, and publishes npm packages when code is pushed to main.
+#
+# Workflow Steps:
+# 1. Checkout with full git history (needed for version comparison)
+# 2. Install dependencies with Bun
+# 3. Run linting, tests, and builds via Nx (only for affected packages)
+# 4. Detect version changes by comparing package.json versions against the previous git tag
+# 5. If version changes are detected:
+#    - Setup npm authentication
+#    - Publish only packages with version changes to npm registry
+# 6. If no version changes: skip publishing
+#
+# Edge Cases Handled:
+# - No previous tags (first release): All packages are considered changed
+# - No version changes: Publishing step is skipped
+# - Package doesn't exist in previous tag: Package is treated as new
+# - Publishing failures: Individual package failures are logged but don't stop other packages
+#
+# Requirements:
+# - NPM_TOKEN secret must be configured in repository settings
+# - Package versions must be manually bumped in package.json before pushing
+# - Git tags are used as the source of truth for version comparison
+#
+name: Build, Test, and Publish
 
 on:
   push:
@@ -10,10 +35,14 @@ permissions:
   contents: read
 
 jobs:
-  publish:
+  build-test-publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
       - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: "1.2.0"
@@ -21,10 +50,136 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build
-        run: bun run build-all
+      - uses: nrwl/nx-set-shas@826660b82addbef3abff5fa871492ebad618c9e1 # v4.3.3
 
-      - name: Publish
-        run: bun run publish-all
+      - name: Run linting, tests, and build
+        run: bun nx affected -t lint test build
+
+      - name: Detect version changes
+        id: version-check
+        run: |
+          chmod +x .github/scripts/detect-version-changes.ts
+          bun run .github/scripts/detect-version-changes.ts
+
+      - name: Publish changed packages
+        if: steps.version-check.outputs.has_changes == 'true'
+        run: |
+          PACKAGES='${{ steps.version-check.outputs.packages }}'
+          echo "Publishing packages: $PACKAGES"
+
+          # Create a temporary script to publish packages
+          cat > /tmp/publish-packages.ts << 'EOF'
+          /**
+           * Spawns a process with a timeout, killing it if the timeout elapses.
+           * 
+           * Business Context: Publishing packages can occasionally hang due to network
+           * issues or npm registry problems. This timeout ensures the CI pipeline doesn't
+           * get stuck indefinitely.
+           * 
+           * Decision Rationale: Using Promise.race with proper cleanup ensures timers are
+           * always cleared, preventing memory/resource leaks in the CI environment.
+           * 
+           * @param cmd Command array to spawn
+           * @param options Spawn options
+           * @param timeoutMs Timeout in milliseconds (default: 300000ms / 5 minutes)
+           * @returns Exit code of the process
+           * @throws Error if timeout elapses or process is killed
+           */
+          async function spawnWithTimeout(
+            cmd: string[],
+            options: { cwd?: string; stdout?: "inherit"; stderr?: "inherit" },
+            timeoutMs: number = 300000
+          ): Promise<number> {
+            const proc = Bun.spawn(cmd, options);
+            
+            let timerId: Timer | undefined;
+            
+            try {
+              const timeoutPromise = new Promise<never>((_, reject) => {
+                timerId = setTimeout(() => {
+                  proc.kill();
+                  reject(new Error(`Process timed out after ${timeoutMs}ms`));
+                }, timeoutMs);
+              });
+              
+              const exitCode = await Promise.race([proc.exited, timeoutPromise]);
+              return exitCode;
+            } finally {
+              // Always clear the timer to prevent leaks
+              if (timerId !== undefined) {
+                clearTimeout(timerId);
+              }
+            }
+          }
+
+          /**
+           * Validates that a package.json object has required name and version fields.
+           * 
+           * @param obj Object to validate
+           * @returns Type guard confirming obj has name and version
+           */
+          function validatePackageJson(obj: unknown): obj is { name: string; version: string } {
+            if (typeof obj !== "object" || obj === null) {
+              return false;
+            }
+            const pkg = obj as Record<string, unknown>;
+            return typeof pkg.name === "string" && typeof pkg.version === "string";
+          }
+
+          const packagesJson = process.env.PACKAGES || '[]';
+          const packages = JSON.parse(packagesJson);
+          const failed: string[] = [];
+
+          for (const packagePath of packages) {
+            const packageJson = await Bun.file(`${packagePath}/package.json`).json();
+            
+            // Validate package.json structure before accessing properties
+            if (!validatePackageJson(packageJson)) {
+              const errorMsg = `Invalid package.json structure: missing name or version in ${packagePath}`;
+              console.error(`❌ ${errorMsg}`);
+              failed.push(errorMsg);
+              continue;
+            }
+            
+            console.log(`\n📦 Publishing ${packageJson.name}@${packageJson.version}...`);
+            
+            try {
+              const exitCode = await spawnWithTimeout(
+                ["bun", "publish", "--access", "public"],
+                {
+                  cwd: packagePath,
+                  stdout: "inherit",
+                  stderr: "inherit",
+                },
+                300000  // 5 minute timeout
+              );
+              
+              if (exitCode !== 0) {
+                failed.push(`${packageJson.name} (exit code ${exitCode})`);
+                console.error(`❌ Failed to publish ${packageJson.name}`);
+              } else {
+                console.log(`✅ Successfully published ${packageJson.name}@${packageJson.version}`);
+              }
+            } catch (error) {
+              failed.push(`${packageJson.name} (${(error as Error).message})`);
+              console.error(`❌ Error publishing ${packageJson.name}:`, error);
+            }
+          }
+
+          if (failed.length > 0) {
+            console.error(`\n❌ Failed to publish ${failed.length} package(s):`);
+            failed.forEach(f => console.error(`  - ${f}`));
+            process.exit(1);
+          }
+
+          console.log(`\n✅ Successfully published ${packages.length} package(s)`);
+          EOF
+
+          PACKAGES="$PACKAGES" bun run /tmp/publish-packages.ts
+          rm -f /tmp/publish-packages.ts
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: No packages to publish
+        if: steps.version-check.outputs.has_changes != 'true'
+        run: echo "ℹ️ No packages with version changes detected. Skipping publish."
