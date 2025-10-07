@@ -55,6 +55,43 @@ jobs:
       - name: Run linting, tests, and build
         run: bun nx affected -t lint test build
 
+      - name: Build Workers bundles
+        run: |
+          # Build Workers-compatible bundles for packages that support it
+          # This checks each affected package for a build:workers script and runs it
+          echo "🔧 Building Workers bundles for affected packages..."
+
+          # Get list of affected projects
+          AFFECTED=$(bun nx show projects --affected --json 2>/dev/null || echo '[]')
+
+          if [ "$AFFECTED" = "[]" ] || [ -z "$AFFECTED" ]; then
+            echo "ℹ️ No affected packages found, skipping Workers build"
+            exit 0
+          fi
+
+          # Check each affected project for build:workers script
+          echo "$AFFECTED" | bun -e '
+            const projects = JSON.parse(await Bun.stdin.text());
+            for (const project of projects) {
+              const pkgPath = `src/${project}/package.json`;
+              try {
+                const pkg = await Bun.file(pkgPath).json();
+                if (pkg.scripts?.["build:workers"]) {
+                  console.log(project);
+                }
+              } catch (e) {
+                // Package.json not found, skip
+              }
+            }
+          ' | while read -r project; do
+            if [ -n "$project" ]; then
+              echo "📦 Building Workers bundle for $project..."
+              bun nx run "$project:build:workers" || echo "⚠️ Workers build failed for $project (continuing...)"
+            fi
+          done
+
+          echo "✅ Workers build step completed"
+
       - name: Detect version changes
         id: version-check
         run: |
