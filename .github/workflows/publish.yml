@@ -17,10 +17,6 @@ jobs:
       - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
         with:
           bun-version: "1.2.0"
-          node-version: "20"
-          registries: |
-            https://registry.npmjs.org/
-            @wemake.cx:https://registry.npmjs.org/|$NPM_TOKEN
 
       - name: Install dependencies
         run: bun install --frozen-lockfile

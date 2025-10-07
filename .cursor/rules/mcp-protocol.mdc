@@ -1,0 +1,173 @@
+---
+alwaysApply: true
+---
+
+# Model Context Protocol (MCP) Server Standards
+
+## MCP Protocol Overview
+
+All servers implement the [Model Context Protocol](https://modelcontextprotocol.io/) for enabling LLMs to securely access enterprise data sources, business tools, and AI agents.
+
+## Core MCP Server Architecture
+
+### Server Initialization Pattern
+
+```typescript
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+const server = new Server(
+  {
+    name: "server-name",
+    version: "1.0.0",
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  }
+);
+
+// Tool handlers
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  // Handle tool calls
+});
+
+// Start server
+const transport = new StdioServerTransport();
+await server.connect(transport);
+```
+
+### Tool Discovery and Registration
+
+Every MCP server MUST:
+
+1. **Define Tool Schemas**: Use JSON Schema for input validation
+2. **Implement Tool Handlers**: Process validated inputs
+3. **Return Structured Results**: Consistent response format
+4. **Handle Errors Gracefully**: Clear error messages with context
+
+Example tool handler pattern from [src/memory/src/index.ts](mdc:src/memory/src/index.ts):
+
+```typescript
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params;
+  
+  switch (name) {
+    case "create_entities":
+      // Validate input
+      // Process request
+      // Return result
+      return { content: [{ type: "text", text: result }] };
+    
+    default:
+      throw new Error(`Unknown tool: ${name}`);
+  }
+});
+```
+
+## Schema Validation
+
+### Input Validation Pattern
+
+All tool inputs MUST be validated before processing:
+
+```typescript
+private validateInput(input: unknown): ValidatedType {
+  if (typeof input !== "object" || input === null) {
+    throw new Error("Invalid input: expected object");
+  }
+  
+  // Type guards and validation
+  const data = input as Record<string, unknown>;
+  
+  // Validate required fields
+  if (typeof data.field !== "string") {
+    throw new Error("Invalid input: field must be string");
+  }
+  
+  return data as ValidatedType;
+}
+```
+
+## Transactional Integrity
+
+For stateful operations:
+
+- **Atomic Operations**: Complete or rollback, no partial states
+- **State Tracking**: Maintain history/registry for audit trails
+- **Idempotency**: Same input produces same output
+- **Recovery**: Clear rollback procedures
+
+See [src/transaction-manager/src/server.ts](mdc:src/transaction-manager/src/server.ts) for transaction patterns.
+
+## Human-in-the-Loop (HITL)
+
+Sensitive operations require human approval:
+
+- Data deletion
+- Data export
+- Configuration changes
+- High-risk decisions
+
+Pattern:
+```typescript
+if (operation === "delete" && !confirmed) {
+  return {
+    content: [{
+      type: "text",
+      text: "⚠️ This operation requires confirmation. Please review and confirm deletion."
+    }],
+    requiresConfirmation: true
+  };
+}
+```
+
+## Enterprise Security Patterns
+
+### Least-Privilege Access
+
+- Default deny, explicit allow
+- Scope permissions to minimum required
+- Validate user context for all operations
+
+### Comprehensive Audit Logging
+
+All MCP operations should log:
+- Timestamp
+- User/session ID
+- Operation type
+- Input parameters (sanitized)
+- Result status
+- Error details (if applicable)
+
+### GDPR Compliance
+
+- Data retention policies
+- Right to erasure support
+- Data portability (export)
+- Consent tracking
+- Privacy by design
+
+## Server Shutdown Handling
+
+Graceful shutdown pattern:
+
+```typescript
+async function shutdown(exitCode: number = 0): Promise<void> {
+  console.error("Shutting down gracefully...");
+  // Close connections
+  // Flush logs
+  // Save state
+  process.exit(exitCode);
+}
+
+process.on("SIGINT", () => shutdown(0));
+process.on("SIGTERM", () => shutdown(0));
+```
+
+## Reference Implementations
+
+- [src/memory/src/index.ts](mdc:src/memory/src/index.ts) - Knowledge graph with CRUD operations
+- [src/decision-framework/src/index.ts](mdc:src/decision-framework/src/index.ts) - Complex state management
+- [src/transaction-manager/src/server.ts](mdc:src/transaction-manager/src/server.ts) - Transaction handling

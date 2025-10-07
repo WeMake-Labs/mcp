@@ -1,0 +1,54 @@
+---
+alwaysApply: true
+---
+
+# Bun-First Development Standards
+
+## Core Requirement
+
+**EXCLUSIVELY use Bun for all operations.** This is a Bun-first monorepo with zero tolerance for alternative tooling.
+
+## Mandatory Bun Commands
+
+- `bun install` - Install dependencies
+- `bun run <script>` - Run package.json scripts
+- `bun test` - Run tests with Bun's native test runner
+- `bun build` - Build applications
+- `bunx <package>` - Run packages (equivalent to npx)
+
+## Mandatory Bun Built-in APIs
+
+Use Bun's native APIs exclusively. External alternatives are PROHIBITED:
+
+- **HTTP/WebSocket Servers**: `Bun.serve()` (NOT express, fastify, ws)
+- **SQLite**: `bun:sqlite` (NOT better-sqlite3)
+- **Redis**: `Bun.redis` (NOT ioredis)
+- **PostgreSQL**: `Bun.sql` (NOT pg)
+- **File Operations**: `Bun.file`, `Bun.write` (NOT fs promises)
+- **Shell Commands**: `Bun.$` (NOT execa, child_process)
+- **Environment**: Built-in `process.env` (NOT dotenv)
+- **Password Hashing**: `Bun.password` (NOT bcrypt)
+
+## Prohibited Tools
+
+NEVER use these alternatives:
+
+- ❌ Node.js, npm, yarn, pnpm
+- ❌ Express, Fastify, Koa
+- ❌ Vite, Webpack, esbuild, Rollup
+- ❌ better-sqlite3, ioredis, pg
+- ❌ ws, socket.io
+- ❌ dotenv
+- ❌ Any non-Bun alternatives unless technically impossible
+
+## Configuration Files
+
+- [bunfig.toml](mdc:bunfig.toml) - Bun configuration
+- [package.json](mdc:package.json) - Workspace and script definitions
+
+## Performance Benefits
+
+- 10-30x faster test execution than Jest/Vitest
+- Native TypeScript support without transpilation
+- Built-in bundling and minification
+- Zero-config SQLite, Redis, PostgreSQL support
