@@ -1,0 +1,244 @@
+---
+globs: *.md,**/README.md
+---
+
+# MCP Documentation Standards
+
+All MCP server READMEs must follow a standardized template for consistency and clarity. Reference:
+[README.md](mdc:README.md)
+
+## Required README Sections
+
+Every MCP server README MUST include these sections in order:
+
+### 1. Title and Executive Summary
+
+```markdown
+# Server Name MCP Server
+
+> One-sentence executive summary of purpose and value proposition
+
+Brief (2-3 sentence) description of what the server does and why it's valuable.
+```
+
+### 2. Overview and Purpose
+
+Explain:
+
+- What problem the server solves
+- Key use cases
+- Target audience (developers, enterprises, specific domains)
+
+### 3. Capabilities (Tools)
+
+List all MCP tools with:
+
+```markdown
+### Tool Name
+
+**Description**: What the tool does
+
+**Input Schema** (JSON): \`\`\`json { "type": "object", "properties": { "field": { "type": "string", "description":
+"Field description" } }, "required": ["field"] } \`\`\`
+
+**Output**: Description of what the tool returns
+
+**Error Cases**:
+
+- Invalid input: Error message
+- Missing data: Error message
+```
+
+### 4. Installation and Setup
+
+```markdown
+## Installation
+
+\`\`\`sh
+
+# Install dependencies
+
+bun install
+
+# Navigate to server directory
+
+cd src/server-name
+
+# Start the server
+
+bun run start \`\`\`
+```
+
+**IMPORTANT**: Always use `bun` commands, NEVER `npm`, `yarn`, or `node`.
+
+### 5. Configuration
+
+Document all environment variables:
+
+```markdown
+## Configuration
+
+Environment variables:
+
+- `VAR_NAME` - Description (default: `value`)
+- `MAX_SESSIONS` - Maximum sessions to track (default: `100`)
+- `DISABLE_LOGGING` - Disable operation logging (default: `false`)
+
+Example `.env`: \`\`\`env VAR_NAME=custom_value MAX_SESSIONS=200 \`\`\`
+```
+
+### 6. Usage
+
+Provide concrete examples:
+
+```markdown
+## Usage
+
+### Example: Basic Operation
+
+\`\`\`json { "name": "tool_name", "arguments": { "field": "value" } } \`\`\`
+
+**Result**: \`\`\` Expected output description or visualization \`\`\`
+```
+
+### 7. System Prompt Template
+
+Include a template for AI integration:
+
+```markdown
+## System Prompt Template
+
+\`\`\` You have access to the [Server Name] MCP server which enables [capability description].
+
+Available tools:
+
+- tool_name: Description of what it does
+
+Use this when [use case scenarios]. \`\`\`
+```
+
+### 8. Security Notes
+
+Document security features:
+
+```markdown
+## Security
+
+This server implements enterprise security patterns:
+
+- **Least Privilege**: Minimal permissions by default
+- **Schema Validation**: All inputs validated before processing
+- **Human-in-the-Loop**: Sensitive operations require confirmation
+- **Audit Logging**: Comprehensive operation logging
+- **GDPR Compliance**: Data minimization and right to erasure
+```
+
+### 9. Testing
+
+```markdown
+## Testing
+
+\`\`\`sh
+
+# Run tests with coverage
+
+bun test --coverage
+
+# Watch mode for development
+
+bun test --watch \`\`\`
+
+Required coverage: 90%+ (lines, functions, branches, statements)
+```
+
+### 10. License and Links
+
+```markdown
+## License
+
+MIT License - See [LICENSE](../../LICENSE)
+
+## Support
+
+- Issues: [GitHub Issues](https://github.com/wemake-cx/mcp/issues)
+- Security: security@wemake.cx
+- Website: [wemake.cx](https://wemake.cx)
+```
+
+## Documentation Style Guide
+
+### Tone and Language
+
+- **Clear and Direct**: Plain language, avoid jargon
+- **Scannable**: Use headings, lists, and code blocks
+- **Copy-Paste Friendly**: All examples should be immediately usable
+- **Professional**: Maintain enterprise tone
+
+### Code Blocks
+
+Always specify language for syntax highlighting:
+
+```markdown
+\`\`\`sh bun install \`\`\`
+
+\`\`\`typescript const server = new Server(); \`\`\`
+
+\`\`\`json {"key": "value"} \`\`\`
+```
+
+### Bun-First Language
+
+✅ Use:
+
+- `bun install`
+- `bun run start`
+- `bun test`
+- `bunx mcp-server`
+
+❌ NEVER use:
+
+- `npm install`
+- `node index.js`
+- `yarn start`
+- `npx mcp-server`
+
+### Line Length
+
+- Limit lines to 120 characters (see [.markdownlint.jsonc](mdc:.markdownlint.jsonc))
+- Break long URLs into link references
+- Use proper word wrapping in paragraphs
+
+## README Template Compliance Checklist
+
+Before submitting documentation, verify:
+
+- [ ] All template sections present and complete
+- [ ] Tool schemas accurate and validated
+- [ ] Environment variables documented with defaults
+- [ ] Security notes included
+- [ ] Example configuration tested with bunx
+- [ ] Links to LICENSE and support channels
+- [ ] No prohibited tooling references (npm, node, yarn)
+- [ ] Follows WeMake tone: clear, direct, plain language
+- [ ] Code blocks have language specifiers
+- [ ] Line length under 120 characters
+- [ ] Examples are copy-paste ready
+
+## Examples
+
+Reference these well-documented servers:
+
+- [README.md](mdc:README.md) - Main repository README
+- Individual server READMEs in `src/*/README.md`
+- Documentation files in `src/*/docs/*.md`
+
+## Markdownlint Configuration
+
+This repository uses markdownlint. See [.markdownlint.jsonc](mdc:.markdownlint.jsonc) for rules.
+
+Common rules:
+
+- MD013: Line length 120 chars
+- MD033: Inline HTML allowed
+- MD041: First line must be H1 heading
+- MD047: Files must end with newline

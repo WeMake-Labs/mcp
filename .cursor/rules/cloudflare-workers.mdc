@@ -1,0 +1,302 @@
+---
+description: Cloudflare Workers deployment patterns
+---
+
+# Cloudflare Workers Deployment Standards
+
+## Overview
+
+All MCP servers must be deployable to Cloudflare Workers for enterprise production use. This requires Workers-compatible
+builds that exclude Bun-only APIs.
+
+## Workers Compatibility Requirements
+
+### Prohibited Bun-Only APIs
+
+The following Bun APIs DO NOT work in Cloudflare Workers:
+
+❌ `bun:sqlite` - Use Cloudflare D1 instead ❌ `Bun.redis` - Use Cloudflare KV or Durable Objects instead ❌ `Bun.$` -
+Shell commands not available in Workers ❌ `Bun.file` - Use Workers APIs or R2 for files ❌ `Bun.password` - Use Web
+Crypto API instead ❌ FFI/native bindings - Not supported
+
+### Workers-Compatible Alternatives
+
+Use these instead:
+
+✅ **Database**: Cloudflare D1 (SQLite-compatible)
+
+```typescript
+export interface Env {
+  DB: D1Database;
+}
+
+const result = await env.DB.prepare("SELECT * FROM users").all();
+```
+
+✅ **Key-Value Storage**: Cloudflare KV
+
+```typescript
+export interface Env {
+  KV: KVNamespace;
+}
+
+await env.KV.put("key", "value");
+const value = await env.KV.get("key");
+```
+
+✅ **Stateful Storage**: Durable Objects
+
+```typescript
+export class MyDurableObject {
+  constructor(state: DurableObjectState, env: Env) {}
+
+  async fetch(request: Request) {
+    // Handle requests
+  }
+}
+```
+
+✅ **Password Hashing**: Web Crypto API
+
+```typescript
+const encoder = new TextEncoder();
+const data = encoder.encode(password);
+const hash = await crypto.subtle.digest("SHA-256", data);
+```
+
+## TypeScript Configuration for Workers
+
+Ensure complete imports (no Bun auto-imports):
+
+```typescript
+// ✅ Explicitly import everything
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import type { Request, Response } from "@cloudflare/workers-types";
+
+// ❌ Relying on Bun auto-imports
+// (Won't work in Workers)
+```
+
+## Build Configuration
+
+### Single-File Output
+
+Workers prefer single-file bundles:
+
+```json
+{
+  "scripts": {
+    "build": "bun build src/index.ts --outfile=dist/worker.js --target=browser"
+  }
+}
+```
+
+### Workers-Specific Entry Point
+
+Create a separate `worker.ts` entry point if needed:
+
+```typescript
+// src/worker.ts - Cloudflare Workers entry
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    // Handle HTTP requests
+    return new Response("OK");
+  }
+};
+```
+
+## Environment Variables
+
+### Never Bake Secrets
+
+❌ NEVER do this:
+
+```typescript
+const API_KEY = "sk-1234567890"; // Hard-coded secret
+```
+
+✅ Use environment variables:
+
+```typescript
+export interface Env {
+  API_KEY: string;
+  DATABASE_URL: string;
+}
+
+export default {
+  async fetch(request: Request, env: Env) {
+    const apiKey = env.API_KEY; // From Workers environment
+  }
+};
+```
+
+### Environment Variable Types
+
+Define strict types for environment:
+
+```typescript
+export interface Env {
+  // Secrets
+  API_KEY: string;
+  DATABASE_PASSWORD: string;
+
+  // Bindings
+  DB: D1Database;
+  KV: KVNamespace;
+  BUCKET: R2Bucket;
+
+  // Configuration
+  MAX_SESSIONS: string; // Workers env vars are strings
+  ENABLE_LOGGING: string;
+}
+```
+
+## Workers Runtime Constraints
+
+### No File System Access
+
+Workers have no traditional file system:
+
+❌ `fs.readFile`, `Bun.file` ✅ Use R2 for object storage, KV for small values
+
+### No Child Processes
+
+Workers cannot spawn processes:
+
+❌ `child_process`, `Bun.$` ✅ Use HTTP APIs or Workers for Workers
+
+### Limited Execution Time
+
+Workers have CPU time limits:
+
+- 50ms (free tier)
+- 30 seconds (paid tier with Unbound Workers)
+
+Design for quick responses; use Durable Objects for long-running tasks.
+
+### No Native Modules
+
+Workers cannot use native Node.js modules:
+
+❌ Native addons, C bindings, FFI ✅ Pure JavaScript/TypeScript only
+
+## CI/CD Pipeline
+
+Reference: [.github/workflows/publish.yml](mdc:.github/workflows/publish.yml)
+
+### Build Pipeline
+
+```yaml
+- name: Build for Workers
+  run: bun run build-workers
+
+- name: Deploy to Cloudflare
+  run: bunx wrangler deploy
+  env:
+    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+```
+
+### Wrangler Configuration
+
+Create `wrangler.toml` for each Workers deployment:
+
+```toml
+name = "mcp-server-name"
+main = "dist/worker.js"
+compatibility_date = "2024-01-01"
+
+[env.production]
+name = "mcp-server-name-production"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "mcp_database"
+database_id = "uuid-here"
+
+# KV binding
+[[kv_namespaces]]
+binding = "KV"
+id = "uuid-here"
+```
+
+## Testing for Workers Compatibility
+
+### Test Without Bun APIs
+
+Run tests that verify Workers compatibility:
+
+```typescript
+import { describe, it, expect } from "bun:test";
+
+describe("Workers Compatibility", () => {
+  it("should not use Bun-specific APIs", async () => {
+    // Import the module
+    const module = await import("../src/index.js");
+
+    // Verify no Bun globals used
+    const source = await Bun.file("../src/index.ts").text();
+    expect(source).not.toContain("Bun.");
+    expect(source).not.toContain("bun:sqlite");
+  });
+});
+```
+
+### Use Miniflare for Local Testing
+
+```sh
+# Install miniflare
+bun add -D miniflare
+
+# Run local Workers environment
+bunx miniflare dist/worker.js
+```
+
+## Deployment Checklist
+
+Before deploying to Workers:
+
+- [ ] No Bun-only APIs used (`bun:sqlite`, `Bun.$`, etc.)
+- [ ] All imports are explicit (no auto-imports)
+- [ ] Environment variables properly typed
+- [ ] No file system operations
+- [ ] No child processes spawned
+- [ ] No native modules/FFI
+- [ ] Single-file bundle generated
+- [ ] Secrets in environment variables (not code)
+- [ ] Response times under 50ms (or Unbound configured)
+- [ ] `wrangler.toml` configured
+- [ ] Tested with Miniflare locally
+
+## Dual Runtime Support
+
+For maximum compatibility, maintain both Bun and Workers builds:
+
+```
+src/
+  index.ts         # Bun-first development version
+  worker.ts        # Workers-compatible version
+  core/
+    logic.ts       # Shared business logic (runtime-agnostic)
+```
+
+Use conditional exports in `package.json`:
+
+```json
+{
+  "exports": {
+    ".": {
+      "bun": "./src/index.ts",
+      "worker": "./dist/worker.js",
+      "default": "./dist/index.js"
+    }
+  }
+}
+```
+
+## Resources
+
+- Cloudflare Workers Docs: [developers.cloudflare.com/workers](https://developers.cloudflare.com/workers/)
+- Wrangler CLI: [developers.cloudflare.com/workers/wrangler](https://developers.cloudflare.com/workers/wrangler/)
+- D1 Database: [developers.cloudflare.com/d1](https://developers.cloudflare.com/d1/)
+- Durable Objects: [developers.cloudflare.com/durable-objects](https://developers.cloudflare.com/durable-objects/)

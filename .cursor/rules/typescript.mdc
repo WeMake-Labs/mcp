@@ -1,0 +1,159 @@
+---
+globs: *.ts,*.tsx
+---
+
+# TypeScript Development Standards
+
+## Strict Mode Requirements
+
+All TypeScript files MUST use strict mode. Verify [tsconfig.json](mdc:tsconfig.json) has:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true
+  }
+}
+```
+
+## Type Safety
+
+### Complete Type Definitions
+
+Always define explicit types for:
+
+- Function parameters
+- Function return types
+- Class properties
+- Object structures
+- Complex data structures
+
+### Interface-First Design
+
+Use interfaces for data structures:
+
+```typescript
+interface DomainElement {
+  id: string;
+  name: string;
+  type: "entity" | "attribute" | "relation" | "process";
+  description: string;
+}
+
+interface AnalogicalMapping {
+  sourceElement: string;
+  targetElement: string;
+  mappingStrength: number; // 0.0-1.0
+  justification: string;
+  limitations?: string[];
+}
+```
+
+### Type Guards
+
+Implement type guards for runtime validation:
+
+```typescript
+function isValidElementType(type: unknown): type is DomainElementType {
+  return typeof type === "string" && allowedElementTypes.includes(type as DomainElementType);
+}
+```
+
+## ES Modules Format
+
+Use ES modules exclusively:
+
+```typescript
+// ✅ Correct
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import type { Result } from "./types.js";
+export default function createServer() {}
+
+// ❌ Incorrect
+const Server = require("@modelcontextprotocol/sdk/server");
+module.exports = createServer;
+```
+
+## Import Standards
+
+### Complete Imports
+
+Import ALL methods, classes, and types used:
+
+```typescript
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
+import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+```
+
+### Import Organization
+
+Order imports:
+
+1. Bun built-ins (`bun:test`, `bun:sqlite`)
+2. External packages (`@modelcontextprotocol/sdk`)
+3. Internal modules (relative imports)
+4. Type imports (group separately)
+
+```typescript
+import { describe, it, expect } from "bun:test";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+
+import { MyModule } from "../src/myModule.js";
+import { HelperClass } from "./helper.js";
+
+import type { Result, Config } from "./types.js";
+```
+
+## No Any Types
+
+Avoid `any` unless absolutely necessary. If required, document why:
+
+```typescript
+// ❌ Avoid
+function process(data: any) {}
+
+// ✅ Preferred
+function process(data: Record<string, unknown>) {}
+
+// ✅ When any is necessary (document)
+/**
+ * Handles dynamic MCP tool arguments.
+ * Using any here because MCP protocol allows arbitrary JSON.
+ */
+function handleTool(args: any) {}
+```
+
+## Const Assertions
+
+Use const assertions for literal types:
+
+```typescript
+const allowedStages = ["problem-definition", "options", "criteria", "evaluation"] as const;
+
+type Stage = (typeof allowedStages)[number];
+```
+
+## File Extension Requirements
+
+Always include `.js` extensions in imports (TypeScript transpiles to ES modules):
+
+```typescript
+// ✅ Correct
+import { helper } from "./helper.js";
+
+// ❌ Incorrect
+import { helper } from "./helper";
+```
+
+## Examples
+
+Reference implementations:
+
+- [src/decision-framework/src/index.ts](mdc:src/decision-framework/src/index.ts)
+- [src/memory/src/index.ts](mdc:src/memory/src/index.ts)
+- [src/sequential-thinking/src/index.ts](mdc:src/sequential-thinking/src/index.ts)

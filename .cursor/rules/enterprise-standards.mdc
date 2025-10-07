@@ -1,0 +1,101 @@
+---
+alwaysApply: true
+---
+
+# Enterprise Development Standards
+
+## AI-First Development Principles
+
+Prioritize code understanding and review quality over generation speed. The real bottlenecks in enterprise development
+are:
+
+- Code reviews and knowledge transfer
+- Testing and validation
+- Team coordination and documentation
+- NOT writing code
+
+## Code Quality Requirements
+
+### Comprehensive Documentation
+
+Every function, class, and complex logic block requires JSDoc comments that explain:
+
+1. **Purpose**: What the code does
+2. **Business Context**: Why this solution was chosen
+3. **Decision Rationale**: Trade-offs and alternatives considered
+4. **Edge Cases**: Important behaviors and constraints
+
+Example:
+
+```typescript
+/**
+ * Validates MCP tool input against schema for the Decision Framework.
+ *
+ * Business Context: Enterprise clients require strict GDPR compliance,
+ * so we validate all inputs to prevent data leakage and maintain audit trails.
+ *
+ * Decision Rationale: Chose runtime validation over compile-time to support
+ * dynamic tool discovery and maintain flexibility for different MCP clients.
+ *
+ * @throws {Error} If input schema validation fails
+ */
+private validateDecisionAnalysisData(input: unknown): DecisionAnalysisData {
+  // ...
+}
+```
+
+### TypeScript Strict Mode
+
+- Use strict TypeScript exclusively
+- Complete type safety with interfaces and type guards
+- No `any` types unless absolutely necessary (document why)
+- Leverage type inference where appropriate
+
+## Enterprise Security Patterns
+
+### GDPR Compliance
+
+- Data minimization by design
+- Explicit consent mechanisms
+- Right to erasure implementation
+- Data portability support
+- Audit logging for all data operations
+
+### Security Best Practices
+
+- **Least-Privilege Access**: Minimal permissions by default
+- **Schema Validation**: Validate all inputs before processing
+- **Human-in-the-Loop (HITL)**: For sensitive operations (delete, export, etc.)
+- **Audit Logging**: Comprehensive logging with timestamps and user context
+- **Secrets Management**: NEVER commit secrets; use environment variables
+
+### Self-Healing Systems
+
+- Graceful error recovery with fallbacks
+- Automated monitoring and alerting
+- Clear error messages for debugging
+- Rollback capabilities for state changes
+
+## Zero-Shot Chain-of-Thought Process
+
+For all development tasks, follow this reasoning process:
+
+1. **Enterprise Requirements Analysis**: Identify core requirements and map to WeMake's enterprise standards
+2. **Strategic Solution Planning**: Decompose into atomic, testable components
+3. **Implementation with Excellence**: Generate production-ready code optimized for review quality
+4. **Quality Assurance**: Validate against 90%+ test coverage and security standards
+5. **Deployment-Ready Delivery**: Include deployment configs, monitoring, documentation
+
+## Response Format
+
+- Use markdown with code blocks for files/scripts
+- Include full file contents with TypeScript types
+- Be thorough yet concise, professional and directive
+- Limit to rule-compliant solutions
+- Explain violations and suggest alternatives
+
+## License and Compliance
+
+- [LICENSE](mdc:LICENSE) - MIT License with enterprise options
+- Security issues: security@wemake.cx
+- GDPR compliance built into all data handling

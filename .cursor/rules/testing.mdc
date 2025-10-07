@@ -1,0 +1,200 @@
+---
+globs: *.test.ts,*.spec.ts,*_test.ts,**/_spec.ts
+---
+
+# Bun Native Test Runner Standards
+
+## Core Testing Principle
+
+**EXCLUSIVELY use Bun's native test runner.** Alternative test frameworks are PROHIBITED.
+
+```typescript
+// ✅ Correct
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
+
+// ❌ PROHIBITED
+import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "jest";
+```
+
+## Test File Organization
+
+### File Naming and Location
+
+- Place tests in `tests/` folders within each package
+- Naming: `functionName.test.ts` or `ClassName.test.ts`
+- Auto-discovered patterns: `*.test.ts`, `*_test.ts`, `*.spec.ts`, `*_spec.ts`
+
+### Test Structure
+
+```typescript
+#!/usr/bin/env bun
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
+import { MyModule } from "../src/myModule.ts";
+
+/**
+ * Test suite for MyModule functionality.
+ * Validates core business logic and edge cases.
+ */
+describe("MyModule", () => {
+  beforeEach(() => {
+    // Setup code
+  });
+
+  afterEach(() => {
+    // Cleanup code
+  });
+
+  it("should handle valid input correctly", () => {
+    expect(MyModule.process("valid")).toBe("expected");
+  });
+
+  it("should throw on invalid input", () => {
+    expect(() => MyModule.process(null)).toThrow();
+  });
+});
+```
+
+## Jest-Compatible API
+
+Bun's test runner provides built-in Jest compatibility:
+
+```typescript
+// Available functions
+describe("suite", () => {
+  beforeAll(() => {
+    /* runs once before all tests */
+  });
+  beforeEach(() => {
+    /* runs before each test */
+  });
+  afterEach(() => {
+    /* runs after each test */
+  });
+  afterAll(() => {
+    /* runs once after all tests */
+  });
+
+  it("test description", () => {});
+  test("alternative syntax", () => {});
+});
+
+// Available matchers
+expect(value).toBe(expected);
+expect(value).toEqual(expected);
+expect(value).toBeTruthy();
+expect(value).toBeFalsy();
+expect(value).toThrow();
+expect(value).toContain(item);
+expect(value).toHaveLength(length);
+```
+
+## Mocking
+
+Use Bun's native mocking (Jest-compatible):
+
+```typescript
+import { jest } from "bun:test";
+
+// Mock functions
+const mockFn = jest.fn();
+mockFn.mockReturnValue("mocked");
+
+// Spy on methods
+const spy = jest.spyOn(object, "method");
+spy.mockImplementation(() => "mocked");
+
+// Vitest-compatible (if needed)
+import { vi } from "bun:test";
+const mockFn2 = vi.fn();
+```
+
+## Coverage Requirements
+
+**MANDATORY 90%+ coverage** for all metrics:
+
+- Lines: 90%+
+- Functions: 90%+
+- Branches: 90%+
+- Statements: 90%+
+
+### Running with Coverage
+
+```sh
+# Generate coverage report
+bun test --coverage
+
+# Coverage with HTML report
+bun test --coverage --coverage-reporter=html
+
+# Coverage with specific threshold
+bun test --coverage --coverage-threshold=90
+```
+
+## Configuration
+
+Test configuration in [bunfig.toml](mdc:bunfig.toml):
+
+```toml
+[test]
+root = "."
+preload = ["./test-setup.ts"]
+
+[test.coverage]
+threshold = 90
+reports = ["text", "html", "json"]
+
+[test.reporter]
+junit = "test-results.xml"
+```
+
+## TypeScript Global Support
+
+Enable TypeScript support for global test functions (optional):
+
+```typescript
+/// <reference types="bun/test-globals" />
+```
+
+## Test Commands
+
+```sh
+# Run all tests
+bun test
+
+# Run with coverage (REQUIRED before commits)
+bun test --coverage
+
+# Run specific test file
+bun test ./tests/myModule.test.ts
+
+# Run tests matching pattern
+bun test --test-name-pattern "authentication"
+
+# Watch mode for development
+bun test --watch
+
+# Generate JUnit XML for CI/CD
+bun test --reporter=junit --reporter-outfile=junit.xml
+```
+
+## Performance Benefits
+
+- **10-30x faster** than Jest/Vitest
+- Native TypeScript execution (no transpilation)
+- Built-in coverage reporting
+- Fast incremental testing with watch mode
+
+## Migration from Vitest/Jest
+
+If updating existing tests:
+
+1. Remove Vitest/Jest dependencies from `package.json`
+2. Delete `vitest.config.ts` or `jest.config.js`
+3. Update imports: `from 'vitest'` → `from 'bun:test'`
+4. Move configuration to [bunfig.toml](mdc:bunfig.toml)
+5. Update mocking: Use `jest.fn()` or `vi.fn()` (both supported)
+
+## Prohibited
+
+❌ Vitest ❌ Jest ❌ Mocha ❌ Jasmine ❌ Any external test framework
