@@ -216,11 +216,45 @@ async function runServer() {
   // Shutdown handlers
   async function shutdown(exitCode: number = 0): Promise<void> {
     console.error("Shutting down gracefully...");
-    process.exit(exitCode);
+
+    try {
+      // Close server connections
+      if (server && typeof server.close === "function") {
+        await server.close();
+      }
+
+      // Flush any pending database operations
+      // Flush any pending logs
+      // Close any open streams or connections
+
+      console.error("Shutdown completed successfully");
+    } catch (error) {
+      console.error("Error during shutdown:", error);
+      exitCode = 1;
+    } finally {
+      process.exit(exitCode);
+    }
   }
 
-  process.on("SIGINT", () => shutdown(0));
-  process.on("SIGTERM", () => shutdown(0));
+  // Important: Don't use arrow functions for signal handlers
+  process.on("SIGINT", () => {
+    void shutdown(0);
+  });
+
+  process.on("SIGTERM", () => {
+    void shutdown(0);
+  });
+
+  // Also handle uncaught errors
+  process.on("uncaughtException", (error) => {
+    console.error("Uncaught exception:", error);
+    void shutdown(1);
+  });
+
+  process.on("unhandledRejection", (reason) => {
+    console.error("Unhandled rejection:", reason);
+    void shutdown(1);
+  });
 
   // Start server
   const transport = new StdioServerTransport();

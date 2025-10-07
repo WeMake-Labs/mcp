@@ -29,6 +29,97 @@ Use Bun's native APIs exclusively. External alternatives are PROHIBITED:
 - **Environment**: Built-in `process.env` (NOT dotenv)
 - **Password Hashing**: `Bun.password` (NOT bcrypt)
 
+## Production Deployment (Cloudflare Workers)
+
+For production deployments on Cloudflare Workers, Bun-specific APIs must be replaced with Workers-compatible
+alternatives. This enables using Bun for local development while deploying to Workers for production.
+
+### Runtime API Substitutions
+
+| Bun API (Local Development) | Workers Alternative (Production)                     |
+| --------------------------- | ---------------------------------------------------- |
+| `bun:sqlite`                | Cloudflare D1 (SQLite-compatible)                    |
+| `Bun.redis`                 | Cloudflare KV or Durable Objects                     |
+| `Bun.$` (shell commands)    | Not available - use HTTP APIs or Workers for Workers |
+| `Bun.file`                  | Workers APIs or R2 for files                         |
+| `Bun.password`              | Web Crypto API                                       |
+| `Bun.serve()`               | Workers fetch handler                                |
+| FFI/native bindings         | Not supported                                        |
+
+### Dual Runtime Architecture Pattern
+
+Separate business logic from platform adapters to maintain compatibility:
+
+```
+src/
+  core/
+    logic.ts       # Shared business logic (runtime-agnostic)
+  index.ts         # Bun-first development version
+  worker.ts        # Workers-compatible version
+```
+
+### Implementation Strategy
+
+1. **Core Business Logic**: Keep platform-agnostic in `core/` directory
+2. **Platform Adapters**: Create thin adapter layers for each runtime
+3. **Conditional Exports**: Use package.json exports for different environments
+
+```typescript
+// Example: Database abstraction
+interface DatabaseAdapter {
+  query(sql: string, params?: any[]): Promise<any[]>;
+  prepare(sql: string): PreparedStatement;
+}
+
+// Bun implementation (local development)
+class BunDatabaseAdapter implements DatabaseAdapter {
+  private db: Database;
+
+  constructor(dbPath: string) {
+    this.db = new Database(dbPath);
+  }
+
+  query(sql: string, params?: any[]): Promise<any[]> {
+    return this.db.query(sql, params).all();
+  }
+}
+
+// Workers implementation (production)
+class WorkersDatabaseAdapter implements DatabaseAdapter {
+  private db: D1Database;
+
+  constructor(db: D1Database) {
+    this.db = db;
+  }
+
+  query(sql: string, params?: any[]): Promise<any[]> {
+    return this.db
+      .prepare(sql)
+      .bind(...(params || []))
+      .all();
+  }
+}
+```
+
+### Configuration Strategy
+
+Use environment-specific configuration:
+
+```typescript
+// Detect runtime environment
+const isWorkers = typeof globalThis.WebSocketPair !== "undefined";
+
+// Select appropriate implementation
+const dbAdapter = isWorkers ? new WorkersDatabaseAdapter(env.DB) : new BunDatabaseAdapter("./local.db");
+```
+
+### References
+
+For detailed implementation patterns, see:
+
+- [cloudflare-workers.mdc](mdc:.cursor/rules/cloudflare-workers.mdc) - General Workers deployment patterns
+- [remote-mcp-servers.mdc](mdc:.cursor/rules/remote-mcp-servers.mdc) - Remote MCP server deployment on Workers
+
 ## Prohibited Tools
 
 NEVER use these alternatives:
