@@ -1,5 +1,5 @@
 ---
-globs: "*.ts,*.tsx"
+globs: *.ts,*.tsx
 ---
 
 # TypeScript Development Standards
@@ -25,6 +25,7 @@ All TypeScript files MUST use strict mode. Verify [tsconfig.json](mdc:tsconfig.j
 ### Complete Type Definitions
 
 Always define explicit types for:
+
 - Function parameters
 - Function return types
 - Class properties
@@ -58,8 +59,7 @@ Implement type guards for runtime validation:
 
 ```typescript
 function isValidElementType(type: unknown): type is DomainElementType {
-  return typeof type === "string" && 
-    allowedElementTypes.includes(type as DomainElementType);
+  return typeof type === "string" && allowedElementTypes.includes(type as DomainElementType);
 }
 ```
 
@@ -71,7 +71,7 @@ Use ES modules exclusively:
 // ✅ Correct
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import type { Result } from "./types.js";
-export default function createServer() { }
+export default function createServer() {}
 
 // ❌ Incorrect
 const Server = require("@modelcontextprotocol/sdk/server");
@@ -93,6 +93,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 ### Import Organization
 
 Order imports:
+
 1. Bun built-ins (`bun:test`, `bun:sqlite`)
 2. External packages (`@modelcontextprotocol/sdk`)
 3. Internal modules (relative imports)
@@ -114,17 +115,17 @@ Avoid `any` unless absolutely necessary. If required, document why:
 
 ```typescript
 // ❌ Avoid
-function process(data: any) { }
+function process(data: any) {}
 
 // ✅ Preferred
-function process(data: Record<string, unknown>) { }
+function process(data: Record<string, unknown>) {}
 
 // ✅ When any is necessary (document)
 /**
  * Handles dynamic MCP tool arguments.
  * Using any here because MCP protocol allows arbitrary JSON.
  */
-function handleTool(args: any) { }
+function handleTool(args: any) {}
 ```
 
 ## Const Assertions
@@ -132,14 +133,9 @@ function handleTool(args: any) { }
 Use const assertions for literal types:
 
 ```typescript
-const allowedStages = [
-  "problem-definition",
-  "options",
-  "criteria",
-  "evaluation"
-] as const;
+const allowedStages = ["problem-definition", "options", "criteria", "evaluation"] as const;
 
-type Stage = typeof allowedStages[number];
+type Stage = (typeof allowedStages)[number];
 ```
 
 ## File Extension Requirements
@@ -157,6 +153,7 @@ import { helper } from "./helper";
 ## Examples
 
 Reference implementations:
+
 - [src/decision-framework/src/index.ts](mdc:src/decision-framework/src/index.ts)
 - [src/memory/src/index.ts](mdc:src/memory/src/index.ts)
 - [src/sequential-thinking/src/index.ts](mdc:src/sequential-thinking/src/index.ts)

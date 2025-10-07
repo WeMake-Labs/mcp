@@ -1,5 +1,5 @@
 ---
-globs: "*.test.ts,*.spec.ts,*_test.ts,**/_spec.ts"
+globs: *.test.ts,*.spec.ts,*_test.ts,**/_spec.ts
 ---
 
 # Bun Native Test Runner Standards
@@ -62,13 +62,21 @@ Bun's test runner provides built-in Jest compatibility:
 ```typescript
 // Available functions
 describe("suite", () => {
-  beforeAll(() => { /* runs once before all tests */ });
-  beforeEach(() => { /* runs before each test */ });
-  afterEach(() => { /* runs after each test */ });
-  afterAll(() => { /* runs once after all tests */ });
+  beforeAll(() => {
+    /* runs once before all tests */
+  });
+  beforeEach(() => {
+    /* runs before each test */
+  });
+  afterEach(() => {
+    /* runs after each test */
+  });
+  afterAll(() => {
+    /* runs once after all tests */
+  });
 
-  it("test description", () => { });
-  test("alternative syntax", () => { });
+  it("test description", () => {});
+  test("alternative syntax", () => {});
 });
 
 // Available matchers
@@ -189,8 +197,4 @@ If updating existing tests:
 
 ## Prohibited
 
-❌ Vitest
-❌ Jest
-❌ Mocha
-❌ Jasmine
-❌ Any external test framework
+❌ Vitest ❌ Jest ❌ Mocha ❌ Jasmine ❌ Any external test framework

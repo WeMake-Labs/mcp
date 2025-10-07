@@ -6,7 +6,8 @@ alwaysApply: true
 
 ## MCP Protocol Overview
 
-All servers implement the [Model Context Protocol](https://modelcontextprotocol.io/) for enabling LLMs to securely access enterprise data sources, business tools, and AI agents.
+All servers implement the [Model Context Protocol](https://modelcontextprotocol.io/) for enabling LLMs to securely
+access enterprise data sources, business tools, and AI agents.
 
 ## Core MCP Server Architecture
 
@@ -19,12 +20,12 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 const server = new Server(
   {
     name: "server-name",
-    version: "1.0.0",
+    version: "1.0.0"
   },
   {
     capabilities: {
-      tools: {},
-    },
+      tools: {}
+    }
   }
 );
 
@@ -52,14 +53,14 @@ Example tool handler pattern from [src/memory/src/index.ts](mdc:src/memory/src/i
 ```typescript
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
-  
+
   switch (name) {
     case "create_entities":
       // Validate input
       // Process request
       // Return result
       return { content: [{ type: "text", text: result }] };
-    
+
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
@@ -77,15 +78,15 @@ private validateInput(input: unknown): ValidatedType {
   if (typeof input !== "object" || input === null) {
     throw new Error("Invalid input: expected object");
   }
-  
+
   // Type guards and validation
   const data = input as Record<string, unknown>;
-  
+
   // Validate required fields
   if (typeof data.field !== "string") {
     throw new Error("Invalid input: field must be string");
   }
-  
+
   return data as ValidatedType;
 }
 ```
@@ -111,13 +112,16 @@ Sensitive operations require human approval:
 - High-risk decisions
 
 Pattern:
+
 ```typescript
 if (operation === "delete" && !confirmed) {
   return {
-    content: [{
-      type: "text",
-      text: "⚠️ This operation requires confirmation. Please review and confirm deletion."
-    }],
+    content: [
+      {
+        type: "text",
+        text: "⚠️ This operation requires confirmation. Please review and confirm deletion."
+      }
+    ],
     requiresConfirmation: true
   };
 }
@@ -134,6 +138,7 @@ if (operation === "delete" && !confirmed) {
 ### Comprehensive Audit Logging
 
 All MCP operations should log:
+
 - Timestamp
 - User/session ID
 - Operation type

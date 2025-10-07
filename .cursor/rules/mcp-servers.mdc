@@ -1,12 +1,13 @@
 ---
-globs: "src/*/src/index.ts"
+globs: src/*/src/index.ts
 ---
 
 # MCP Server Implementation Patterns
 
 ## Standard MCP Server Structure
 
-All MCP servers in this monorepo follow a consistent architecture pattern. Reference: [src/decision-framework/src/index.ts](mdc:src/decision-framework/src/index.ts)
+All MCP servers in this monorepo follow a consistent architecture pattern. Reference:
+[src/decision-framework/src/index.ts](mdc:src/decision-framework/src/index.ts)
 
 ## Required Components
 
@@ -33,7 +34,7 @@ private validateInput(input: unknown): ValidatedDataType {
   }
 
   // Validate ranges
-  if (typeof data.confidence !== "number" || 
+  if (typeof data.confidence !== "number" ||
       data.confidence < 0 || data.confidence > 1) {
     throw new Error("Invalid confidence: must be 0.0-1.0");
   }
@@ -91,11 +92,11 @@ Maintain state for audit trails and session continuity:
 class MyMCPServer {
   // History tracking
   private operationHistory: Record<string, OperationData[]> = {};
-  
+
   // Registry tracking
   private entityRegistry: Record<string, Record<string, Entity>> = {};
   private relationRegistry: Record<string, Relation[]> = {};
-  
+
   // Session management
   private sessionOrder: string[] = [];
   private readonly maxSessions = Number(process.env.MAX_SESSIONS ?? "100");
@@ -172,12 +173,12 @@ async function runServer() {
   const server = new Server(
     {
       name: "my-mcp-server",
-      version: "1.0.0",
+      version: "1.0.0"
     },
     {
       capabilities: {
-        tools: {},
-      },
+        tools: {}
+      }
     }
   );
 
@@ -204,12 +205,12 @@ async function runServer() {
         inputSchema: {
           type: "object",
           properties: {
-            field: { type: "string", description: "Field description" },
+            field: { type: "string", description: "Field description" }
           },
-          required: ["field"],
-        },
-      },
-    ],
+          required: ["field"]
+        }
+      }
+    ]
   }));
 
   // Shutdown handlers
@@ -247,11 +248,11 @@ class MyMCPServer {
   }
 
   // 3. Update methods
-  private updateHistory(data: ValidatedType): void { }
-  private updateRegistry(data: ValidatedType): void { }
+  private updateHistory(data: ValidatedType): void {}
+  private updateRegistry(data: ValidatedType): void {}
 
   // 4. Visualization methods
-  private visualize(data: ValidatedType): string { }
+  private visualize(data: ValidatedType): string {}
 
   // 5. Public process method
   public processOperation(input: unknown): Result {

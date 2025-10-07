@@ -1,12 +1,13 @@
 ---
-description: "Cloudflare Workers deployment patterns"
+description: Cloudflare Workers deployment patterns
 ---
 
 # Cloudflare Workers Deployment Standards
 
 ## Overview
 
-All MCP servers must be deployable to Cloudflare Workers for enterprise production use. This requires Workers-compatible builds that exclude Bun-only APIs.
+All MCP servers must be deployable to Cloudflare Workers for enterprise production use. This requires Workers-compatible
+builds that exclude Bun-only APIs.
 
 ## Workers Compatibility Requirements
 
@@ -14,18 +15,16 @@ All MCP servers must be deployable to Cloudflare Workers for enterprise producti
 
 The following Bun APIs DO NOT work in Cloudflare Workers:
 
-❌ `bun:sqlite` - Use Cloudflare D1 instead
-❌ `Bun.redis` - Use Cloudflare KV or Durable Objects instead
-❌ `Bun.$` - Shell commands not available in Workers
-❌ `Bun.file` - Use Workers APIs or R2 for files
-❌ `Bun.password` - Use Web Crypto API instead
-❌ FFI/native bindings - Not supported
+❌ `bun:sqlite` - Use Cloudflare D1 instead ❌ `Bun.redis` - Use Cloudflare KV or Durable Objects instead ❌ `Bun.$` -
+Shell commands not available in Workers ❌ `Bun.file` - Use Workers APIs or R2 for files ❌ `Bun.password` - Use Web
+Crypto API instead ❌ FFI/native bindings - Not supported
 
 ### Workers-Compatible Alternatives
 
 Use these instead:
 
 ✅ **Database**: Cloudflare D1 (SQLite-compatible)
+
 ```typescript
 export interface Env {
   DB: D1Database;
@@ -35,6 +34,7 @@ const result = await env.DB.prepare("SELECT * FROM users").all();
 ```
 
 ✅ **Key-Value Storage**: Cloudflare KV
+
 ```typescript
 export interface Env {
   KV: KVNamespace;
@@ -45,10 +45,11 @@ const value = await env.KV.get("key");
 ```
 
 ✅ **Stateful Storage**: Durable Objects
+
 ```typescript
 export class MyDurableObject {
-  constructor(state: DurableObjectState, env: Env) { }
-  
+  constructor(state: DurableObjectState, env: Env) {}
+
   async fetch(request: Request) {
     // Handle requests
   }
@@ -56,6 +57,7 @@ export class MyDurableObject {
 ```
 
 ✅ **Password Hashing**: Web Crypto API
+
 ```typescript
 const encoder = new TextEncoder();
 const data = encoder.encode(password);
@@ -108,11 +110,13 @@ export default {
 ### Never Bake Secrets
 
 ❌ NEVER do this:
+
 ```typescript
 const API_KEY = "sk-1234567890"; // Hard-coded secret
 ```
 
 ✅ Use environment variables:
+
 ```typescript
 export interface Env {
   API_KEY: string;
@@ -135,12 +139,12 @@ export interface Env {
   // Secrets
   API_KEY: string;
   DATABASE_PASSWORD: string;
-  
+
   // Bindings
   DB: D1Database;
   KV: KVNamespace;
   BUCKET: R2Bucket;
-  
+
   // Configuration
   MAX_SESSIONS: string; // Workers env vars are strings
   ENABLE_LOGGING: string;
@@ -153,15 +157,13 @@ export interface Env {
 
 Workers have no traditional file system:
 
-❌ `fs.readFile`, `Bun.file`
-✅ Use R2 for object storage, KV for small values
+❌ `fs.readFile`, `Bun.file` ✅ Use R2 for object storage, KV for small values
 
 ### No Child Processes
 
 Workers cannot spawn processes:
 
-❌ `child_process`, `Bun.$`
-✅ Use HTTP APIs or Workers for Workers
+❌ `child_process`, `Bun.$` ✅ Use HTTP APIs or Workers for Workers
 
 ### Limited Execution Time
 
@@ -176,8 +178,7 @@ Design for quick responses; use Durable Objects for long-running tasks.
 
 Workers cannot use native Node.js modules:
 
-❌ Native addons, C bindings, FFI
-✅ Pure JavaScript/TypeScript only
+❌ Native addons, C bindings, FFI ✅ Pure JavaScript/TypeScript only
 
 ## CI/CD Pipeline
 
@@ -232,7 +233,7 @@ describe("Workers Compatibility", () => {
   it("should not use Bun-specific APIs", async () => {
     // Import the module
     const module = await import("../src/index.js");
-    
+
     // Verify no Bun globals used
     const source = await Bun.file("../src/index.ts").text();
     expect(source).not.toContain("Bun.");
