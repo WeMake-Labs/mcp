@@ -87,7 +87,7 @@ Example:
 
 ## Setup
 
-### bunx
+### Cursor
 
 ```json
 {
@@ -99,28 +99,6 @@ Example:
   }
 }
 ```
-
-#### bunx with custom settings
-
-The server can be configured using the following environment variables:
-
-```json
-{
-  "mcpServers": {
-    "Analogical Reasoning": {
-      "command": "bunx",
-      "args": ["-y", "@wemake.cx/analogical-reasoning@latest"],
-      "env": {
-        "ANALOGY_MAX_ELEMENTS": "50",
-        "ANALOGY_MIN_CONFIDENCE": "0.3"
-      }
-    }
-  }
-}
-```
-
-- `ANALOGY_MAX_ELEMENTS`: Maximum number of elements per domain (default: 20)
-- `ANALOGY_MIN_CONFIDENCE`: Minimum confidence threshold for mappings (default: 0.1)
 
 ## System Prompt
 

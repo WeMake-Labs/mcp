@@ -1,7 +1,7 @@
 {
   "name": "@wemake.cx/analogical-reasoning",
-  "version": "0.2.12",
-  "description": "MCP server for diagrammatic thinking and spatial representation",
+  "version": "0.3.0",
+  "description": "MCP server for structured analogical reasoning and domain mapping",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
@@ -37,10 +37,14 @@
     "start": "bun run ./dist/index.js",
     "prepare": "bun run build",
     "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch",
-    "publish": "bun publish"
+    "publish": "bun publish",
+    "test": "bun test"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4"
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "chalk": "^5.3.0",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.5"
   },
   "devDependencies": {
     "@types/node": "^22",
