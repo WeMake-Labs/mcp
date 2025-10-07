@@ -34,5 +34,14 @@ export default [
       ...typescriptEslint.configs.recommended.rules
       // Add or override rules as needed
     }
+  },
+  {
+    files: [".github/scripts/**/*.ts"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        Bun: "readonly"
+      }
+    }
   }
 ];

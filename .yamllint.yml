@@ -1,0 +1,45 @@
+---
+# YAMLlint configuration for GitHub workflows and other YAML files
+# This ensures consistent YAML formatting and catches common errors
+
+extends: default
+
+rules:
+  # Require exactly 2 spaces before inline comments
+  comments:
+    min-spaces-from-content: 2
+    require-starting-space: true
+
+  # Line length matching prettier config
+  line-length:
+    max: 120
+    allow-non-breakable-inline-mappings: true
+
+  # Indentation
+  indentation:
+    spaces: 2
+    indent-sequences: true
+
+  # Allow duplicate keys in anchors/aliases
+  key-duplicates: enable
+
+  # Document markers
+  document-start: disable
+
+  # Trailing spaces
+  trailing-spaces: enable
+
+  # Empty lines
+  empty-lines:
+    max: 2
+
+  # Truthy values (allow yes/no, on/off)
+  truthy:
+    allowed-values: ["true", "false", "yes", "no", "on", "off"]
+    check-keys: false
+
+# Ignore certain files
+ignore: |
+  node_modules/
+  dist/
+  .git/
