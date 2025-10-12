@@ -174,7 +174,7 @@
     },
     "src/metacognitive-monitoring": {
       "name": "@wemake.cx/metacognitive-monitoring",
-      "version": "0.2.13",
+      "version": "0.3.0",
       "bin": {
         "mcp-server-metacognitive-monitoring": "dist/index.js",
       },

@@ -118,46 +118,41 @@ Example:
 
 ## Setup
 
-### bunx
+### Cursor
+
+Add the following to your `~/.cursor/mcp.json` file:
 
 ```json
 {
   "mcpServers": {
     "Metacognitive Monitoring": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/metacognitive-monitoring@latest"]
+      "args": ["@wemake.cx/metacognitive-monitoring@latest"]
     }
   }
 }
 ```
 
-#### bunx with custom settings
+### Raycast
 
-The server can be configured using the following environment variables:
+Use **Manage MCP Servers**, press CMD + N and paste the following:
 
 ```json
 {
   "mcpServers": {
     "Metacognitive Monitoring": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/metacognitive-monitoring@latest"],
-      "env": {
-        "MONITORING_HISTORY_LIMIT": "100",
-        "CONFIDENCE_THRESHOLD": "0.7"
-      }
+      "args": ["@wemake.cx/metacognitive-monitoring@latest"]
     }
   }
 }
 ```
-
-- `MONITORING_HISTORY_LIMIT`: Maximum number of monitoring sessions to retain (default: 50)
-- `CONFIDENCE_THRESHOLD`: Minimum confidence threshold for high-confidence claims (default: 0.8)
 
 ## System Prompt
 
 The prompt for utilizing metacognitive monitoring should encourage systematic self-assessment:
 
-```markdown
+```text
 Follow these steps for metacognitive monitoring:
 
 1. Knowledge Boundary Assessment:

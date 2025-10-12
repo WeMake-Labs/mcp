@@ -56,7 +56,7 @@ interface MetacognitiveMonitoringData {
   suggestedAssessments?: Array<"knowledge" | "claim" | "reasoning" | "overall">;
 }
 
-class MetacognitiveMonitoringServer {
+export class MetacognitiveMonitoringServer {
   private monitoringHistory: Record<string, MetacognitiveMonitoringData[]> = {};
   private knowledgeInventory: Record<string, KnowledgeAssessment> = {};
   private claimRegistry: Record<string, ClaimAssessment> = {};
@@ -804,7 +804,7 @@ Key features:
 const server = new Server(
   {
     name: "metacognitive-monitoring-server",
-    version: "0.2.13"
+    version: "0.3.0"
   },
   {
     capabilities: {
