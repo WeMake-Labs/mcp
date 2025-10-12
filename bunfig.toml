@@ -31,3 +31,17 @@ sourcemap = true
 
 # Minify for production builds
 minify = true
+
+# Test configuration
+[test]
+# Enable coverage by default
+coverage = true
+
+# Coverage thresholds (90%+ enterprise requirement)
+coverageThreshold = 90
+
+# Skip test files in coverage reports
+coverageSkipTestFiles = true
+
+# Coverage reporters
+coverageReporter = ["text", "json", "html", "lcov"]
