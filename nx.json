@@ -2,19 +2,36 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["productionBuild"],
-      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "productionBuild"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
       "cache": true
     },
     "prepare": {
-      "dependsOn": ["^prepare"],
+      "dependsOn": [
+        "^prepare"
+      ],
       "cache": true
     },
     "test": {
-      "dependsOn": ["^test"],
-      "inputs": ["default", "^default", "{workspaceRoot}/bunfig.toml"],
-      "outputs": ["{projectRoot}/coverage", "{projectRoot}/.bun-test-results"],
+      "dependsOn": [
+        "^test"
+      ],
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/bunfig.toml"
+      ],
+      "outputs": [
+        "{projectRoot}/coverage",
+        "{projectRoot}/.bun-test-results"
+      ],
       "cache": true
     }
   },
@@ -26,9 +43,11 @@
       }
     }
   ],
-  "nxCloudId": "6884dd9e0fe8167c4795da5e",
+  "nxCloudId": "68ec2392753fa0764f0ee5c3",
   "namedInputs": {
-    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"],
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci.yml"
+    ],
     "default": [
       "sharedGlobals",
       "{projectRoot}/**/*",
