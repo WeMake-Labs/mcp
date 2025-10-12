@@ -1,21 +1,24 @@
 #!/usr/bin/env bun
-/// <reference types="bun-types" />
 
 /**
  * Version Change Detection Script
  *
  * Business Context: Detects packages with version changes by comparing current
- * package.json versions against the previous git tag. This ensures we only
- * publish packages that have been intentionally versioned for release.
+ * package.json versions against the previous git tag and npm registry. This ensures
+ * we only publish packages that have been intentionally versioned for release and
+ * prevents attempting to republish already-published versions.
  *
  * Decision Rationale: Using git tags as the source of truth for version comparison
  * allows us to maintain a clear audit trail and prevents accidental republishing
- * of unchanged packages. This approach integrates seamlessly with semantic versioning
- * and release workflows.
+ * of unchanged packages. Adding npm registry checks prevents 403 Forbidden errors
+ * and makes the workflow idempotent. This approach integrates seamlessly with
+ * semantic versioning and release workflows.
  *
  * Edge Cases Handled:
  * - No previous tags exist (first release) - all packages are considered changed
  * - Package doesn't exist in previous tag - package is considered new/changed
+ * - Package already published to npm - package is skipped to prevent 403 errors
+ * - npm registry query failures - package is attempted for safety (fails open)
  * - Invalid package.json - package is skipped with warning
  * - Git command failures - script exits with clear error message
  */
@@ -30,6 +33,7 @@ interface PackageInfo {
   currentVersion: string;
   previousVersion?: string;
   hasVersionChange: boolean;
+  packageName?: string;
 }
 
 /**
@@ -46,9 +50,32 @@ async function getLatestTag(): Promise<string | null> {
 }
 
 /**
- * Reads the version from a package.json file
+ * Gets the published version of a package from npm registry.
+ *
+ * Business Context: Before attempting to publish, we check if the package
+ * already exists at the current version in npm registry to prevent 403 errors.
+ *
+ * Decision Rationale: Using `npm view` is a public operation that doesn't require
+ * authentication and works reliably for both scoped and unscoped packages.
+ *
+ * @param packageName The full npm package name (e.g., "@wemake.cx/memory")
+ * @returns The published version string, or null if package doesn't exist
  */
-async function readPackageVersion(packagePath: string): Promise<string | null> {
+async function getPublishedVersion(packageName: string): Promise<string | null> {
+  try {
+    // Use npm view to check published version (works without authentication)
+    const result = await $`npm view ${packageName} version`.text();
+    return result.trim() || null;
+  } catch {
+    // Package not published yet or doesn't exist
+    return null;
+  }
+}
+
+/**
+ * Reads the version and name from a package.json file
+ */
+async function readPackageVersion(packagePath: string): Promise<{ version: string; name: string } | null> {
   try {
     const packageJsonPath = join(packagePath, "package.json");
     const packageFile = Bun.file(packageJsonPath);
@@ -56,7 +83,10 @@ async function readPackageVersion(packagePath: string): Promise<string | null> {
       return null;
     }
     const packageJson = await packageFile.json();
-    return packageJson.version || null;
+    if (!packageJson.version || !packageJson.name) {
+      return null;
+    }
+    return { version: packageJson.version, name: packageJson.name };
   } catch (error) {
     console.error(`Warning: Failed to read version from ${packagePath}:`, error);
     return null;
@@ -115,27 +145,42 @@ async function detectVersionChanges(): Promise<PackageInfo[]> {
   const packageInfos: PackageInfo[] = [];
 
   for (const packagePath of packageDirs) {
-    const packageName = packagePath.split("/").pop()!;
-    const currentVersion = await readPackageVersion(packagePath);
+    const packageDirName = packagePath.split("/").pop()!;
+    const packageData = await readPackageVersion(packagePath);
 
-    if (!currentVersion) {
-      console.warn(`Skipping ${packageName}: No version found in package.json`);
+    if (!packageData) {
+      console.warn(`Skipping ${packageDirName}: No version or name found in package.json`);
       continue;
     }
+
+    const { version: currentVersion, name: packageName } = packageData;
 
     let previousVersion: string | null = null;
     let hasVersionChange = true;
 
     if (latestTag) {
-      previousVersion = await readPackageVersionAtTag(latestTag, packageName);
+      previousVersion = await readPackageVersionAtTag(latestTag, packageDirName);
       hasVersionChange = previousVersion !== currentVersion;
     }
 
+    // Check if already published to npm
+    const publishedVersion = await getPublishedVersion(packageName);
+    if (publishedVersion === currentVersion) {
+      console.log(`  ${packageDirName}: already published (${currentVersion})`);
+      hasVersionChange = false;
+    } else if (hasVersionChange) {
+      const changeType = previousVersion ? `${previousVersion} → ${currentVersion}` : `new package (${currentVersion})`;
+      console.log(`✓ ${packageDirName}: ${changeType}`);
+    } else {
+      console.log(`  ${packageDirName}: no change (${currentVersion})`);
+    }
+
     const packageInfo: PackageInfo = {
-      name: packageName,
+      name: packageDirName,
       path: packagePath,
       currentVersion,
-      hasVersionChange
+      hasVersionChange,
+      packageName
     };
 
     if (previousVersion !== null) {
@@ -143,13 +188,6 @@ async function detectVersionChanges(): Promise<PackageInfo[]> {
     }
 
     packageInfos.push(packageInfo);
-
-    if (hasVersionChange) {
-      const changeType = previousVersion ? `${previousVersion} → ${currentVersion}` : `new package (${currentVersion})`;
-      console.log(`✓ ${packageName}: ${changeType}`);
-    } else {
-      console.log(`  ${packageName}: no change (${currentVersion})`);
-    }
   }
 
   return packageInfos;
