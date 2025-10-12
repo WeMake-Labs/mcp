@@ -68,7 +68,7 @@ function isValidElementType(type: unknown): type is DomainElementType {
   return typeof type === "string" && allowedElementTypes.includes(type as DomainElementType);
 }
 
-class AnalogicalReasoningServer {
+export class AnalogicalReasoningServer {
   private analogyHistory: Record<string, AnalogicalReasoningData[]> = {};
   private domainRegistry: Record<
     string,
@@ -79,7 +79,7 @@ class AnalogicalReasoningServer {
   > = {};
   private nextElementId = 1;
 
-  private validateAnalogicalReasoningData(input: unknown): AnalogicalReasoningData {
+  public validateAnalogicalReasoningData(input: unknown): AnalogicalReasoningData {
     const data = input as Record<string, unknown>;
 
     // Validate required fields

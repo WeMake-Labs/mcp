@@ -10,9 +10,31 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    # Group minor and patch updates for easier review
+    groups:
+      production-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Limit number of open PRs
+    open-pull-requests-limit: 10
+    # Add labels for easier filtering
+    labels:
+      - "dependencies"
+      - "bun"
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: ".github/workflows"
     schedule:
       interval: "weekly"
+    # Group all GitHub Actions updates
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "github-actions"

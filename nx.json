@@ -13,6 +13,8 @@
     },
     "test": {
       "dependsOn": ["^test"],
+      "inputs": ["default", "^default", "{workspaceRoot}/bunfig.toml"],
+      "outputs": ["{projectRoot}/coverage", "{projectRoot}/.bun-test-results"],
       "cache": true
     }
   },
