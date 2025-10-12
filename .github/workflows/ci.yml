@@ -34,11 +34,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-
 
-      # This enables task distribution via Nx Cloud
-      # Run this command as early as possible, before dependencies are installed
+      # Nx Cloud distributed execution (optional)
+      # Requires VCS integration configured at: https://cloud.nx.app
+      # If not configured, this step will be skipped and tasks run locally
       # Learn more at https://nx.dev/ci/reference/nx-cloud-cli#npx-nxcloud-startcirun
       - name: Start Nx Cloud CI Run
         run: bunx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
+        continue-on-error: true
 
       - run: bun install --frozen-lockfile
       - uses: nrwl/nx-set-shas@826660b82addbef3abff5fa871492ebad618c9e1 # v4.3.3
@@ -85,5 +87,6 @@ jobs:
         continue-on-error: true
 
       # Nx Cloud recommends fixes for failures to help you get CI green faster. Learn more: https://nx.dev/ci/features/self-healing-ci
-      - run: bun nx-cloud fix-ci
+      - run: bunx nx-cloud fix-ci
         if: always()
+        continue-on-error: true
