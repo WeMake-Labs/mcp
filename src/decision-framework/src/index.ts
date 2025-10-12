@@ -1047,7 +1047,7 @@ Key features:
 const server = new Server(
   {
     name: "decision-framework-server",
-    version: "0.2.12"
+    version: "0.2.13"
   },
   {
     capabilities: {

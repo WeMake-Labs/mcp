@@ -81,7 +81,7 @@ const GOAL_TRACKER_TOOL = {
 // src/goal-tracker/src/index.ts (around lines 52–53)
 
 // derive version from build/env rather than hard-coding
-const version = process.env.PKG_VERSION ?? "0.2.12";
+const version = process.env.PKG_VERSION ?? "0.2.13";
 const server = new Server({ name: "goal-tracker-server", version }, { capabilities: { tools: {} } });
 const tracker = new GoalTracker();
 
