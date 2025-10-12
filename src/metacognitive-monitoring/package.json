@@ -17,6 +17,7 @@
   ],
   "exports": "./dist/index.js",
   "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
   "bin": {
     "mcp-server-metacognitive-monitoring": "dist/index.js"
   },
