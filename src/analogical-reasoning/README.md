@@ -89,12 +89,33 @@ Example:
 
 ### Cursor
 
+[Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=Analogical%20Reasoning&config=eyJjb21tYW5kIjoiYnVueCBAd2VtYWtlLmN4L2FuYWxvZ2ljYWwtcmVhc29uaW5nQGxhdGVzdCJ9)
+
+Or manually add the following to your `~/.cursor/mcp.json` file:
+
 ```json
 {
   "mcpServers": {
     "Analogical Reasoning": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/analogical-reasoning@latest"]
+      "args": ["@wemake.cx/analogical-reasoning@latest"]
+    }
+  }
+}
+```
+
+### Raycast
+
+[Add to Raycast](raycast://mcp/install?name=Analogical%20Reasoning&type=stdio&command=bunx%20@wemake.cx/analogical-reasoning@latest)
+
+Or manually via UI by using Manage MCP Servers, and press CMD + N and paste the following:
+
+```json
+{
+  "mcpServers": {
+    "Analogical Reasoning": {
+      "command": "bunx",
+      "args": ["@wemake.cx/analogical-reasoning@latest"]
     }
   }
 }
@@ -104,7 +125,7 @@ Example:
 
 The prompt for utilizing analogical reasoning should encourage systematic mapping and evaluation:
 
-```markdown
+```text
 Follow these steps for analogical reasoning:
 
 1. Domain Definition:
