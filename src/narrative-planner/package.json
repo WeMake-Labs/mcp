@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/narrative-planner",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "MCP server that creates simple narrative outlines",
   "license": "MIT",
   "type": "module",

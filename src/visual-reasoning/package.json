@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/visual-reasoning",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "MCP server for diagrammatic thinking and spatial representation",
   "license": "MIT",
   "type": "module",
@@ -42,7 +42,8 @@
     "publish": "bun publish"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4"
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "chalk": "^5.3.0"
   },
   "devDependencies": {
     "@types/node": "^22",

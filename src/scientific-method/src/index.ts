@@ -1015,7 +1015,7 @@ Key features:
 const server = new Server(
   {
     name: "scientific-method-server",
-    version: "0.2.10"
+    version: "0.2.11"
   },
   {
     capabilities: {

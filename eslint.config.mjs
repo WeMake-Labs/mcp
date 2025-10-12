@@ -3,7 +3,8 @@ import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import globals from "globals";
 
-export default [
+/** @type {import('eslint').Linter.Config[]} */
+const config = [
   { ignores: ["**/dist/**", ".nx/cache/**"] },
   js.configs.recommended,
   {
@@ -45,3 +46,5 @@ export default [
     }
   }
 ];
+
+export default config;

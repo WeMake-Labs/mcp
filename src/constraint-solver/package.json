@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/constraint-solver",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "MCP server for validating variable assignments against constraints",
   "license": "MIT",
   "type": "module",
