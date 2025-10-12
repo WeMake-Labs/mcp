@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/analogical-reasoning",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "MCP server for structured analogical reasoning and domain mapping",
   "keywords": [
     "mcp",
@@ -17,6 +17,7 @@
   ],
   "exports": "./dist/index.js",
   "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
   "bin": {
     "mcp-server-analogical-reasoning": "dist/index.js"
   },

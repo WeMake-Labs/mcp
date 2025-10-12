@@ -44,4 +44,4 @@ coverageThreshold = 90
 coverageSkipTestFiles = true
 
 # Coverage reporters
-coverageReporter = ["text", "json", "html", "lcov"]
+coverageReporter = ["text", "lcov"]
