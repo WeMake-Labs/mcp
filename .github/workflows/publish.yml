@@ -215,7 +215,7 @@ jobs:
           PACKAGES="$PACKAGES" bun run /tmp/publish-packages.ts
           rm -f /tmp/publish-packages.ts
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: No packages to publish
         if: steps.version-check.outputs.has_changes != 'true'
