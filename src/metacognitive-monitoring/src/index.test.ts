@@ -1,6 +1,5 @@
 import { describe, expect, test, beforeEach } from "bun:test";
 import { MetacognitiveMonitoringServer } from "./index.js";
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 
 /**
  * Test suite for Metacognitive Monitoring MCP Server.
@@ -13,52 +12,36 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
  * testing is done via MCP Inspector during development workflow.
  */
 describe("Metacognitive Monitoring Server", () => {
-  test("server initializes successfully", () => {
-    const server = new Server(
-      {
-        name: "metacognitive-monitoring-server",
-        version: "0.3.0"
-      },
-      {
-        capabilities: {
-          tools: {}
-        }
-      }
-    );
-    expect(server).toBeDefined();
+  test("MetacognitiveMonitoringServer initializes successfully", () => {
+    const serverInstance = new MetacognitiveMonitoringServer();
+    expect(serverInstance).toBeDefined();
+    expect(serverInstance).toBeInstanceOf(MetacognitiveMonitoringServer);
   });
 
-  test("server exports correct configuration", () => {
-    const server = new Server(
-      {
-        name: "metacognitive-monitoring-server",
-        version: "0.3.0"
-      },
-      {
-        capabilities: {
-          tools: {}
-        }
-      }
-    );
-    // Verify server is an MCP Server instance
-    expect(typeof server.connect).toBe("function");
-    expect(typeof server.close).toBe("function");
+  test("MetacognitiveMonitoringServer has expected methods", () => {
+    const serverInstance = new MetacognitiveMonitoringServer();
+    expect(typeof serverInstance.processMetacognitiveMonitoring).toBe("function");
   });
 
-  test("server has correct name and version", () => {
-    const server = new Server(
-      {
-        name: "metacognitive-monitoring-server",
-        version: "0.3.0"
-      },
-      {
-        capabilities: {
-          tools: {}
-        }
-      }
-    );
-    // Server metadata is internal, but we can verify it initializes
-    expect(server).toBeDefined();
+  test("metacognitiveMonitoring tool is properly defined", () => {
+    const serverInstance = new MetacognitiveMonitoringServer();
+
+    // Test that the server can process monitoring requests
+    const minimalInput = {
+      task: "Test",
+      stage: "planning",
+      overallConfidence: 0.5,
+      uncertaintyAreas: [],
+      recommendedApproach: "Test",
+      monitoringId: "test-init",
+      iteration: 1,
+      nextAssessmentNeeded: false
+    };
+
+    const result = serverInstance.processMetacognitiveMonitoring(minimalInput);
+    expect(result).toBeDefined();
+    expect(result.content).toBeDefined();
+    expect(result.isError).toBeUndefined();
   });
 });
 
