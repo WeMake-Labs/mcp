@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/sequential-thinking",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "MCP server for sequential thinking and problem solving",
   "license": "MIT",
   "type": "module",
@@ -17,7 +17,7 @@
     "tag": "latest"
   },
   "engines": {
-    "bun": ">=1.2.0"
+    "bun": ">=1.3.0"
   },
   "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/sequential-thinking",
   "author": "heyFlorentin",

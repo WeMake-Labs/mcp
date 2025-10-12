@@ -59,7 +59,7 @@ class MultimodalSynthServer {
 }
 
 const server = new Server(
-  { name: "multimodal-synthesizer-server", version: "0.2.11" },
+  { name: "multimodal-synthesizer-server", version: "0.2.12" },
   { capabilities: { tools: {} } }
 );
 const synthServer = new MultimodalSynthServer();

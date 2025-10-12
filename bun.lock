@@ -4,7 +4,7 @@
     "": {
       "name": "mcp",
       "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.17.4",
+        "@modelcontextprotocol/sdk": "1.20.0",
         "@wemake.cx/analogical-reasoning": "*",
         "@wemake.cx/bias-detection": "*",
         "@wemake.cx/constraint-solver": "*",
@@ -23,24 +23,24 @@
         "@wemake.cx/visual-reasoning": "*",
       },
       "devDependencies": {
-        "@eslint/js": "^9.15.0",
+        "@eslint/js": "9.37.0",
         "@nx/eslint": "21.4.1",
-        "@tsconfig/bun": "^1.0.8",
+        "@tsconfig/bun": "1.0.9",
         "@types/bun": "1.2.21",
-        "@typescript-eslint/eslint-plugin": "^8.40.0",
-        "@typescript-eslint/parser": "^8.40.0",
-        "eslint": "^9.34.0",
-        "globals": "^15.14.0",
-        "markdownlint": "^0.38.0",
+        "@typescript-eslint/eslint-plugin": "8.46.0",
+        "@typescript-eslint/parser": "8.46.0",
+        "eslint": "9.37.0",
+        "globals": "15.15.0",
+        "markdownlint": "0.38.0",
         "nx": "21.4.1",
-        "prettier": "^3.6.2",
-        "typescript": "^5.9.2",
-        "vite-tsconfig-paths": "^5.1.4",
+        "prettier": "3.6.2",
+        "typescript": "5.9.3",
+        "vite-tsconfig-paths": "5.1.4",
       },
     },
     "src/analogical-reasoning": {
       "name": "@wemake.cx/analogical-reasoning",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "bin": {
         "mcp-server-analogical-reasoning": "dist/index.js",
       },
@@ -57,7 +57,7 @@
     },
     "src/bias-detection": {
       "name": "@wemake.cx/bias-detection",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-bias-detection": "dist/index.js",
       },
@@ -71,7 +71,7 @@
     },
     "src/collaborative-reasoning": {
       "name": "@wemake.cx/collaborative-reasoning",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-collaborative-reasoning": "dist/index.js",
       },
@@ -86,7 +86,7 @@
     },
     "src/constraint-solver": {
       "name": "@wemake.cx/constraint-solver",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-constraint-solver": "dist/index.js",
       },
@@ -101,7 +101,7 @@
     },
     "src/decision-framework": {
       "name": "@wemake.cx/decision-framework",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-decision-framework": "dist/index.js",
       },
@@ -116,7 +116,7 @@
     },
     "src/ethical-reasoning": {
       "name": "@wemake.cx/ethical-reasoning",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-ethical-reasoning": "dist/index.js",
       },
@@ -131,7 +131,7 @@
     },
     "src/focus-group": {
       "name": "@wemake.cx/focus-group",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-focus-group": "dist/index.js",
       },
@@ -146,7 +146,7 @@
     },
     "src/goal-tracker": {
       "name": "@wemake.cx/goal-tracker",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-goal-tracker": "dist/index.js",
       },
@@ -160,7 +160,7 @@
     },
     "src/memory": {
       "name": "@wemake.cx/memory",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-memory": "dist/index.js",
       },
@@ -174,7 +174,7 @@
     },
     "src/metacognitive-monitoring": {
       "name": "@wemake.cx/metacognitive-monitoring",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-metacognitive-monitoring": "dist/index.js",
       },
@@ -189,7 +189,7 @@
     },
     "src/multimodal-synthesizer": {
       "name": "@wemake.cx/multimodal-synthesizer",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-multimodal-synthesizer": "dist/index.js",
       },
@@ -203,7 +203,7 @@
     },
     "src/narrative-planner": {
       "name": "@wemake.cx/narrative-planner",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-narrative-planner": "dist/index.js",
       },
@@ -217,7 +217,7 @@
     },
     "src/scientific-method": {
       "name": "@wemake.cx/scientific-method",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-scientific-method": "dist/index.js",
       },
@@ -232,7 +232,7 @@
     },
     "src/sequential-thinking": {
       "name": "@wemake.cx/sequential-thinking",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-sequential-thinking": "dist/index.js",
       },
@@ -247,7 +247,7 @@
     },
     "src/structured-argumentation": {
       "name": "@wemake.cx/structured-argumentation",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-structured-argumentation": "dist/index.js",
       },
@@ -262,7 +262,7 @@
     },
     "src/transaction-manager": {
       "name": "@wemake.cx/transaction-manager",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-transaction-manager": "dist/index.js",
       },
@@ -280,7 +280,7 @@
     },
     "src/visual-reasoning": {
       "name": "@wemake.cx/visual-reasoning",
-      "version": "0.2.11",
+      "version": "0.2.12",
       "bin": {
         "mcp-server-visual-reasoning": "dist/index.js",
       },
