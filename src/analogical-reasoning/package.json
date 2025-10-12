@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/analogical-reasoning",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "MCP server for structured analogical reasoning and domain mapping",
   "license": "MIT",
   "type": "module",
@@ -37,7 +37,6 @@
     "start": "bun run ./dist/index.js",
     "prepare": "bun run build",
     "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch",
-    "publish": "bun publish",
     "test": "bun test"
   },
   "dependencies": {

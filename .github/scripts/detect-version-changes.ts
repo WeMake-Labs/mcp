@@ -55,17 +55,24 @@ async function getLatestTag(): Promise<string | null> {
  * Business Context: Before attempting to publish, we check if the package
  * already exists at the current version in npm registry to prevent 403 errors.
  *
- * Decision Rationale: Using `npm view` is a public operation that doesn't require
- * authentication and works reliably for both scoped and unscoped packages.
+ * Decision Rationale: Using `bun pm view` with explicit registry ensures we're
+ * consistently checking npmjs.org in CI environments. The version format validation
+ * prevents false positives from error messages being treated as versions.
  *
  * @param packageName The full npm package name (e.g., "@wemake.cx/memory")
  * @returns The published version string, or null if package doesn't exist
  */
 async function getPublishedVersion(packageName: string): Promise<string | null> {
   try {
-    // Use npm view to check published version (works without authentication)
-    const result = await $`npm view ${packageName} version`.text();
-    return result.trim() || null;
+    // Use bun pm view with explicit registry for consistency
+    const result = await $`bun pm view ${packageName} version --registry https://registry.npmjs.org`.text();
+    const version = result.trim();
+
+    // Validate it's a real version string (semver format), not an error message
+    if (version && /^\d+\.\d+\.\d+/.test(version)) {
+      return version;
+    }
+    return null;
   } catch {
     // Package not published yet or doesn't exist
     return null;
