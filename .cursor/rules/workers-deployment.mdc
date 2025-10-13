@@ -262,7 +262,7 @@ GITHUB_CLIENT_SECRET="dev-client-secret-here"
 
 **Production** (Wrangler secrets):
 
-```bash
+```sh
 bunx wrangler secret put GITHUB_CLIENT_ID --env production
 bunx wrangler secret put GITHUB_CLIENT_SECRET --env production
 ```
@@ -363,7 +363,7 @@ import type { Request, Response } from "@cloudflare/workers-types";
 
 Workers require single-file bundles:
 
-```bash
+```sh
 # Build Workers-compatible bundle
 bun build src/index.ts \
   --outfile=dist/worker.js \
@@ -476,7 +476,7 @@ RATE_LIMIT_PER_HOUR = "100"
 
 **Secrets** (via CLI, NEVER in version control):
 
-```bash
+```sh
 # Set secrets for production
 bunx wrangler secret put GITHUB_CLIENT_ID --env production
 bunx wrangler secret put GITHUB_CLIENT_SECRET --env production
@@ -497,7 +497,7 @@ API_ENCRYPTION_KEY=local-encryption-key
 
 #### Step 1: Start Development Server
 
-```bash
+```sh
 cd src/decision-framework
 bun run dev  # or: bunx wrangler dev
 ```
@@ -506,7 +506,7 @@ Server runs at: `http://localhost:8787/sse`
 
 #### Step 2: Launch MCP Inspector
 
-```bash
+```sh
 bunx @modelcontextprotocol/inspector@latest
 ```
 
@@ -525,7 +525,7 @@ Inspector opens at: `http://localhost:5173`
 
 #### Deploy to Workers
 
-```bash
+```sh
 # Build for production
 bun run build
 
@@ -549,7 +549,7 @@ Deployed URL: `https://mcp-server-name-production.your-account.workers.dev/sse`
 
 #### Monitoring and Logs
 
-```bash
+```sh
 # View real-time logs
 bunx wrangler tail --env production
 
@@ -887,7 +887,7 @@ Deployment Issue?
 
 ## Quick Commands Reference
 
-```bash
+```sh
 # Local development
 bunx wrangler dev                       # Start local Workers server
 bunx @modelcontextprotocol/inspector@latest  # Open MCP Inspector

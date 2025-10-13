@@ -8,7 +8,7 @@
 
 ### 1. Enable CodeRabbit on Your Repository
 
-```bash
+```sh
 # Commit the configuration
 git add .coderabbit.yaml CODERABBIT_CONFIGURATION_SUMMARY.md VELOCITY_QUICK_REFERENCE.md
 git commit -m "Configure CodeRabbit for maximum development velocity"
@@ -24,7 +24,7 @@ git push
 
 ### 3. Create Your First Test PR
 
-```bash
+```sh
 # Make a small change to test the configuration
 git checkout -b test/coderabbit-validation
 echo "# Test" >> TEST.md
@@ -53,7 +53,7 @@ git push -u origin test/coderabbit-validation
 
 ### Creating PRs
 
-```bash
+```sh
 # Use descriptive titles - CodeRabbit will auto-label
 git commit -m "feat(mcp-server): Add new tool for X"  # → mcp-server label
 git commit -m "fix(workers): Remove Bun.file usage"   # → workers-deployment label

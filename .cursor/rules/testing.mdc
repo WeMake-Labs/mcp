@@ -20,7 +20,7 @@ globs: *.test.ts,*.spec.ts,*_test.ts,**/_spec.ts
 
 ## Test Coverage Quick-Check
 
-```bash
+```sh
 # Quick coverage check (must be 90%+)
 bun test --coverage
 
@@ -313,7 +313,7 @@ describe("Async Operations", () => {
 
 ### Pre-Commit Workflow
 
-```bash
+```sh
 1. bun test --watch          # Develop with live feedback
 2. bun test --coverage       # Verify 90%+ coverage
 3. bun run lint              # Fix linting issues
@@ -333,7 +333,7 @@ describe("Async Operations", () => {
 
 ### Coverage Gap Resolution
 
-```bash
+```sh
 # 1. Identify gaps
 bun test --coverage
 

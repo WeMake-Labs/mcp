@@ -631,7 +631,7 @@ Ready-to-use commands for common fixes:
 
 ### Fix All Safe Issues
 
-```bash
+```sh
 # Run all safe fixes
 bun run format        # Format code
 bun run lint --fix    # Auto-fix linting issues
@@ -640,7 +640,7 @@ bun run check         # Validate types
 
 ### Pre-Commit Validation
 
-```bash
+```sh
 # Complete pre-commit check
 bun test --coverage && \
 bun run format && \
@@ -650,7 +650,7 @@ bun run check
 
 ### Pre-Deployment Validation
 
-```bash
+```sh
 # Full deployment readiness check
 cd src/<server-name>
 bun test --coverage       # 90%+ required
@@ -660,7 +660,7 @@ bunx wrangler deploy --dry-run  # Validate config
 
 ### Fix Specific Issues
 
-```bash
+```sh
 # Fix import organization
 # [AI will provide specific sed/awk commands if needed]
 

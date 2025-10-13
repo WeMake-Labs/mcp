@@ -357,7 +357,7 @@ Just ask! The AI has access to all rules and can provide contextualized guidance
 
 ### Server Won't Start
 
-```bash
+```sh
 # Check for syntax errors
 bun run check
 
@@ -370,7 +370,7 @@ lsof -ti:8787 | xargs kill -9
 
 ### Tests Failing
 
-```bash
+```sh
 # Run specific test file
 bun test src/<server-name>/src/index.test.ts
 
@@ -383,7 +383,7 @@ bun test --coverage
 
 ### Deployment Issues
 
-```bash
+```sh
 # Validate wrangler.toml
 bunx wrangler deploy --dry-run
 
@@ -396,7 +396,7 @@ bunx wrangler dev
 
 ### Build Errors
 
-```bash
+```sh
 # Clean and rebuild
 bun run cleanup && bun install && bun run build-all
 

@@ -103,7 +103,7 @@ NEVER use these alternatives:
 
 **Problem:** Falling back to npm/node habits
 
-```bash
+```sh
 # ❌ Wrong
 npm install
 node index.js
@@ -112,7 +112,7 @@ npm run test
 
 **Solution:** Use Bun exclusively
 
-```bash
+```sh
 # ✅ Correct
 bun install
 bun run index.ts
@@ -160,7 +160,7 @@ export interface Env {
 
 **Solution:** Always test Workers build locally
 
-```bash
+```sh
 bunx wrangler dev  # Test Workers compatibility
 ```
 
@@ -170,7 +170,7 @@ bunx wrangler dev  # Test Workers compatibility
 
 **Solution:** Always run tests with coverage
 
-```bash
+```sh
 bun test --coverage  # 90%+ required
 ```
 
