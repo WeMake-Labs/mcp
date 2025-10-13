@@ -1044,6 +1044,27 @@ Key features:
   }
 };
 
+/**
+ * Creates and configures the Decision Framework MCP server instance.
+ *
+ * Purpose: Initializes an MCP `Server`, instantiates `DecisionFrameworkServer`,
+ * and registers tool handlers for tools/list and tools/call.
+ *
+ * Side effects:
+ * - Instantiates an internal DecisionFrameworkServer
+ * - Registers ListToolsRequestSchema and CallToolRequestSchema handlers
+ *
+ * @returns Server Configured MCP server ready to be connected to a transport
+ *
+ * @example
+ * import createServer from "./index.js";
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.error("Decision Framework MCP Server running on stdio");
+ */
 export default function createServer(): Server {
   const server = new Server(
     {

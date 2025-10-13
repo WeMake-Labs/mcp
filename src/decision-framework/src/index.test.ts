@@ -355,10 +355,10 @@ describe("Decision Analysis Data Validation", () => {
  * messages and proper input sanitization.
  */
 describe("Input Validation Errors", () => {
-  let serverInstance: DecisionFrameworkServer;
+  let serverInstance: TestableDecisionFrameworkServer;
 
   beforeEach(() => {
-    serverInstance = new DecisionFrameworkServer();
+    serverInstance = new TestableDecisionFrameworkServer();
   });
 
   it("rejects missing decisionStatement", () => {
@@ -515,10 +515,10 @@ describe("Input Validation Errors", () => {
  * calculations and multi-criteria analysis.
  */
 describe("Decision Processing", () => {
-  let serverInstance: DecisionFrameworkServer;
+  let serverInstance: TestableDecisionFrameworkServer;
 
   beforeEach(() => {
-    serverInstance = new DecisionFrameworkServer();
+    serverInstance = new TestableDecisionFrameworkServer();
   });
 
   it("processes decision with expected utility analysis", () => {
@@ -716,7 +716,7 @@ describe("MCP Server Integration", () => {
       nextStageNeeded: false
     };
 
-    const serverInstance = new DecisionFrameworkServer();
+    const serverInstance = new TestableDecisionFrameworkServer();
     const result = serverInstance.testValidateDecisionAnalysisData(validInput);
     expect(result.decisionStatement).toBe("Should we implement the new feature?");
     expect(result.options).toHaveLength(2);
@@ -733,10 +733,10 @@ describe("MCP Server Integration", () => {
  * production reliability.
  */
 describe("Edge Cases and Performance", () => {
-  let serverInstance: DecisionFrameworkServer;
+  let serverInstance: TestableDecisionFrameworkServer;
 
   beforeEach(() => {
-    serverInstance = new DecisionFrameworkServer();
+    serverInstance = new TestableDecisionFrameworkServer();
   });
 
   it("handles large number of options", () => {
