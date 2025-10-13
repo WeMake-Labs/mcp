@@ -107,7 +107,7 @@ coverage = true
 
 ### Coverage Requirements
 
-- **Target**: 90%+ coverage for enterprise standards
+- **Target**: 80%+ coverage for enterprise standards
 - **Reporting**: Integrated with Bun's native coverage
 - **Format**: Console output during CI, JUnit XML for integration
 

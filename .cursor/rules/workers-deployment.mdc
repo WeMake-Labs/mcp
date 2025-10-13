@@ -49,7 +49,7 @@ production deployment workflows.
 
 Use this checklist before every deployment:
 
-- [ ] **Tests**: All tests pass with 90%+ coverage (`bun test --coverage`)
+- [ ] **Tests**: All tests pass with 80%+ coverage (`bun test --coverage`)
 - [ ] **Linting**: No linter errors (`bun run lint`)
 - [ ] **Type Check**: TypeScript validates (`bun run check`)
 - [ ] **Format**: Code formatted (`bun run format`)

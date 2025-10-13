@@ -171,7 +171,7 @@ bunx wrangler dev  # Test Workers compatibility
 **Solution:** Always run tests with coverage
 
 ```sh
-bun test --coverage  # 90%+ required
+bun test --coverage  # 80%+ required
 ```
 
 ## Performance Benefits

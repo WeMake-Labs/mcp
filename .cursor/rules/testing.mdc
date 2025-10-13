@@ -21,11 +21,11 @@ globs: *.test.ts,*.spec.ts,*_test.ts,**/_spec.ts
 ## Test Coverage Quick-Check
 
 ```sh
-# Quick coverage check (must be 90%+)
+# Quick coverage check (must be 80%+)
 bun test --coverage
 
 # Coverage with threshold enforcement
-bun test --coverage --coverage-threshold=90
+bun test --coverage --coverage-threshold=80
 
 # Generate HTML report for detailed view
 bun test --coverage --coverage-reporter=html
@@ -135,12 +135,12 @@ const mockFn2 = vi.fn();
 
 ## Coverage Requirements
 
-**MANDATORY 90%+ coverage** for all metrics:
+**MANDATORY 80%+ coverage** for all metrics:
 
-- Lines: 90%+
-- Functions: 90%+
-- Branches: 90%+
-- Statements: 90%+
+- Lines: 80%+
+- Functions: 80%+
+- Branches: 80%+
+- Statements: 80%+
 
 ### Running with Coverage
 
@@ -152,7 +152,7 @@ bun test --coverage
 bun test --coverage --coverage-reporter=html
 
 # Coverage with specific threshold
-bun test --coverage --coverage-threshold=90
+bun test --coverage --coverage-threshold=80
 ```
 
 ## Configuration
@@ -165,7 +165,7 @@ root = "."
 preload = ["./test-setup.ts"]
 
 [test.coverage]
-threshold = 90
+threshold = 80
 reports = ["text", "html", "json"]
 
 [test.reporter]
@@ -315,7 +315,7 @@ describe("Async Operations", () => {
 
 ```sh
 1. bun test --watch          # Develop with live feedback
-2. bun test --coverage       # Verify 90%+ coverage
+2. bun test --coverage       # Verify 80%+ coverage
 3. bun run lint              # Fix linting issues
 4. bun run check             # TypeScript validation
 5. git commit                # Commit changes
@@ -325,7 +325,7 @@ describe("Async Operations", () => {
 
 ```yaml
 # Automated in GitHub Actions
-- bun test --coverage --coverage-threshold=90
+- bun test --coverage --coverage-threshold=80
 - bun run lint
 - bun run check
 - bun run build

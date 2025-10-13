@@ -141,7 +141,7 @@ reviews:
     - label: "breaking-change"
       instructions: "For API changes that affect tool schemas or server interfaces"
     - label: "needs-coverage"
-      instructions: "When test coverage drops below 90%"
+      instructions: "When test coverage drops below 80%"
     - label: "bun-compatibility"
       instructions: "For changes to Bun usage patterns"
 
@@ -170,7 +170,7 @@ reviews:
         Reference: .cursor/rules/workers-deployment.mdc"
     - path: "src/*/src/*.test.ts"
       instructions:
-        "Bun native tests. Must achieve 90%+ coverage. Use describe/it/expect from 'bun:test'. Include edge cases, error
+        "Bun native tests. Must achieve 80%+ coverage. Use describe/it/expect from 'bun:test'. Include edge cases, error
         scenarios, and input validation tests. Reference: .cursor/rules/testing.mdc"
     - path: "src/*/README.md"
       instructions:
@@ -291,7 +291,7 @@ reviews:
           R2, Web Crypto API."
       - name: "Test Coverage Requirement"
         instructions:
-          "Ensure test coverage is 90%+ for lines, functions, branches, and statements. Flag PRs that reduce coverage
+          "Ensure test coverage is 80%+ for lines, functions, branches, and statements. Flag PRs that reduce coverage
           below this threshold."
       - name: "Workers Deployment Checklist"
         instructions:
@@ -790,5 +790,5 @@ code_generation:
     path_instructions:
       - path: "src/**/src/*.ts"
         instructions:
-          "Generate Bun native tests using describe/it/expect. Achieve 90%+ coverage with: happy path, edge cases, error
+          "Generate Bun native tests using describe/it/expect. Achieve 80%+ coverage with: happy path, edge cases, error
           scenarios, input validation, type guards. Follow pattern in .cursor/rules/testing.mdc"

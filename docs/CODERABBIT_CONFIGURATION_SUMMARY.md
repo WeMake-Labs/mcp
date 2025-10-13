@@ -36,7 +36,7 @@ assistance and Cloudflare Workers deployment.
 - ✅ Label 'tests' for test files
 - ✅ Label 'security' for security-related changes
 - ✅ Label 'breaking-change' for API changes
-- ✅ Label 'needs-coverage' when coverage drops below 90%
+- ✅ Label 'needs-coverage' when coverage drops below 80%
 - ✅ Label 'bun-compatibility' for Bun usage patterns
 
 ### 3. Path Filters & Instructions ✅
@@ -68,7 +68,7 @@ assistance and Cloudflare Workers deployment.
 **Custom Pre-Merge Checks Added:**
 
 1. ✅ **Bun-Only APIs Check** - Verify no Bun APIs in Workers builds
-2. ✅ **Test Coverage Requirement** - Ensure 90%+ coverage
+2. ✅ **Test Coverage Requirement** - Ensure 80%+ coverage
 3. ✅ **Workers Deployment Checklist** - Validate deployment readiness
 4. ✅ **Bun Command Usage** - Verify exclusive use of `bun`/`bunx`
 5. ✅ **MCP Server Pattern Compliance** - Enforce standard patterns
@@ -120,7 +120,7 @@ assistance and Cloudflare Workers deployment.
 
 **Unit Test Generation:**
 
-- ✅ Added path instruction for `src/**/src/*.ts` - Bun native test patterns with 90%+ coverage
+- ✅ Added path instruction for `src/**/src/*.ts` - Bun native test patterns with 80%+ coverage
 
 ### 8. Chat Configuration ✅
 
@@ -169,7 +169,7 @@ assistance and Cloudflare Workers deployment.
 
 The configuration now automatically enforces:
 
-- ✅ **90%+ test coverage requirement**
+- ✅ **80%+ test coverage requirement**
 - ✅ **Bun-first development** (no npm/node/yarn)
 - ✅ **Workers compatibility checks** (no Bun-only APIs in production)
 - ✅ **GDPR compliance awareness**

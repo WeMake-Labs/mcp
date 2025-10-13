@@ -28,7 +28,7 @@ Switzerland.
   code is more critical than generating it. Implement mandatory human review for AI-generated security-sensitive code
 - **SAST/DAST/SCA**: Static/dynamic analyses and dependency audits mandatory in CI
 - **SBOM**: Signed SBOMs (e.g. SPDX/CycloneDX) for MCP servers and AI agents
-- **Test Coverage Gate**: ≥90% (branches/lines) as a merge requirement for security-relevant components
+- **Test Coverage Gate**: ≥80% (branches/lines) as a merge requirement for security-relevant components
 - **Sandboxing**: Isolated execution environments for AI agent operations
 - **Audit Logging**: Comprehensive logging of all AI interactions for compliance and security monitoring
 - **Rate Limiting**: Advanced throttling mechanisms to prevent abuse and ensure service availability

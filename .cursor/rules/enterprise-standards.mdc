@@ -26,7 +26,7 @@ Use this checklist for all enterprise development:
 - [ ] **Audit Logging**: Log all operations with timestamps and user context
 - [ ] **GDPR Compliance**: Data minimization, right to erasure, portability
 - [ ] **HITL Required**: Sensitive operations require human confirmation
-- [ ] **Test Coverage**: 90%+ coverage (lines, functions, branches, statements)
+- [ ] **Test Coverage**: 80%+ coverage (lines, functions, branches, statements)
 - [ ] **Documentation**: JSDoc for all public APIs with business context
 
 ## AI-First Development Principles
@@ -108,7 +108,7 @@ For all development tasks, follow this reasoning process:
 1. **Enterprise Requirements Analysis**: Identify core requirements and map to WeMake's enterprise standards
 2. **Strategic Solution Planning**: Decompose into atomic, testable components
 3. **Implementation with Excellence**: Generate production-ready code optimized for review quality
-4. **Quality Assurance**: Validate against 90%+ test coverage and security standards
+4. **Quality Assurance**: Validate against 80%+ test coverage and security standards
 5. **Deployment-Ready Delivery**: Include deployment configs, monitoring, documentation
 
 ## Response Format

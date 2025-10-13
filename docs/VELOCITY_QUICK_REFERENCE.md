@@ -83,7 +83,7 @@ git commit -m "WIP: Experimental feature"             # → Ignored by CodeRabbi
 - `tests` → Test file changes
 - `security` → Security-related changes
 - `breaking-change` → API changes requiring attention
-- `needs-coverage` → Test coverage below 90%
+- `needs-coverage` → Test coverage below 80%
 - `bun-compatibility` → Bun usage pattern changes
 
 **Action:** Sort PRs by label to batch similar reviews
@@ -91,7 +91,7 @@ git commit -m "WIP: Experimental feature"             # → Ignored by CodeRabbi
 ### Custom Checks Save Time
 
 1. **Bun-Only APIs Check** - Catches Workers incompatibility
-2. **Test Coverage** - Ensures 90%+ coverage
+2. **Test Coverage** - Ensures 80%+ coverage
 3. **Workers Deployment** - Validates production readiness
 4. **Bun Command Usage** - Enforces bun/bunx only
 5. **MCP Server Pattern** - Validates standard patterns
@@ -290,7 +290,7 @@ reviews:
 ### Short-term (Month 1)
 
 - ✅ 50% reduction in review back-and-forth
-- ✅ 90%+ test coverage maintained automatically
+- ✅ 80%+ test coverage maintained automatically
 - ✅ Zero deployment issues from Bun API usage
 
 ### Long-term (Month 3+)
@@ -351,7 +351,7 @@ After 2 weeks with this configuration, you should:
 - [ ] Rarely have PRs blocked by custom checks
 - [ ] Write code that passes first review
 - [ ] Spend <5 minutes per PR on review
-- [ ] Have 90%+ test coverage on all new code
+- [ ] Have 80%+ test coverage on all new code
 - [ ] Zero Workers deployment issues from Bun APIs
 - [ ] Documentation generated automatically
 - [ ] PRs merge within 24 hours

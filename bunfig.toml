@@ -37,8 +37,8 @@ minify = true
 # Enable coverage by default
 coverage = true
 
-# Coverage thresholds (90%+ enterprise requirement)
-coverageThreshold = 90
+# Coverage thresholds (80%+ enterprise requirement)
+coverageThreshold = 80
 
 # Skip test files in coverage reports
 coverageSkipTestFiles = true

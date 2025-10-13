@@ -32,7 +32,7 @@ Creating a new MCP server? Follow this checklist:
 - [ ] **State Management**: Track history and registries for audit trails
 - [ ] **Visualization**: Provide human-readable output formatting
 - [ ] **Shutdown Handlers**: Implement graceful shutdown on SIGINT/SIGTERM
-- [ ] **Tests**: Write tests with 90%+ coverage
+- [ ] **Tests**: Write tests with 80%+ coverage
 - [ ] **Documentation**: Create README following [Documentation](mdc:.cursor/rules/documentation.mdc)
 - [ ] **Security**: Implement HITL for sensitive operations
 

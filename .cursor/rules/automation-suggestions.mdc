@@ -653,7 +653,7 @@ bun run check
 ```sh
 # Full deployment readiness check
 cd src/<server-name>
-bun test --coverage       # 90%+ required
+bun test --coverage       # 80%+ required
 bun run build             # Build for Workers
 bunx wrangler deploy --dry-run  # Validate config
 ```

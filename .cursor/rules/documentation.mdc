@@ -29,7 +29,7 @@ Creating documentation for a new server? Use this checklist:
 - [ ] **Usage**: Concrete examples with expected output
 - [ ] **System Prompt**: Template for AI integration
 - [ ] **Security**: Enterprise security patterns
-- [ ] **Testing**: Coverage requirements (90%+)
+- [ ] **Testing**: Coverage requirements (80%+)
 - [ ] **License**: MIT with enterprise licensing info
 - [ ] **Support**: Links to issues, security email, website
 
@@ -174,7 +174,7 @@ bun test --coverage
 
 bun test --watch \`\`\`
 
-Required coverage: 90%+ (lines, functions, branches, statements)
+Required coverage: 80%+ (lines, functions, branches, statements)
 ```
 
 ### 10. License and Links

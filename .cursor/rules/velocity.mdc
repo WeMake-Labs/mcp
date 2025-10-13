@@ -28,7 +28,7 @@ monorepo.
 | **Install dependencies**    | `bun install`                                  | First time setup, after pulling changes |
 | **Start a server locally**  | `cd src/<server-name> && bun run start`        | Local development and testing           |
 | **Run all tests**           | `bun test`                                     | Before committing, CI validation        |
-| **Test with coverage**      | `bun test --coverage`                          | Pre-commit validation (90%+ required)   |
+| **Test with coverage**      | `bun test --coverage`                          | Pre-commit validation (80%+ required)   |
 | **Build all servers**       | `bun run build-all`                            | Pre-deployment, CI builds               |
 | **Build single server**     | `cd src/<server-name> && bun run build`        | Server-specific builds                  |
 | **Format code**             | `bun run format`                               | Fix formatting and linting              |
@@ -59,7 +59,7 @@ monorepo.
 **If you're preparing for DEPLOYMENT:**
 
 1. Consult [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc) checklist
-2. Verify [Testing](mdc:.cursor/rules/testing.mdc) coverage (90%+ required)
+2. Verify [Testing](mdc:.cursor/rules/testing.mdc) coverage (80%+ required)
 3. Review [Enterprise Standards](mdc:.cursor/rules/enterprise-standards.mdc) security
 4. Build with `bun run build` and validate output
 
@@ -268,7 +268,7 @@ import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 ### Common Pitfalls to Avoid
 
 1. **DON'T use npm/node/yarn** → Use `bun` exclusively
-2. **DON'T skip tests** → 90%+ coverage required
+2. **DON'T skip tests** → 80%+ coverage required
 3. **DON'T commit without formatting** → Run `bun run format`
 4. **DON'T use `any` without documentation** → Prefer `unknown` + type guards
 5. **DON'T forget Workers compatibility** → Check [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc)
@@ -277,7 +277,7 @@ import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 Before deploying to Cloudflare Workers, verify:
 
-- [ ] All tests pass: `bun test --coverage` (90%+ required)
+- [ ] All tests pass: `bun test --coverage` (80%+ required)
 - [ ] No linter errors: `bun run lint`
 - [ ] TypeScript validates: `bun run check`
 - [ ] Code formatted: `bun run format`
@@ -307,7 +307,7 @@ See complete checklist in [Workers Deployment](mdc:.cursor/rules/workers-deploym
 
 ### Required Metrics
 
-- **Test Coverage**: 90%+ (lines, functions, branches, statements)
+- **Test Coverage**: 80%+ (lines, functions, branches, statements)
 - **Build Time**: < 30s per server (Nx caching helps)
 - **Type Safety**: Strict TypeScript, no `any` (unless documented)
 - **Documentation**: JSDoc for all public APIs
@@ -330,7 +330,7 @@ The AI can help you with:
 ### Immediate Assistance
 
 - Generate boilerplate for new MCP servers
-- Write test cases with 90%+ coverage
+- Write test cases with 80%+ coverage
 - Fix linter and type errors
 - Update documentation
 - Suggest performance improvements

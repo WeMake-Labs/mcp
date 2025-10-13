@@ -242,7 +242,7 @@ describe("MCP Server Integration", () => {
  * Business Context: Direct unit testing of server methods ensures comprehensive
  * coverage of validation, processing, and business logic.
  *
- * Decision Rationale: Test server methods directly to achieve 90%+ coverage
+ * Decision Rationale: Test server methods directly to achieve 80%+ coverage
  * without requiring a connected MCP transport.
  */
 describe("Direct Server Method Tests", () => {
