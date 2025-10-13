@@ -189,14 +189,14 @@ describe("Input Validation", () => {
     await expect(server.request(request, CallToolRequestSchema)).rejects.toThrow();
   });
 
-  test("accepts valid string input", () => {
-    // Test validates that server initializes correctly
+  test("server creates without errors", () => {
+    // Test validates that server factory function works correctly
     const server = createServer();
     expect(server).toBeDefined();
   });
 
-  test("handles empty string input", () => {
-    // Test validates that server has required methods
+  test("server provides required MCP methods", () => {
+    // Test validates that server exposes connect and close methods for MCP protocol
     const server = createServer();
     expect(typeof server.connect).toBe("function");
     expect(typeof server.close).toBe("function");
