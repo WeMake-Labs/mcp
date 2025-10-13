@@ -19,7 +19,7 @@ interface EthicalRequestData {
   suggestedNext?: FrameworkType[];
 }
 
-class EthicalReasoningServer {
+export class EthicalReasoningServer {
   private history: EthicalRequestData[] = [];
 
   private validateData(input: unknown): EthicalRequestData {
@@ -147,26 +147,34 @@ const ETHICAL_REASONING_TOOL: Tool = {
   }
 };
 
-const server = new Server({ name: "ethical-reasoning-server", version: "0.3.0" }, { capabilities: { tools: {} } });
-const ethicalServer = new EthicalReasoningServer();
+export default function createServer(): Server {
+  const server = new Server({ name: "ethical-reasoning-server", version: "0.3.0" }, { capabilities: { tools: {} } });
+  const ethicalServer = new EthicalReasoningServer();
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ETHICAL_REASONING_TOOL] }));
-server.setRequestHandler(CallToolRequestSchema, async (req) => {
-  if (req.params.name === "ethicalReasoning") {
-    return ethicalServer.process(req.params.arguments);
-  }
-  return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
-});
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ETHICAL_REASONING_TOOL] }));
+  server.setRequestHandler(CallToolRequestSchema, async (req) => {
+    if (req.params.name === "ethicalReasoning") {
+      return ethicalServer.process(req.params.arguments);
+    }
+    return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
+  });
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Ethical Reasoning MCP Server running on stdio");
-  process.once("SIGINT", () => process.exit(0));
-  process.once("SIGTERM", () => process.exit(0));
+  return server;
 }
 
-runServer().catch((err) => {
-  console.error("Fatal error running server:", err);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Ethical Reasoning MCP Server running on stdio");
+    process.once("SIGINT", () => process.exit(0));
+    process.once("SIGTERM", () => process.exit(0));
+  }
+
+  runServer().catch((err) => {
+    console.error("Fatal error running server:", err);
+    process.exit(1);
+  });
+}

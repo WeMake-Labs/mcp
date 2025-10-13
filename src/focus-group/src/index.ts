@@ -71,7 +71,7 @@ interface FocusGroupData {
   suggestedFocusArea?: string;
 }
 
-class FocusGroupServer {
+export class FocusGroupServer {
   private personaRegistry: Record<string, Record<string, FocusGroupPersona>> = {};
   private feedbackHistory: Record<string, Feedback[]> = {};
   private focusAreaTracker: Record<string, FocusAreaAnalysis[]> = {};
@@ -747,47 +747,55 @@ Key features:
   }
 };
 
-const server = new Server(
-  {
-    name: "focus-group-server",
-    version: "0.3.0"
-  },
-  {
-    capabilities: {
-      tools: {}
-    }
-  }
-);
-
-const focusGroupServer = new FocusGroupServer();
-
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [FOCUS_GROUP_TOOL]
-}));
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "focusGroup") {
-    return focusGroupServer.processFocusGroup(request.params.arguments);
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: `Unknown tool: ${request.params.name}`
+export default function createServer(): Server {
+  const server = new Server(
+    {
+      name: "focus-group-server",
+      version: "0.3.0"
+    },
+    {
+      capabilities: {
+        tools: {}
       }
-    ],
-    isError: true
-  };
-});
+    }
+  );
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Focus Group MCP Server running on stdio");
+  const focusGroupServer = new FocusGroupServer();
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [FOCUS_GROUP_TOOL]
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name === "focusGroup") {
+      return focusGroupServer.processFocusGroup(request.params.arguments);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Unknown tool: ${request.params.name}`
+        }
+      ],
+      isError: true
+    };
+  });
+
+  return server;
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error running server:", error);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Focus Group MCP Server running on stdio");
+  }
+
+  runServer().catch((error) => {
+    console.error("Fatal error running server:", error);
+    process.exit(1);
+  });
+}

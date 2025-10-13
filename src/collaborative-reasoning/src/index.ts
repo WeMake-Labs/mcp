@@ -67,7 +67,7 @@ interface CollaborativeReasoningData {
   suggestedContributionTypes?: string[];
 }
 
-class CollaborativeReasoningServer {
+export class CollaborativeReasoningServer {
   private personaRegistry: Record<string, Record<string, Persona>> = {};
   private contributionHistory: Record<string, Contribution[]> = {};
   private disagreementTracker: Record<string, Disagreement[]> = {};
@@ -944,47 +944,55 @@ Key features:
   }
 };
 
-const server = new Server(
-  {
-    name: "collaborative-reasoning-server",
-    version: "0.3.0"
-  },
-  {
-    capabilities: {
-      tools: {}
-    }
-  }
-);
-
-const collaborativeReasoningServer = new CollaborativeReasoningServer();
-
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [COLLABORATIVE_REASONING_TOOL]
-}));
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "collaborativeReasoning") {
-    return collaborativeReasoningServer.processCollaborativeReasoning(request.params.arguments);
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: `Unknown tool: ${request.params.name}`
+export default function createServer(): Server {
+  const server = new Server(
+    {
+      name: "collaborative-reasoning-server",
+      version: "0.3.0"
+    },
+    {
+      capabilities: {
+        tools: {}
       }
-    ],
-    isError: true
-  };
-});
+    }
+  );
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Collaborative Reasoning MCP Server running on stdio");
+  const collaborativeReasoningServer = new CollaborativeReasoningServer();
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [COLLABORATIVE_REASONING_TOOL]
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name === "collaborativeReasoning") {
+      return collaborativeReasoningServer.processCollaborativeReasoning(request.params.arguments);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Unknown tool: ${request.params.name}`
+        }
+      ],
+      isError: true
+    };
+  });
+
+  return server;
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error running server:", error);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Collaborative Reasoning MCP Server running on stdio");
+  }
+
+  runServer().catch((error) => {
+    console.error("Fatal error running server:", error);
+    process.exit(1);
+  });
+}

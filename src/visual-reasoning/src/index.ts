@@ -49,7 +49,7 @@ function isTransformationType(value: unknown): value is VisualOperationData["tra
   return typeof value === "string" && ["rotate", "move", "resize", "recolor", "regroup"].includes(value);
 }
 
-class VisualReasoningServer {
+export class VisualReasoningServer {
   private visualStateHistory: Record<string, VisualOperationData[]> = {};
   private currentVisualState: Record<string, Record<string, VisualElement>> = {};
   private nextElementId = 1;
@@ -593,55 +593,65 @@ Parameters explained:
   }
 };
 
-const server = new Server(
-  {
-    name: "visual-reasoning-server",
-    version: "0.3.0"
-  },
-  {
-    capabilities: {
-      tools: {}
-    }
-  }
-);
-
-const visualReasoningServer = new VisualReasoningServer();
-
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [VISUAL_REASONING_TOOL]
-}));
-
-server.setRequestHandler(ListResourcesRequestSchema, async () => ({
-  resources: []
-}));
-
-server.setRequestHandler(ListPromptsRequestSchema, async () => ({
-  prompts: []
-}));
-
-server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest) => {
-  if (request.params.name === "visualReasoning") {
-    return visualReasoningServer.processVisualOperation(request.params.arguments);
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: `Unknown tool: ${request.params.name}`
+export default function createServer(): Server {
+  const server = new Server(
+    {
+      name: "visual-reasoning-server",
+      version: "0.3.0"
+    },
+    {
+      capabilities: {
+        tools: {},
+        resources: {},
+        prompts: {}
       }
-    ],
-    isError: true
-  };
-});
+    }
+  );
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Visual Reasoning MCP Server running on stdio");
+  const visualReasoningServer = new VisualReasoningServer();
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [VISUAL_REASONING_TOOL]
+  }));
+
+  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+    resources: []
+  }));
+
+  server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+    prompts: []
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest) => {
+    if (request.params.name === "visualReasoning") {
+      return visualReasoningServer.processVisualOperation(request.params.arguments);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Unknown tool: ${request.params.name}`
+        }
+      ],
+      isError: true
+    };
+  });
+
+  return server;
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error running server:", error);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Visual Reasoning MCP Server running on stdio");
+  }
+
+  runServer().catch((error) => {
+    console.error("Fatal error running server:", error);
+    process.exit(1);
+  });
+}

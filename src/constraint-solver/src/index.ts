@@ -59,7 +59,7 @@ const CONSTRAINT_SOLVER_TOOL = {
   }
 };
 
-class ConstraintSolverServer {
+export class ConstraintSolverServer {
   async process(input: unknown): Promise<Result> {
     // First treat input as a partial to allow safe inspection
     const data = input as Partial<ConstraintSolverInput>;
@@ -94,29 +94,37 @@ class ConstraintSolverServer {
   }
 }
 
-const server = new Server({ name: "constraint-solver-server", version: "0.3.0" }, { capabilities: { tools: {} } });
-const constraintServer = new ConstraintSolverServer();
+export default function createServer(): Server {
+  const server = new Server({ name: "constraint-solver-server", version: "0.3.0" }, { capabilities: { tools: {} } });
+  const constraintServer = new ConstraintSolverServer();
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [CONSTRAINT_SOLVER_TOOL] }));
-server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
-  if (req.params.name === "constraintSolver") {
-    return await constraintServer.process(req.params.arguments);
-  }
-  return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
-});
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [CONSTRAINT_SOLVER_TOOL] }));
+  server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
+    if (req.params.name === "constraintSolver") {
+      return await constraintServer.process(req.params.arguments);
+    }
+    return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
+  });
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  try {
-    await server.connect(transport);
-    console.error("Constraint Solver MCP Server running on stdio");
-  } catch (err) {
-    console.error("Failed to connect constraint-solver:", err);
-    process.exit(1);
-  }
+  return server;
 }
 
-runServer().catch((err) => {
-  console.error("Fatal error running server:", err);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    try {
+      await server.connect(transport);
+      console.error("Constraint Solver MCP Server running on stdio");
+    } catch (err) {
+      console.error("Failed to connect constraint-solver:", err);
+      process.exit(1);
+    }
+  }
+
+  runServer().catch((err) => {
+    console.error("Fatal error running server:", err);
+    process.exit(1);
+  });
+}

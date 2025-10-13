@@ -18,7 +18,7 @@ interface GoalState {
   completed: boolean;
 }
 
-class GoalTracker {
+export class GoalTracker {
   private goals: GoalState[] = [];
 
   handle(input: GoalInput): Result {
@@ -80,30 +80,38 @@ const GOAL_TRACKER_TOOL = {
 
 // src/goal-tracker/src/index.ts (around lines 52–53)
 
-// derive version from build/env rather than hard-coding
-const version = process.env.PKG_VERSION ?? "0.3.0";
-const server = new Server({ name: "goal-tracker-server", version }, { capabilities: { tools: {} } });
-const tracker = new GoalTracker();
+export default function createServer(): Server {
+  // derive version from build/env rather than hard-coding
+  const version = process.env.PKG_VERSION ?? "0.3.0";
+  const server = new Server({ name: "goal-tracker-server", version }, { capabilities: { tools: {} } });
+  const tracker = new GoalTracker();
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [GOAL_TRACKER_TOOL] }));
-server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
-  if (req.params.name === "goalTracker") {
-    return tracker.handle((req.params.arguments ?? {}) as unknown as GoalInput);
-  }
-  return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
-});
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [GOAL_TRACKER_TOOL] }));
+  server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
+    if (req.params.name === "goalTracker") {
+      return tracker.handle((req.params.arguments ?? {}) as unknown as GoalInput);
+    }
+    return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
+  });
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Goal Tracker MCP Server running on stdio");
+  return server;
 }
 
-runServer().catch((err) => {
-  console.error("Fatal error running server:", err);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
 
-// Graceful Shutdown
-process.on("SIGINT", () => process.exit(0));
-process.on("SIGTERM", () => process.exit(0));
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Goal Tracker MCP Server running on stdio");
+  }
+
+  runServer().catch((err) => {
+    console.error("Fatal error running server:", err);
+    process.exit(1);
+  });
+
+  // Graceful Shutdown
+  process.on("SIGINT", () => process.exit(0));
+  process.on("SIGTERM", () => process.exit(0));
+}

@@ -1,11 +1,23 @@
 import { Redis, RedisOptions } from "ioredis";
 import chalk from "chalk";
 
-const REDIS_URL = process.env.REDIS_URL;
+let REDIS_URL = process.env.REDIS_URL;
 
+// Allow tests to work without Redis by using a mock URL
 if (!REDIS_URL) {
-  console.error(chalk.red("Error: REDIS_URL environment variable is not set."));
-  process.exit(1);
+  // Check if we're in a test environment
+  const isTest =
+    process.env.NODE_ENV === "test" ||
+    process.env.BUN_ENV === "test" ||
+    (typeof Bun !== "undefined" && Bun?.argv?.some((arg: string) => arg.includes("test")));
+
+  if (isTest) {
+    console.warn(chalk.yellow("Warning: REDIS_URL not set in test environment. Using mock URL."));
+    REDIS_URL = "redis://localhost:6379/test";
+  } else {
+    console.error(chalk.red("Error: REDIS_URL environment variable is not set."));
+    process.exit(1);
+  }
 }
 
 const redisOptions: RedisOptions = {

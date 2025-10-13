@@ -158,7 +158,7 @@ async function handleTransactionCallback(args: TxnRequestArgs): Promise<CallTool
 
 // -- Server Initialization (Refactored) --
 
-export async function runServer(): Promise<void> {
+export function createServer(): McpServer {
   const mcpServer = new McpServer({
     name: "transaction-manager",
     version: "0.3.0" // Updated version
@@ -171,6 +171,12 @@ export async function runServer(): Promise<void> {
     TxnRequestSchema.shape, // Pass the shape for Zod validation
     handleTransactionCallback
   );
+
+  return mcpServer;
+}
+
+export async function runServer(): Promise<void> {
+  const mcpServer = createServer();
 
   // Connect using stdio
   const transport = new StdioServerTransport();

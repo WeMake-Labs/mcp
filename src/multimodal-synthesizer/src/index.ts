@@ -39,7 +39,7 @@ const MULTIMODAL_SYNTH_TOOL = {
   }
 };
 
-class MultimodalSynthServer {
+export class MultimodalSynthServer {
   async process(input: unknown): Promise<Result> {
     if (!input || typeof input !== "object") {
       return { content: [{ type: "text", text: "Invalid input" }], isError: true };
@@ -58,26 +58,37 @@ class MultimodalSynthServer {
   }
 }
 
-const server = new Server({ name: "multimodal-synthesizer-server", version: "0.3.0" }, { capabilities: { tools: {} } });
-const synthServer = new MultimodalSynthServer();
+export default function createServer(): Server {
+  const server = new Server(
+    { name: "multimodal-synthesizer-server", version: "0.3.0" },
+    { capabilities: { tools: {} } }
+  );
+  const synthServer = new MultimodalSynthServer();
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [MULTIMODAL_SYNTH_TOOL] }));
-server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
-  if (req.params.name === "multimodalSynth") {
-    return await synthServer.process(req.params.arguments);
-  }
-  return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
-});
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [MULTIMODAL_SYNTH_TOOL] }));
+  server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
+    if (req.params.name === "multimodalSynth") {
+      return await synthServer.process(req.params.arguments);
+    }
+    return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
+  });
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  process.once("SIGINT", () => process.exit(0));
-  process.once("SIGTERM", () => process.exit(0));
-  console.error("Multimodal Synthesizer MCP Server running on stdio");
+  return server;
 }
 
-runServer().catch((err) => {
-  console.error("Fatal error running server:", err);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    process.once("SIGINT", () => process.exit(0));
+    process.once("SIGTERM", () => process.exit(0));
+    console.error("Multimodal Synthesizer MCP Server running on stdio");
+  }
+
+  runServer().catch((err) => {
+    console.error("Fatal error running server:", err);
+    process.exit(1);
+  });
+}

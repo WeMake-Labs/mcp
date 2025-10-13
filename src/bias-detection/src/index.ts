@@ -30,8 +30,8 @@ const BIAS_DETECTION_TOOL = {
   }
 };
 
-class BiasDetectionServer {
-  async process(input: unknown): Promise<Result> {
+export class BiasDetectionServer {
+  process(input: unknown): Result {
     if (
       !input ||
       typeof input !== "object" ||
@@ -49,24 +49,32 @@ class BiasDetectionServer {
   }
 }
 
-const server = new Server({ name: "bias-detection-server", version: "0.3.0" }, { capabilities: { tools: {} } });
-const biasServer = new BiasDetectionServer();
+export default function createServer(): Server {
+  const server = new Server({ name: "bias-detection-server", version: "0.3.0" }, { capabilities: { tools: {} } });
+  const biasServer = new BiasDetectionServer();
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [BIAS_DETECTION_TOOL] }));
-server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
-  if (req.params.name === "biasDetection") {
-    return await biasServer.process(req.params.arguments);
-  }
-  return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
-});
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [BIAS_DETECTION_TOOL] }));
+  server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
+    if (req.params.name === "biasDetection") {
+      return biasServer.process(req.params.arguments);
+    }
+    return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
+  });
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Bias Detection MCP Server running on stdio");
+  return server;
 }
 
-runServer().catch((err) => {
-  console.error("Fatal error running server:", err);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Bias Detection MCP Server running on stdio");
+  }
+
+  runServer().catch((err) => {
+    console.error("Fatal error running server:", err);
+    process.exit(1);
+  });
+}
