@@ -88,7 +88,7 @@ Constraint evaluation uses safe JavaScript evaluation:
   "mcpServers": {
     "Constraint Solver": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/constraint-solver@latest"]
+      "args": ["@wemake.cx/constraint-solver@latest"]
     }
   }
 }
@@ -103,7 +103,7 @@ The server supports various configuration options:
   "mcpServers": {
     "Constraint Solver": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/constraint-solver@latest"],
+      "args": ["@wemake.cx/constraint-solver@latest"],
       "env": {
         "CONSTRAINT_MAX_VARIABLES": "100",
         "CONSTRAINT_MAX_EXPRESSIONS": "50",

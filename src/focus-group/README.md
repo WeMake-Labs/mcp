@@ -125,7 +125,7 @@ The server categorizes feedback into specific types:
   "mcpServers": {
     "Focus Group": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/focus-group@latest"]
+      "args": ["@wemake.cx/focus-group@latest"]
     }
   }
 }
@@ -140,7 +140,7 @@ The server can be configured using the following environment variables:
   "mcpServers": {
     "Focus Group": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/focus-group@latest"],
+      "args": ["@wemake.cx/focus-group@latest"],
       "env": {
         "FOCUS_MAX_PERSONAS": "8",
         "FOCUS_MAX_FEEDBACK_ITEMS": "50",
