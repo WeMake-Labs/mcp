@@ -54,8 +54,19 @@ describe("Tool Registration", () => {
   it("should advertise memory tools", async () => {
     const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
-    expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("testTool");
+
+    // Memory server registers 9 tools
+    expect(response.tools.length).toBeGreaterThanOrEqual(9);
+    const toolNames = response.tools.map((tool: { name: string }) => tool.name);
+    expect(toolNames).toContain("create_entities");
+    expect(toolNames).toContain("create_relations");
+    expect(toolNames).toContain("list_entities");
+    expect(toolNames).toContain("get_entity");
+    expect(toolNames).toContain("delete_entity");
+    expect(toolNames).toContain("upsert_entity");
+    expect(toolNames).toContain("query_entities");
+    expect(toolNames).toContain("export_entities");
+    expect(toolNames).toContain("import_entities");
   });
 });
 
@@ -70,100 +81,120 @@ describe("Entity CRUD Operations", () => {
   });
 
   it("should create entity successfully", async () => {
-    const result = await manager.createEntity({
-      name: "Test Entity",
-      entityType: "concept",
-      observations: ["First observation"]
-    });
+    const entities = await manager.createEntities([
+      {
+        name: "Test Entity",
+        entityType: "concept",
+        observations: ["First observation"]
+      }
+    ]);
 
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].type).toBe("text");
+    expect(entities).toHaveLength(1);
+    expect(entities[0].name).toBe("Test Entity");
+    expect(entities[0].entityType).toBe("concept");
   });
 
   it("should read entity successfully", async () => {
     // First create an entity
-    await manager.createEntity({
-      name: "Test Entity",
-      entityType: "concept",
-      observations: ["Test observation"]
-    });
+    await manager.createEntities([
+      {
+        name: "Test Entity",
+        entityType: "concept",
+        observations: ["Test observation"]
+      }
+    ]);
 
     // Then read it back
-    const result = await manager.readEntity({ name: "Test Entity" });
+    const graph = await manager.openNodes(["Test Entity"]);
 
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].type).toBe("text");
+    expect(graph.entities).toHaveLength(1);
+    expect(graph.entities[0].name).toBe("Test Entity");
+    expect(graph.entities[0].observations).toContain("Test observation");
   });
 
   it("should update entity successfully", async () => {
     // First create an entity
-    await manager.createEntity({
-      name: "Test Entity",
-      entityType: "concept",
-      observations: ["Original observation"]
-    });
+    await manager.createEntities([
+      {
+        name: "Test Entity",
+        entityType: "concept",
+        observations: ["Original observation"]
+      }
+    ]);
 
-    // Then update it
-    const result = await manager.updateEntity({
-      name: "Test Entity",
-      observations: ["Updated observation", "Another observation"]
-    });
+    // Then add observations to it
+    const updatedEntities = await manager.addObservations([
+      {
+        entityName: "Test Entity",
+        contents: ["Updated observation", "Another observation"]
+      }
+    ]);
 
-    expect(result.isError).toBeUndefined();
+    expect(updatedEntities).toHaveLength(1);
   });
 
   it("should delete entity successfully", async () => {
     // First create an entity
-    await manager.createEntity({
-      name: "Test Entity",
-      entityType: "concept",
-      observations: ["To be deleted"]
-    });
+    await manager.createEntities([
+      {
+        name: "Test Entity",
+        entityType: "concept",
+        observations: ["To be deleted"]
+      }
+    ]);
 
     // Then delete it
-    const result = await manager.deleteEntity({ name: "Test Entity" });
+    await manager.deleteEntities(["Test Entity"]);
 
-    expect(result.isError).toBeUndefined();
+    // Verify it's deleted by trying to read it
+    const graph = await manager.openNodes(["Test Entity"]);
+    expect(graph.entities).toHaveLength(0);
   });
 
   it("should handle duplicate entity creation", async () => {
-    await manager.createEntity({
-      name: "Duplicate Entity",
-      entityType: "concept",
-      observations: ["First"]
-    });
+    await manager.createEntities([
+      {
+        name: "Duplicate Entity",
+        entityType: "concept",
+        observations: ["First"]
+      }
+    ]);
 
-    const result = await manager.createEntity({
-      name: "Duplicate Entity",
-      entityType: "concept",
-      observations: ["Second"]
-    });
+    const entities = await manager.createEntities([
+      {
+        name: "Duplicate Entity",
+        entityType: "concept",
+        observations: ["Second"]
+      }
+    ]);
 
-    expect(result.isError).toBeUndefined();
+    // Should handle duplicates gracefully
+    expect(entities).toHaveLength(1);
   });
 
   it("should handle reading non-existent entity", async () => {
-    const result = await manager.readEntity({ name: "Non-existent" });
+    const graph = await manager.openNodes(["Non-existent"]);
 
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("not found");
+    expect(graph.entities).toHaveLength(0);
   });
 
   it("should handle updating non-existent entity", async () => {
-    const result = await manager.updateEntity({
-      name: "Non-existent",
-      observations: ["Update"]
-    });
+    const entities = await manager.addObservations([
+      {
+        entityName: "Non-existent",
+        contents: ["Update"]
+      }
+    ]);
 
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("not found");
+    // Should handle non-existent entities gracefully
+    expect(entities).toHaveLength(0);
   });
 
   it("should handle deleting non-existent entity", async () => {
-    const result = await manager.deleteEntity({ name: "Non-existent" });
+    // Should handle non-existent entities gracefully
+    await manager.deleteEntities(["Non-existent"]);
 
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("not found");
+    // No error should be thrown
   });
 });
 
@@ -179,62 +210,73 @@ describe("Relation Management", () => {
 
   it("should create relation successfully", async () => {
     // First create entities
-    await manager.createEntity({
-      name: "Entity A",
-      entityType: "concept",
-      observations: ["Entity A observation"]
-    });
-
-    await manager.createEntity({
-      name: "Entity B",
-      entityType: "concept",
-      observations: ["Entity B observation"]
-    });
+    await manager.createEntities([
+      {
+        name: "Entity A",
+        entityType: "concept",
+        observations: ["Entity A observation"]
+      },
+      {
+        name: "Entity B",
+        entityType: "concept",
+        observations: ["Entity B observation"]
+      }
+    ]);
 
     // Then create relation
-    const result = await manager.createRelation({
-      from: "Entity A",
-      to: "Entity B",
-      relationType: "relates-to"
-    });
+    const relations = await manager.createRelations([
+      {
+        from: "Entity A",
+        to: "Entity B",
+        relationType: "relates-to"
+      }
+    ]);
 
-    expect(result.isError).toBeUndefined();
+    expect(relations).toHaveLength(1);
+    expect(relations[0].from).toBe("Entity A");
+    expect(relations[0].to).toBe("Entity B");
   });
 
   it("should handle relation between non-existent entities", async () => {
-    const result = await manager.createRelation({
-      from: "Non-existent A",
-      to: "Non-existent B",
-      relationType: "relates-to"
-    });
+    const relations = await manager.createRelations([
+      {
+        from: "Non-existent A",
+        to: "Non-existent B",
+        relationType: "relates-to"
+      }
+    ]);
 
-    expect(result.isError).toBe(true);
+    // Should handle gracefully
+    expect(relations).toHaveLength(0);
   });
 
   it("should delete relation successfully", async () => {
     // First create entities and relation
-    await manager.createEntity({ name: "A", entityType: "concept", observations: [] });
-    await manager.createEntity({ name: "B", entityType: "concept", observations: [] });
-    await manager.createRelation({ from: "A", to: "B", relationType: "relates-to" });
+    await manager.createEntities([
+      { name: "A", entityType: "concept", observations: [] },
+      { name: "B", entityType: "concept", observations: [] }
+    ]);
+    await manager.createRelations([{ from: "A", to: "B", relationType: "relates-to" }]);
 
     // Then delete relation
-    const result = await manager.deleteRelation({
-      from: "A",
-      to: "B",
-      relationType: "relates-to"
-    });
+    await manager.deleteRelations([{ from: "A", to: "B", relationType: "relates-to" }]);
 
-    expect(result.isError).toBeUndefined();
+    // Verify it's deleted
+    const graph = await manager.readGraph();
+    expect(graph.relations).toHaveLength(0);
   });
 
   it("should handle deleting non-existent relation", async () => {
-    const result = await manager.deleteRelation({
-      from: "Non-existent",
-      to: "Non-existent",
-      relationType: "non-existent"
-    });
+    // Should handle gracefully
+    await manager.deleteRelations([
+      {
+        from: "Non-existent",
+        to: "Non-existent",
+        relationType: "non-existent"
+      }
+    ]);
 
-    expect(result.isError).toBe(true);
+    // No error should be thrown
   });
 });
 
@@ -279,57 +321,46 @@ describe("Graph Queries", () => {
     });
   });
 
-  it("should search entities by name", async () => {
-    const result = await manager.searchEntities({ query: "Alice" });
+  it("should search nodes by query", async () => {
+    const graph = await manager.searchNodes("Alice");
 
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].type).toBe("text");
+    expect(graph.entities.length).toBeGreaterThan(0);
+    expect(graph.entities[0].name).toBe("Alice");
   });
 
-  it("should find neighbors of an entity", async () => {
-    const result = await manager.getNeighbors({ entityName: "Alice" });
+  it("should read entire graph", async () => {
+    const graph = await manager.readGraph();
 
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].type).toBe("text");
+    expect(graph.entities.length).toBeGreaterThanOrEqual(3);
+    expect(graph.relations.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("should find paths between entities", async () => {
-    const result = await manager.getPaths({
-      from: "Alice",
-      to: "Bob",
-      maxDepth: 3
-    });
+  it("should search nodes with no results", async () => {
+    const graph = await manager.searchNodes("Non-existent");
 
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].type).toBe("text");
+    expect(graph.entities).toHaveLength(0);
   });
 
-  it("should handle search with no results", async () => {
-    const result = await manager.searchEntities({ query: "Non-existent" });
+  it("should handle searching non-existent entity", async () => {
+    const graph = await manager.searchNodes("Non-existent");
 
-    expect(result.isError).toBeUndefined();
-  });
-
-  it("should handle neighbors of non-existent entity", async () => {
-    const result = await manager.getNeighbors({ entityName: "Non-existent" });
-
-    expect(result.isError).toBe(true);
+    expect(graph.entities).toHaveLength(0);
   });
 
   it("should handle paths with no path found", async () => {
-    await manager.createEntity({
-      name: "Isolated",
-      entityType: "concept",
-      observations: ["Isolated entity"]
-    });
+    await manager.createEntities([
+      {
+        name: "Isolated",
+        entityType: "concept",
+        observations: ["Isolated entity"]
+      }
+    ]);
 
-    const result = await manager.getPaths({
-      from: "Alice",
-      to: "Isolated",
-      maxDepth: 1
-    });
+    const graph = await manager.readGraph();
 
-    expect(result.isError).toBeUndefined();
+    // Verify isolated entity exists but has no relations
+    const isolated = graph.entities.find((e) => e.name === "Isolated");
+    expect(isolated).toBeDefined();
   });
 });
 
@@ -589,14 +620,15 @@ describe("MCP Server Integration", () => {
       {
         method: "tools/call",
         params: {
-          name: "memory",
+          name: "create_entities",
           arguments: {
-            operation: "createEntity",
-            entity: {
-              name: "Test Entity",
-              entityType: "concept",
-              observations: ["Test observation"]
-            }
+            entities: [
+              {
+                name: "Test Entity",
+                entityType: "concept",
+                observations: ["Test observation"]
+              }
+            ]
           }
         }
       },

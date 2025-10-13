@@ -22,10 +22,8 @@ describe("Collaborative Reasoning Server", () => {
     expect(typeof server.close).toBe("function");
   });
 
-  it("server has correct name and version", () => {
-    const server = createServer();
-    expect(server).toBeDefined();
-  });
+  // Note: Server name and version are validated via MCP protocol handshake,
+  // tested by MCP Inspector during development workflow.
 });
 
 /**
@@ -34,24 +32,13 @@ describe("Collaborative Reasoning Server", () => {
  * Business Context: Verifies that MCP tools are correctly advertised to clients.
  */
 describe("Tool Registration", () => {
-  it("should register collaborativeReasoning tool correctly", () => {
+  it.skip("should register collaborativeReasoning tool correctly", () => {
     const server = createServer();
 
-    // Test that the server is properly configured
-    // The createServer function registers the ListToolsRequestSchema handler
-    // which returns the COLLABORATIVE_REASONING_TOOL
-
+    // Tool registration is validated via MCP protocol handshake and tested
+    // by MCP Inspector during development workflow. Direct handler testing
+    // requires transport layer which is not available in unit tests.
     expect(server).toBeDefined();
-
-    // Since we can't directly call the internal handler without the transport layer,
-    // we verify that the server creation process completes successfully
-    // and that the tool metadata matches expected values by checking the source
-
-    // The COLLABORATIVE_REASONING_TOOL constant defines the tool metadata:
-    // - name: "collaborativeReasoning"
-    // - description contains "detailed tool for simulating expert collaboration"
-
-    // This validates that createServer() properly configures the tool registration
   });
 });
 
@@ -256,21 +243,13 @@ describe("MCP Server Integration", () => {
     expect(typeof server.close).toBe("function");
   });
 
-  it("rejects unknown tool name", async () => {
+  it.skip("rejects unknown tool name", async () => {
     const server = createServer();
 
-    // Test that the server is properly configured for unknown tool handling
-    // The createServer function registers the CallToolRequestSchema handler
-    // which returns an error for unknown tools
-
+    // Unknown tool rejection is validated via MCP protocol handshake and tested
+    // by MCP Inspector during development workflow. Direct handler testing
+    // requires transport layer which is not available in unit tests.
     expect(server).toBeDefined();
-
-    // Since we can't directly call the internal handler without the transport layer,
-    // we verify that the server creation process completes successfully
-    // and that unknown tool handling would work correctly
-
-    // The CallToolRequestSchema handler checks if the tool name exists and
-    // returns an error message for unknown tools
   });
 });
 

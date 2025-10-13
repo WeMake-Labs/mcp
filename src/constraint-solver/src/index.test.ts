@@ -40,8 +40,8 @@ describe("Tool Registration", () => {
     const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("testTool");
-    expect(response.tools[0].description).toContain("Test tool");
+    expect(response.tools[0].name).toBe("constraintSolver");
+    expect(response.tools[0].description).toContain("Checks if a set of variables satisfies all constraints");
   });
 });
 

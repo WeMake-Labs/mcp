@@ -38,7 +38,7 @@ describe("Tool Registration", () => {
     const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("testTool");
+    expect(response.tools[0].name).toBe("visualReasoning");
   });
 });
 
@@ -117,6 +117,171 @@ describe("Input Validation", () => {
     const result = server.processOperation(validInput);
     expect(result.isError).toBeUndefined();
     expect(result.content[0].type).toBe("text");
+  });
+
+  it("should reject elements array containing invalid element type", () => {
+    const input = {
+      operation: "create",
+      elements: [
+        {
+          id: "invalid1",
+          type: "invalid_type",
+          label: "Invalid element"
+        }
+      ],
+      diagramId: "diagram1",
+      diagramType: "graph",
+      iteration: 0,
+      nextOperationNeeded: false,
+      transformationType: "move"
+    };
+    const result = server.processOperation(input);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Invalid element type");
+  });
+
+  it("should reject element objects missing required type field", () => {
+    const input = {
+      operation: "create",
+      elements: [
+        {
+          id: "missing1",
+          label: "Missing type field"
+        }
+      ],
+      diagramId: "diagram1",
+      diagramType: "graph",
+      iteration: 0,
+      nextOperationNeeded: false,
+      transformationType: "move"
+    };
+    const result = server.processOperation(input);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Missing type");
+  });
+
+  it("should reject transform/operation calls missing transformationType", () => {
+    const input = {
+      operation: "transform",
+      elements: [],
+      diagramId: "diagram1",
+      diagramType: "graph",
+      iteration: 0,
+      nextOperationNeeded: false
+    };
+    const result = server.processOperation(input);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Missing transformationType");
+  });
+
+  it("should reject edge elements missing source or target", () => {
+    const input = {
+      operation: "create",
+      elements: [
+        {
+          id: "edge1",
+          type: "edge",
+          target: "node2"
+        }
+      ],
+      diagramId: "diagram1",
+      diagramType: "graph",
+      iteration: 0,
+      nextOperationNeeded: false,
+      transformationType: "move"
+    };
+    const result = server.processOperation(input);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Missing source/target");
+  });
+
+  it("should reject container elements with invalid contains (non-array)", () => {
+    const input = {
+      operation: "create",
+      elements: [
+        {
+          id: "container1",
+          type: "container",
+          label: "Invalid contains",
+          contains: "not_an_array"
+        }
+      ],
+      diagramId: "diagram1",
+      diagramType: "graph",
+      iteration: 0,
+      nextOperationNeeded: false,
+      transformationType: "regroup"
+    };
+    const result = server.processOperation(input);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Invalid contains");
+  });
+
+  it("should reject container elements with invalid contains (non-string ids)", () => {
+    const input = {
+      operation: "create",
+      elements: [
+        {
+          id: "container1",
+          type: "container",
+          label: "Invalid contains ids",
+          contains: ["node1", 123, "node3"]
+        }
+      ],
+      diagramId: "diagram1",
+      diagramType: "graph",
+      iteration: 0,
+      nextOperationNeeded: false,
+      transformationType: "regroup"
+    };
+    const result = server.processOperation(input);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Invalid contains");
+  });
+
+  it("should reject invalid iteration values (negative)", () => {
+    const input = {
+      operation: "create",
+      elements: [],
+      diagramId: "diagram1",
+      diagramType: "graph",
+      iteration: -1,
+      nextOperationNeeded: false,
+      transformationType: "move"
+    };
+    const result = server.processOperation(input);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Invalid iteration");
+  });
+
+  it("should reject invalid iteration values (non-integer)", () => {
+    const input = {
+      operation: "create",
+      elements: [],
+      diagramId: "diagram1",
+      diagramType: "graph",
+      iteration: 1.5,
+      nextOperationNeeded: false,
+      transformationType: "move"
+    };
+    const result = server.processOperation(input);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Invalid iteration");
+  });
+
+  it("should reject invalid nextOperationNeeded values (non-boolean)", () => {
+    const input = {
+      operation: "create",
+      elements: [],
+      diagramId: "diagram1",
+      diagramType: "graph",
+      iteration: 0,
+      nextOperationNeeded: "not_boolean",
+      transformationType: "move"
+    };
+    const result = server.processOperation(input);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Invalid nextOperationNeeded");
   });
 });
 
@@ -310,7 +475,7 @@ describe("MCP Server Integration", () => {
   });
 
   it("rejects unknown tool name", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request(
       {
         method: "tools/call",

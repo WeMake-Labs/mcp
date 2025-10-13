@@ -38,7 +38,7 @@ describe("Tool Registration", () => {
     const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("testTool");
+    expect(response.tools[0].name).toBe("sequentialthinking");
   });
 });
 
@@ -322,7 +322,8 @@ describe("Edge Cases and Performance", () => {
       nextThoughtNeeded: false
     };
     const result = server.processThought(input);
-    expect(result.isError).toBeUndefined();
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Invalid thought");
   });
 
   it("handles special characters in thought", () => {
@@ -370,6 +371,7 @@ describe("Edge Cases and Performance", () => {
       nextThoughtNeeded: true
     };
     const result = server.processThought(input);
-    expect(result.isError).toBeUndefined();
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Invalid thoughtNumber");
   });
 });
