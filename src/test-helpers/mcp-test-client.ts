@@ -54,11 +54,15 @@ export function createTestClient(server: Server): Server & { request: SimpleMCPT
  * Test helper for McpServer (used by transaction-manager)
  */
 export class TransactionManagerTestClient {
-  constructor(private server: unknown) {} // Using unknown since McpServer has different interface
+  private originalServer: unknown;
+
+  constructor(server: unknown) {
+    this.originalServer = server; // Store original server before request method is added
+  }
 
   async request(request: { method: string; params?: unknown }): Promise<unknown> {
     // McpServer has a different interface, need to access its request method
-    return await (this.server as { request: (req: unknown) => Promise<unknown> }).request(request);
+    return await (this.originalServer as { request: (req: unknown) => Promise<unknown> }).request(request);
   }
 }
 
@@ -68,7 +72,9 @@ export class TransactionManagerTestClient {
 export function createTransactionManagerTestClient(
   server: unknown
 ): unknown & { request: TransactionManagerTestClient["request"] } {
-  const client = new TransactionManagerTestClient(server);
+  // Store original server before adding request method
+  const originalServer = server;
+  const client = new TransactionManagerTestClient(originalServer);
   return Object.assign(server as Record<string, unknown>, {
     request: client.request.bind(client)
   });

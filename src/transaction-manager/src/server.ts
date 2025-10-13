@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolResult, McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
+export type { CallToolResult };
 import { z } from "zod";
 import chalk from "chalk";
 import { v4 as uuidv4 } from "uuid";
@@ -15,7 +16,7 @@ const TxnRequestSchema = z.object({
 });
 
 // Infer the type from the Zod schema
-type TxnRequestArgs = z.infer<typeof TxnRequestSchema>;
+export type TxnRequestArgs = z.infer<typeof TxnRequestSchema>;
 
 // -- Types for Response Payload (unchanged) --
 
@@ -47,7 +48,7 @@ function calculateExpiry(ttlSeconds: number): string {
 
 // -- Main Handler Logic (Refactored) --
 
-async function handleTransactionCallback(args: TxnRequestArgs): Promise<CallToolResult> {
+export async function handleTransactionCallback(args: TxnRequestArgs): Promise<CallToolResult> {
   const { action, token: requestToken, payload, ttlSeconds: requestTtl } = args;
   let effectiveTtl = Math.min(requestTtl ?? DEFAULT_TTL_SECONDS, MAX_TTL_SECONDS);
   if (effectiveTtl <= 0) effectiveTtl = DEFAULT_TTL_SECONDS;

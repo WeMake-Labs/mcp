@@ -3,6 +3,7 @@
 import { createServer as createMcpServer, runServer } from "./server.js";
 
 // Export the createServer function for testing
+export { createMcpServer as createServer };
 export default createMcpServer;
 
 // Run the server if this is the main module

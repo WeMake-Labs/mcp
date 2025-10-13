@@ -568,7 +568,7 @@ describe("MCP Server Integration", () => {
   });
 
   it("rejects unknown tool name", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request(
       {
         method: "tools/call",
@@ -584,7 +584,7 @@ describe("MCP Server Integration", () => {
   });
 
   it("handles valid memory operations", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request(
       {
         method: "tools/call",
