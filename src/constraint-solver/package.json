@@ -1,9 +1,8 @@
 {
   "name": "@wemake.cx/constraint-solver",
-  "version": "0.2.13",
+  "version": "0.3.0",
   "description": "MCP server for validating variable assignments against constraints",
   "license": "MIT",
-  "type": "module",
   "main": "./dist/index.js",
   "exports": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
@@ -35,10 +34,9 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' && tsc",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun'",
     "start": "bun run ./dist/index.js",
     "test": "bun test",
-    "prepare": "bun run build",
     "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch"
   },
   "dependencies": {

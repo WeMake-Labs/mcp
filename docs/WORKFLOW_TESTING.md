@@ -97,6 +97,7 @@ coverage = true
 {
   "scripts": {
     "test": "bun test",
+    "prepare": "bun run build",
     "test:coverage": "bun test --coverage",
     "test:watch": "bun test --watch",
     "test:ci": "bun test --reporter=junit --reporter-outfile=test-results.xml --coverage"

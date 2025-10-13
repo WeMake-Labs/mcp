@@ -26,6 +26,7 @@
     "build-all": "bun run --filter='./src/*' build",
     "watch": "bun run --filter='./src/*' watch",
     "test": "bun test",
+    "prepare": "bun build-all",
     "test:all": "bun run --filter='./src/*' test",
     "test:coverage": "bun test --coverage",
     "test:coverage:all": "bun run --filter='./src/*' test --coverage",

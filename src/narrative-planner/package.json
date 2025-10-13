@@ -1,18 +1,11 @@
 {
   "name": "@wemake.cx/narrative-planner",
-  "version": "0.2.13",
+  "version": "0.3.0",
   "description": "MCP server that creates simple narrative outlines",
   "license": "MIT",
-  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    }
-  },
+  "exports": "./dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/WeMake-AI/mcp.git",
@@ -41,10 +34,9 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' && tsc",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun'",
     "start": "bun run ./dist/index.js",
     "test": "bun test",
-    "prepare": "bun run build",
     "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch"
   },
   "dependencies": {

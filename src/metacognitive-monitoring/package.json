@@ -28,12 +28,10 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' && tsc",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun'",
     "start": "bun run ./dist/index.js",
     "test": "bun test",
-    "prepare": "bun run build",
-    "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch",
-    "test": "bun test"
+    "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
