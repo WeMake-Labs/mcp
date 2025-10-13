@@ -3,7 +3,6 @@ process.env.REDIS_URL = "redis://localhost:6379/test";
 
 import { describe, expect, test, afterAll } from "bun:test";
 import createServer from "./index.js";
-import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 afterAll(() => {
   delete process.env.REDIS_URL;

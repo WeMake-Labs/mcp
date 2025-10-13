@@ -1,6 +1,8 @@
 import { Redis, RedisOptions } from "ioredis";
 import chalk from "chalk";
 
+declare const Bun: typeof import("bun") | undefined;
+
 let REDIS_URL = process.env.REDIS_URL;
 
 // Allow tests to work without Redis by using a mock URL

@@ -61,8 +61,9 @@ export class NarrativePlannerServer {
   }
 }
 
+import { readFileSync } from "node:fs";
+
 export default function createServer(): Server {
-  const { readFileSync } = require("node:fs");
   const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf-8"));
   const server = new Server(
     { name: "narrative-planner-server", version: pkg.version },

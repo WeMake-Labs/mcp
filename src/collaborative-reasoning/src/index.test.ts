@@ -1,6 +1,5 @@
-import { describe, expect, test, beforeEach } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import createServer from "./index.js";
-import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 /**
  * Test suite for SERVER_NAME MCP Server.
