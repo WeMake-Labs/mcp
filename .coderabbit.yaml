@@ -128,14 +128,22 @@ reviews:
   # Labeling Instructions - Provide guidelines for suggesting labels for the PR/MR. When specific labels or instructions are provided, only those labels are considered, though previous examples are still used to inform the suggestions. If no such labels are provided, suggestions are based solely on previous PR/MRs.
   # Default: []
   labeling_instructions:
-    - "Label 'mcp-server' for changes to src/*/src/index.ts or MCP server implementations"
-    - "Label 'workers-deployment' for changes to wrangler.toml, worker.ts, or Workers-related code"
-    - "Label 'documentation' for changes to README.md, .md files in docs/"
-    - "Label 'tests' for changes to *.test.ts files or test coverage"
-    - "Label 'security' for changes involving authentication, secrets, GDPR, or audit logging"
-    - "Label 'breaking-change' for API changes that affect tool schemas or server interfaces"
-    - "Label 'needs-coverage' when test coverage drops below 90%"
-    - "Label 'bun-compatibility' for changes to Bun usage patterns"
+    - label: "mcp-server"
+      instructions: "For changes to src/*/src/index.ts or MCP server implementations"
+    - label: "workers-deployment"
+      instructions: "For changes to wrangler.toml, worker.ts, or Workers-related code"
+    - label: "documentation"
+      instructions: "For changes to README.md or .md files in docs/"
+    - label: "tests"
+      instructions: "For changes to *.test.ts files or test coverage"
+    - label: "security"
+      instructions: "For changes involving authentication, secrets, GDPR, or audit logging"
+    - label: "breaking-change"
+      instructions: "For API changes that affect tool schemas or server interfaces"
+    - label: "needs-coverage"
+      instructions: "When test coverage drops below 90%"
+    - label: "bun-compatibility"
+      instructions: "For changes to Bun usage patterns"
 
   # Specify file patterns to include or exclude in a review using glob patterns (e.g., !dist/**, src/**). These patterns also apply to 'git sparse-checkout', including specified patterns and ignoring excluded ones (starting with '!') when cloning the repository.
   # Default: []
