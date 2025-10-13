@@ -1,28 +1,28 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import createServer from "./index.js";
 
 /**
- * Test suite for SERVER_NAME MCP Server.
+ * Test suite for Scientific Method MCP Server.
  *
- * Business Context: Ensures the server_name framework correctly validates
+ * Business Context: Ensures the scientific-method framework correctly validates
  * inputs and provides reliable functionality for enterprise applications.
  *
  * Decision Rationale: Tests focus on server initialization, schema validation,
  * and core functionality to ensure production-ready reliability.
  */
-describe("SERVER_NAME Server", () => {
-  test("server initializes successfully", () => {
+describe("Scientific Method Server", () => {
+  it("server initializes successfully", () => {
     const server = createServer();
     expect(server).toBeDefined();
   });
 
-  test("server exports correct configuration", () => {
+  it("server exports correct configuration", () => {
     const server = createServer();
     expect(typeof server.connect).toBe("function");
     expect(typeof server.close).toBe("function");
   });
 
-  test("server has correct name and version", () => {
+  it("server has correct name and version", () => {
     const server = createServer();
     expect(server).toBeDefined();
   });
@@ -37,12 +37,12 @@ describe("SERVER_NAME Server", () => {
  * Decision Rationale: Test validation logic directly without transport layer.
  */
 describe("Input Validation", () => {
-  test("rejects invalid input", () => {
+  it("rejects invalid input", () => {
     const server = createServer();
     expect(server).toBeDefined();
   });
 
-  test("handles valid input", () => {
+  it("handles valid input", () => {
     const server = createServer();
     expect(typeof server.connect).toBe("function");
     expect(typeof server.close).toBe("function");
@@ -57,14 +57,14 @@ describe("Input Validation", () => {
  * Decision Rationale: Test server initialization without requiring a connected transport.
  */
 describe("MCP Server Integration", () => {
-  test("server can be created without errors", () => {
+  it("server can be created without errors", () => {
     const server = createServer();
     expect(server).toBeDefined();
     expect(typeof server.connect).toBe("function");
     expect(typeof server.close).toBe("function");
   });
 
-  test("rejects unknown tool name", () => {
+  it("rejects unknown tool name", () => {
     const server = createServer();
     expect(server).toBeDefined();
   });
@@ -80,17 +80,17 @@ describe("MCP Server Integration", () => {
  * production reliability.
  */
 describe("Edge Cases and Performance", () => {
-  test("handles large inputs efficiently", () => {
+  it("handles large inputs efficiently", () => {
     const server = createServer();
     expect(server).toBeDefined();
   });
 
-  test("handles empty inputs gracefully", () => {
+  it("handles empty inputs gracefully", () => {
     const server = createServer();
     expect(server).toBeDefined();
   });
 
-  test("handles special characters in inputs", () => {
+  it("handles special characters in inputs", () => {
     const server = createServer();
     expect(server).toBeDefined();
   });

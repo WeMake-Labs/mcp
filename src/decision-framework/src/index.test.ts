@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach } from "bun:test";
+import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { DecisionFrameworkServer } from "./index.js";
 import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
@@ -12,18 +12,18 @@ import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
  * and decision analysis logic to ensure production-ready reliability for strategic decisions.
  */
 describe("Decision Framework Server", () => {
-  test("server initializes successfully", () => {
+  it("server initializes successfully", () => {
     const server = createServer();
     expect(server).toBeDefined();
   });
 
-  test("server exports correct configuration", () => {
+  it("server exports correct configuration", () => {
     const server = createServer();
     expect(typeof server.connect).toBe("function");
     expect(typeof server.close).toBe("function");
   });
 
-  test("server has correct name and version", () => {
+  it("server has correct name and version", () => {
     const server = createServer();
     expect(server).toBeDefined();
   });
@@ -45,7 +45,7 @@ describe("Decision Analysis Data Validation", () => {
     serverInstance = new DecisionFrameworkServer();
   });
 
-  test("validates complete decision analysis structure", () => {
+  it("validates complete decision analysis structure", () => {
     const validInput = {
       decisionStatement: "Should we invest in new technology infrastructure?",
       options: [
@@ -87,7 +87,7 @@ describe("Decision Analysis Data Validation", () => {
     expect(result.stakeholders).toHaveLength(3);
   });
 
-  test("auto-generates missing option IDs", () => {
+  it("auto-generates missing option IDs", () => {
     const inputWithoutIds = {
       decisionStatement: "Test decision",
       options: [
@@ -117,7 +117,7 @@ describe("Decision Analysis Data Validation", () => {
     expect(result.options[0].id).not.toBe(result.options[1].id);
   });
 
-  test("validates all analysis types", () => {
+  it("validates all analysis types", () => {
     const analysisTypes = ["expected-utility", "multi-criteria", "maximin", "minimax-regret", "satisficing"];
 
     for (const analysisType of analysisTypes) {
@@ -140,7 +140,7 @@ describe("Decision Analysis Data Validation", () => {
     }
   });
 
-  test("validates all decision stages", () => {
+  it("validates all decision stages", () => {
     const stages = ["problem-definition", "options", "criteria", "evaluation", "analysis", "recommendation"];
 
     for (const stage of stages) {
@@ -163,7 +163,7 @@ describe("Decision Analysis Data Validation", () => {
     }
   });
 
-  test("validates all risk tolerance levels", () => {
+  it("validates all risk tolerance levels", () => {
     const riskLevels = ["risk-averse", "risk-neutral", "risk-seeking"];
 
     for (const riskTolerance of riskLevels) {
@@ -186,7 +186,7 @@ describe("Decision Analysis Data Validation", () => {
     }
   });
 
-  test("validates criterion evaluations", () => {
+  it("validates criterion evaluations", () => {
     const inputWithEvaluations = {
       decisionStatement: "Test decision with evaluations",
       options: [
@@ -240,7 +240,7 @@ describe("Decision Analysis Data Validation", () => {
     expect(result.criteriaEvaluations[0].justification).toBe("Lower cost than alternative");
   });
 
-  test("validates possible outcomes", () => {
+  it("validates possible outcomes", () => {
     const inputWithOutcomes = {
       decisionStatement: "Test decision with outcomes",
       options: [{ id: "opt1", name: "Option 1", description: "Test option" }],
@@ -271,7 +271,7 @@ describe("Decision Analysis Data Validation", () => {
     expect(result.possibleOutcomes[0].value).toBe(100000);
   });
 
-  test("validates information gaps", () => {
+  it("validates information gaps", () => {
     const inputWithGaps = {
       decisionStatement: "Test decision with information gaps",
       options: [{ id: "opt1", name: "Option 1", description: "Test option" }],
@@ -300,7 +300,7 @@ describe("Decision Analysis Data Validation", () => {
     expect(result.informationGaps[0].researchMethod).toBe("Survey analysis");
   });
 
-  test("validates analysis results", () => {
+  it("validates analysis results", () => {
     const inputWithResults = {
       decisionStatement: "Test decision with results",
       options: [
@@ -352,7 +352,7 @@ describe("Input Validation Errors", () => {
     serverInstance = new DecisionFrameworkServer();
   });
 
-  test("rejects missing decisionStatement", () => {
+  it("rejects missing decisionStatement", () => {
     const invalidInput = {
       options: [{ id: "opt1", name: "Option 1", description: "Test" }],
       stakeholders: ["Test"],
@@ -369,7 +369,7 @@ describe("Input Validation Errors", () => {
     expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid decisionStatement");
   });
 
-  test("rejects non-string decisionStatement", () => {
+  it("rejects non-string decisionStatement", () => {
     const invalidInput = {
       decisionStatement: 123,
       options: [{ id: "opt1", name: "Option 1", description: "Test" }],
@@ -387,7 +387,7 @@ describe("Input Validation Errors", () => {
     expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid decisionStatement");
   });
 
-  test("rejects invalid analysisType", () => {
+  it("rejects invalid analysisType", () => {
     const invalidInput = {
       decisionStatement: "Test decision",
       options: [{ id: "opt1", name: "Option 1", description: "Test" }],
@@ -405,7 +405,7 @@ describe("Input Validation Errors", () => {
     expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid analysisType");
   });
 
-  test("rejects invalid stage", () => {
+  it("rejects invalid stage", () => {
     const invalidInput = {
       decisionStatement: "Test decision",
       options: [{ id: "opt1", name: "Option 1", description: "Test" }],
@@ -423,7 +423,7 @@ describe("Input Validation Errors", () => {
     expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid stage");
   });
 
-  test("rejects invalid riskTolerance", () => {
+  it("rejects invalid riskTolerance", () => {
     const invalidInput = {
       decisionStatement: "Test decision",
       options: [{ id: "opt1", name: "Option 1", description: "Test" }],
@@ -441,7 +441,7 @@ describe("Input Validation Errors", () => {
     expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid riskTolerance");
   });
 
-  test("rejects negative iteration", () => {
+  it("rejects negative iteration", () => {
     const invalidInput = {
       decisionStatement: "Test decision",
       options: [{ id: "opt1", name: "Option 1", description: "Test" }],
@@ -459,7 +459,7 @@ describe("Input Validation Errors", () => {
     expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid iteration");
   });
 
-  test("rejects non-boolean nextStageNeeded", () => {
+  it("rejects non-boolean nextStageNeeded", () => {
     const invalidInput = {
       decisionStatement: "Test decision",
       options: [{ id: "opt1", name: "Option 1", description: "Test" }],
@@ -477,7 +477,7 @@ describe("Input Validation Errors", () => {
     expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid nextStageNeeded");
   });
 
-  test("rejects non-array options", () => {
+  it("rejects non-array options", () => {
     const invalidInput = {
       decisionStatement: "Test decision",
       options: "not an array",
@@ -512,7 +512,7 @@ describe("Decision Processing", () => {
     serverInstance = new DecisionFrameworkServer();
   });
 
-  test("processes decision with expected utility analysis", () => {
+  it("processes decision with expected utility analysis", () => {
     const input = {
       decisionStatement: "Investment decision",
       options: [{ id: "opt1", name: "High Risk Investment", description: "High risk, high reward" }],
@@ -551,7 +551,7 @@ describe("Decision Processing", () => {
     expect(result.isError).toBeUndefined();
   });
 
-  test("processes decision with multi-criteria analysis", () => {
+  it("processes decision with multi-criteria analysis", () => {
     const input = {
       decisionStatement: "Technology selection",
       options: [
@@ -618,7 +618,7 @@ describe("Decision Processing", () => {
     expect(result.isError).toBeUndefined();
   });
 
-  test("handles decision with information gaps", () => {
+  it("handles decision with information gaps", () => {
     const input = {
       decisionStatement: "Market expansion decision",
       options: [
@@ -671,13 +671,13 @@ describe("MCP Server Integration", () => {
     server = createServer();
   });
 
-  test("server can be created without errors", () => {
+  it("server can be created without errors", () => {
     expect(server).toBeDefined();
     expect(typeof server.connect).toBe("function");
     expect(typeof server.close).toBe("function");
   });
 
-  test("rejects unknown tool name", async () => {
+  it("rejects unknown tool name", async () => {
     const request = {
       method: "tools/call" as const,
       params: {
@@ -689,7 +689,7 @@ describe("MCP Server Integration", () => {
     await expect(server.request(request, CallToolRequestSchema)).rejects.toThrow();
   });
 
-  test("handles valid decision analysis request", () => {
+  it("handles valid decision analysis request", () => {
     const validInput = {
       decisionStatement: "Should we implement the new feature?",
       options: [
@@ -730,7 +730,7 @@ describe("Edge Cases and Performance", () => {
     serverInstance = new DecisionFrameworkServer();
   });
 
-  test("handles large number of options", () => {
+  it("handles large number of options", () => {
     const manyOptions = Array.from({ length: 50 }, (_, i) => ({
       id: `opt${i + 1}`,
       name: `Option ${i + 1}`,
@@ -755,7 +755,7 @@ describe("Edge Cases and Performance", () => {
     expect(result.options).toHaveLength(50);
   });
 
-  test("handles complex nested structures", () => {
+  it("handles complex nested structures", () => {
     const complexInput = {
       decisionStatement: "Complex decision with nested evaluations",
       options: [{ id: "opt1", name: "Option 1", description: "Complex option" }],
@@ -811,7 +811,7 @@ describe("Edge Cases and Performance", () => {
     expect(result.informationGaps[0].researchMethod).toContain("Comprehensive market analysis");
   });
 
-  test("handles zero iteration", () => {
+  it("handles zero iteration", () => {
     const input = {
       decisionStatement: "Initial decision",
       options: [{ id: "opt1", name: "Option 1", description: "Test option" }],
@@ -830,7 +830,7 @@ describe("Edge Cases and Performance", () => {
     expect(result.iteration).toBe(0);
   });
 
-  test("handles empty arrays", () => {
+  it("handles empty arrays", () => {
     const input = {
       decisionStatement: "Decision with empty arrays",
       options: [{ id: "opt1", name: "Option 1", description: "Test option" }],
