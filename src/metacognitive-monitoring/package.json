@@ -27,11 +27,9 @@
     "directory": "src/metacognitive-monitoring"
   },
   "scripts": {
-    "clean": "rm -rf dist",
     "build": "bun build ./src/index.ts --outdir='./dist' --target='bun'",
     "start": "bun run ./dist/index.js",
-    "test": "bun test",
-    "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch"
+    "test": "bun test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
