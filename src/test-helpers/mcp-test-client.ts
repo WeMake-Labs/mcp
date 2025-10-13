@@ -69,7 +69,7 @@ export function createTransactionManagerTestClient(
   server: unknown
 ): unknown & { request: TransactionManagerTestClient["request"] } {
   const client = new TransactionManagerTestClient(server);
-  return Object.assign(server, {
+  return Object.assign(server as Record<string, unknown>, {
     request: client.request.bind(client)
   });
 }

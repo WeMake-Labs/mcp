@@ -1,6 +1,5 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { EthicalReasoningServer } from "./index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 /**
  * Test suite for Ethical Reasoning MCP Server.

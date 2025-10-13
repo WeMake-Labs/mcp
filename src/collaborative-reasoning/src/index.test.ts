@@ -1,6 +1,5 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { CollaborativeReasoningServer } from "./index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 /**
  * Test suite for Collaborative Reasoning MCP Server.

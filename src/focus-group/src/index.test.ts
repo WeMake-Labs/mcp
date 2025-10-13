@@ -1,6 +1,5 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { FocusGroupServer } from "./index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 /**
  * Test suite for Focus Group MCP Server.
