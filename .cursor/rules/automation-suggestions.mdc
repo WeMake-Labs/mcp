@@ -1,0 +1,786 @@
+---
+alwaysApply: true
+---
+
+# Automation Suggestions - Intelligent Self-Healing Patterns
+
+> **Suggestion-first automation for velocity without losing human oversight**
+
+This rule defines patterns for the AI to suggest fixes, improvements, and optimizations while maintaining enterprise
+quality and human decision-making authority.
+
+## Quick Navigation
+
+- 🚀 [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Start here
+- ☁️ [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc) - Deployment guide
+- 🧪 [Testing](mdc:.cursor/rules/testing.mdc) - Testing standards
+- 📘 [TypeScript](mdc:.cursor/rules/typescript.mdc) - Type patterns
+- 🏢 [Enterprise Standards](mdc:.cursor/rules/enterprise-standards.mdc) - Quality standards
+
+## Automation Philosophy
+
+**Suggestion-First Approach:**
+
+- AI detects issues and opportunities
+- Provides exact fix with rationale
+- Offers copy-paste commands
+- Human reviews and applies
+- No automatic code changes without explicit request
+
+**Velocity Focus:**
+
+- One-click application when appropriate
+- Grouped related fixes
+- Prioritize high-impact improvements
+- Minimize back-and-forth iterations
+
+## Safe Auto-Suggest Patterns
+
+These patterns are safe to suggest immediately with exact fixes:
+
+### 1. Import Organization
+
+**Pattern Detection:**
+
+```typescript
+// ❌ Detected: Disorganized imports
+import { MyClass } from "./myClass.js";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { describe, it, expect } from "bun:test";
+```
+
+**Suggested Fix:**
+
+```typescript
+// ✅ Suggested: Organized imports
+import { describe, it, expect } from "bun:test";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+
+import { MyClass } from "./myClass.js";
+```
+
+**AI Response Template:**
+
+```
+🔧 Import Organization Improvement
+
+Detected: Imports not following standard order
+- Bun built-ins should come first
+- External packages second
+- Internal modules last
+
+📝 Quick Fix:
+[Show reorganized imports]
+
+⚡ Apply: Would you like me to reorganize these imports?
+```
+
+### 2. Unused Imports
+
+**Pattern Detection:**
+
+```typescript
+// ❌ Detected: Unused imports
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js"; // unused
+```
+
+**Suggested Fix:**
+
+```typescript
+// ✅ Remove unused import
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+```
+
+**AI Response Template:**
+
+```
+🔧 Unused Import Detected
+
+Import not used in file: CallToolRequestSchema
+
+📝 Quick Fix: Remove the unused import
+
+⚡ Apply: Remove this import?
+```
+
+### 3. Missing File Extensions
+
+**Pattern Detection:**
+
+```typescript
+// ❌ Detected: Missing .js extension
+import { helper } from "./helper";
+```
+
+**Suggested Fix:**
+
+```typescript
+// ✅ Add .js extension (required for ESM)
+import { helper } from "./helper.js";
+```
+
+**AI Response Template:**
+
+```
+🔧 Missing File Extension
+
+ES modules require explicit .js extensions in imports
+
+📝 Quick Fix: Add .js to import path
+
+⚡ Apply: Update import statement?
+```
+
+### 4. Formatting Inconsistencies
+
+**Pattern Detection:**
+
+- Inconsistent indentation
+- Missing semicolons (if configured)
+- Trailing whitespace
+- Missing newlines at EOF
+
+**Suggested Fix:**
+
+```
+🔧 Formatting Issues Detected
+
+Run: bun run format
+
+This will fix:
+- Indentation (2 spaces)
+- Line length (120 chars)
+- Trailing whitespace
+- End-of-file newlines
+
+⚡ Quick Fix: Run formatter now?
+```
+
+## Suggest-First Patterns
+
+These patterns require human review before applying:
+
+### 1. Type Inference Improvements
+
+**Pattern Detection:**
+
+```typescript
+// 🟡 Opportunity: Explicit type could be inferred
+const result: string = processData();
+
+// Or: Missing return type
+function processData() {
+  return "result";
+}
+```
+
+**Suggested Improvement:**
+
+```typescript
+// ✅ Option 1: Remove redundant type
+const result = processData(); // Type inferred
+
+// ✅ Option 2: Add return type
+function processData(): string {
+  return "result";
+}
+```
+
+**AI Response Template:**
+
+```
+💡 Type Inference Opportunity
+
+Current: Redundant type annotation on variable
+Suggestion: Remove explicit type (inferred as string)
+
+OR
+
+Current: Missing return type on function
+Suggestion: Add explicit return type
+
+📝 Rationale: Improves code clarity and type safety
+
+🤔 Review: Which approach do you prefer?
+```
+
+### 2. Error Handling Enhancements
+
+**Pattern Detection:**
+
+```typescript
+// 🟡 Opportunity: Unhandled promise
+async function fetchData() {
+  const data = await fetch(url);
+  return data.json();
+}
+```
+
+**Suggested Improvement:**
+
+```typescript
+// ✅ Add error handling
+async function fetchData() {
+  try {
+    const data = await fetch(url);
+    return data.json();
+  } catch (error) {
+    console.error("Fetch failed:", error);
+    throw new Error("Failed to fetch data");
+  }
+}
+```
+
+**AI Response Template:**
+
+```
+💡 Error Handling Enhancement
+
+Detected: Async function without error handling
+Risk: Unhandled promise rejections
+
+📝 Suggested Pattern:
+[Show try-catch implementation]
+
+💭 Consider: Should this throw or return error Result?
+
+🤔 Review: Apply error handling?
+```
+
+### 3. Test Coverage Gaps
+
+**Pattern Detection:**
+
+```typescript
+// 🟡 Detected: Function without tests
+export function calculateTotal(items: Item[]): number {
+  return items.reduce((sum, item) => sum + item.price, 0);
+}
+
+// Edge cases not tested:
+// - Empty array
+// - Negative prices
+// - Non-numeric prices
+```
+
+**Suggested Tests:**
+
+```typescript
+describe("calculateTotal", () => {
+  it("should return 0 for empty array", () => {
+    expect(calculateTotal([])).toBe(0);
+  });
+
+  it("should handle negative prices", () => {
+    expect(calculateTotal([{ price: -10 }])).toBe(-10);
+  });
+
+  it("should sum multiple items", () => {
+    const items = [{ price: 10 }, { price: 20 }];
+    expect(calculateTotal(items)).toBe(30);
+  });
+});
+```
+
+**AI Response Template:**
+
+```
+💡 Test Coverage Gap
+
+Function: calculateTotal
+Current Coverage: 0%
+Missing Tests:
+- Empty array case
+- Negative values
+- Multiple items
+
+📝 Suggested Tests:
+[Show test implementation]
+
+🤔 Review: Add these test cases?
+```
+
+### 4. `any` Type Replacements
+
+**Pattern Detection:**
+
+```typescript
+// 🟡 Detected: any type usage
+function processData(input: any) {
+  return input.value;
+}
+```
+
+**Suggested Improvement:**
+
+```typescript
+// ✅ Option 1: Use unknown + type guard
+function processData(input: unknown): string {
+  if (typeof input !== "object" || input === null) {
+    throw new Error("Invalid input");
+  }
+  const data = input as Record<string, unknown>;
+  if (typeof data.value !== "string") {
+    throw new Error("Invalid value type");
+  }
+  return data.value;
+}
+
+// ✅ Option 2: Define interface
+interface DataInput {
+  value: string;
+}
+
+function processData(input: DataInput): string {
+  return input.value;
+}
+```
+
+**AI Response Template:**
+
+```
+💡 Type Safety Improvement
+
+Detected: any type (reduces type safety)
+Options:
+1. Use unknown + type guards (runtime validation)
+2. Define explicit interface (compile-time validation)
+
+📝 Recommendation: Option 1 for external data, Option 2 for internal APIs
+
+🤔 Review: Which approach fits your use case?
+```
+
+## Deployment Readiness Checks
+
+Before deployment, the AI will validate:
+
+### Pre-Deployment Checklist Validation
+
+```
+🚀 Deployment Readiness Check
+
+Running automated validations...
+
+✅ Tests: All passing (95% coverage)
+✅ Linting: No errors
+✅ TypeScript: Type check passed
+✅ Formatting: Code formatted
+⚠️ Workers Compatibility: Potential issue detected
+❌ Environment Variables: Missing documentation
+
+📋 Issues Found:
+
+1. Workers Compatibility Warning:
+   - File: src/index.ts:45
+   - Issue: Using Bun.file() (not Workers-compatible)
+   - Suggestion: Use Workers APIs or R2 for files
+   - Fix: See [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc)
+
+2. Environment Variables:
+   - Missing: GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
+   - Action: Document in README or .env.example
+   - Template: [Show environment variable docs template]
+
+🤔 Review: Fix these issues before deploying?
+```
+
+### Workers Compatibility Scan
+
+**Pattern Detection:**
+
+```typescript
+// ❌ Detected: Bun-only API in Workers build
+import { Database } from "bun:sqlite";
+
+const db = new Database("local.db");
+```
+
+**Suggested Fix:**
+
+```typescript
+// ✅ Workers-compatible alternative
+export interface Env {
+  DB: D1Database;
+}
+
+export default {
+  async fetch(request: Request, env: Env) {
+    const result = await env.DB.prepare("SELECT * FROM users").all();
+  }
+};
+```
+
+**AI Response Template:**
+
+```
+⚠️ Workers Compatibility Issue
+
+Detected: bun:sqlite usage
+Workers Alternative: Cloudflare D1
+
+📝 Suggested Pattern:
+[Show D1 implementation]
+
+📚 Reference: [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc)
+
+🤔 Review: Convert to D1 for Workers deployment?
+```
+
+### Security & Secrets Audit
+
+**Pattern Detection:**
+
+```typescript
+// ❌ Detected: Hardcoded secret
+const API_KEY = "sk-1234567890abcdef";
+```
+
+**Suggested Fix:**
+
+```typescript
+// ✅ Use environment variable
+export interface Env {
+  API_KEY: string;
+}
+
+const apiKey = env.API_KEY;
+```
+
+**AI Response Template:**
+
+```
+🔐 Security Issue: Hardcoded Secret
+
+Detected: API key in source code
+Risk: Secret exposure in version control
+
+📝 Required Actions:
+1. Move to environment variable
+2. Add to wrangler.toml (for config)
+3. Use wrangler secret put (for secrets)
+4. Remove from git history if committed
+
+⚡ Urgent: Fix immediately before committing
+
+🤔 Review: Apply environment variable pattern?
+```
+
+## Iterative Improvement Suggestions
+
+Post-deployment optimization opportunities:
+
+### Performance Optimization
+
+**Pattern Detection:**
+
+```typescript
+// 🟡 Opportunity: Synchronous file reading in loop
+for (const file of files) {
+  const content = await readFile(file);
+  process(content);
+}
+```
+
+**Suggested Improvement:**
+
+```typescript
+// ✅ Parallel processing
+const contents = await Promise.all(files.map((file) => readFile(file)));
+contents.forEach((content) => process(content));
+```
+
+**AI Response Template:**
+
+```
+⚡ Performance Optimization
+
+Detected: Sequential async operations
+Opportunity: Process in parallel
+
+📊 Impact:
+- Current: ~1000ms (sequential)
+- Improved: ~200ms (parallel)
+- Speedup: 5x faster
+
+📝 Suggested Pattern:
+[Show parallel implementation]
+
+🤔 Review: Apply performance optimization?
+```
+
+### Code Organization
+
+**Pattern Detection:**
+
+```typescript
+// 🟡 Opportunity: Large function (>100 lines)
+function processRequest(input: unknown): Result {
+  // 150 lines of validation, processing, formatting
+}
+```
+
+**Suggested Improvement:**
+
+```typescript
+// ✅ Extract logical components
+function processRequest(input: unknown): Result {
+  const validated = validateInput(input);
+  const processed = processData(validated);
+  return formatResult(processed);
+}
+
+private validateInput(input: unknown): ValidatedType {
+  // Validation logic
+}
+
+private processData(data: ValidatedType): ProcessedData {
+  // Processing logic
+}
+
+private formatResult(data: ProcessedData): Result {
+  // Formatting logic
+}
+```
+
+**AI Response Template:**
+
+```
+📦 Code Organization Suggestion
+
+Detected: Large function (150 lines)
+Suggestion: Extract into smaller, focused functions
+
+📝 Benefits:
+- Easier to test individual components
+- Better code reusability
+- Improved readability
+- Clearer responsibility separation
+
+🤔 Review: Refactor into smaller functions?
+```
+
+### Documentation Improvements
+
+**Pattern Detection:**
+
+```typescript
+// 🟡 Opportunity: Complex function without JSDoc
+function analyzeDecision(options: Option[], criteria: Criterion[], weights: number[]): AnalysisResult {
+  // Complex multi-criteria analysis logic
+}
+```
+
+**Suggested Documentation:**
+
+````typescript
+/**
+ * Performs multi-criteria decision analysis on provided options.
+ *
+ * Business Context: Enables structured decision-making for enterprise
+ * clients using weighted criteria evaluation.
+ *
+ * Decision Rationale: Weighted sum approach chosen for simplicity and
+ * transparency over more complex methods (AHP, TOPSIS).
+ *
+ * @param options - Decision alternatives to evaluate
+ * @param criteria - Evaluation criteria with scoring methods
+ * @param weights - Normalized weights (must sum to 1.0)
+ * @returns Analysis result with scores and recommendation
+ * @throws {Error} If weights don't sum to 1.0 or arrays have mismatched lengths
+ *
+ * @example
+ * ```typescript
+ * const result = analyzeDecision(
+ *   [{ name: "Option A" }, { name: "Option B" }],
+ *   [{ name: "Cost", evaluationMethod: "quantitative" }],
+ *   [1.0]
+ * );
+ * ```
+ */
+function analyzeDecision(options: Option[], criteria: Criterion[], weights: number[]): AnalysisResult {
+  // Implementation
+}
+````
+
+**AI Response Template:**
+
+```
+📖 Documentation Enhancement
+
+Detected: Complex function without JSDoc
+Missing: Purpose, parameters, examples
+
+📝 Suggested Documentation:
+[Show complete JSDoc]
+
+💡 Includes:
+- Business context
+- Decision rationale
+- Parameter descriptions
+- Usage example
+- Error cases
+
+🤔 Review: Add documentation?
+```
+
+## Command Templates
+
+Ready-to-use commands for common fixes:
+
+### Fix All Safe Issues
+
+```bash
+# Run all safe fixes
+bun run format        # Format code
+bun run lint --fix    # Auto-fix linting issues
+bun run check         # Validate types
+```
+
+### Pre-Commit Validation
+
+```bash
+# Complete pre-commit check
+bun test --coverage && \
+bun run format && \
+bun run lint && \
+bun run check
+```
+
+### Pre-Deployment Validation
+
+```bash
+# Full deployment readiness check
+cd src/<server-name>
+bun test --coverage       # 90%+ required
+bun run build             # Build for Workers
+bunx wrangler deploy --dry-run  # Validate config
+```
+
+### Fix Specific Issues
+
+```bash
+# Fix import organization
+# [AI will provide specific sed/awk commands if needed]
+
+# Update all .js extensions
+find src -name "*.ts" -exec sed -i '' 's/from "\(\..*\)"/from "\1.js"/g' {} \;
+
+# Remove unused imports (TypeScript)
+bun run check  # Shows unused imports
+```
+
+## AI Suggestion Flow
+
+### Standard Suggestion Format
+
+```
+[Emoji] [Category] [Title]
+
+Detected: [What was found]
+[Risk/Opportunity]: [Why it matters]
+
+📝 Suggested Fix:
+[Code or command with syntax highlighting]
+
+💡 Rationale:
+[Why this improves velocity/quality]
+
+📚 Reference:
+[Link to relevant rule if applicable]
+
+🤔 Review: [Question to user about applying fix]
+```
+
+### Grouping Related Fixes
+
+When multiple related issues are detected:
+
+```
+🔧 Multiple Import Issues Detected (5 total)
+
+Issues:
+1. Missing .js extension (3 files)
+2. Unused imports (2 files)
+3. Import order (4 files)
+
+📝 Batch Fix Available:
+bun run format  # Fixes all automatically
+
+Individual fixes:
+[List each with line numbers]
+
+⚡ Quick Fix: Run formatter for all issues?
+```
+
+## Suggestion Prioritization
+
+**Priority Levels:**
+
+1. **Critical** (Security, Secrets, Breaking): Immediate action required
+2. **High** (Tests, Type Safety, Workers Compatibility): Fix before deployment
+3. **Medium** (Performance, Organization): Improve when convenient
+4. **Low** (Documentation, Style): Nice to have
+
+**AI Presentation:**
+
+```
+🚨 Critical: Hardcoded secret detected (Fix immediately)
+⚠️ High: Missing test coverage (Fix before deploying)
+💡 Medium: Performance optimization available (Consider applying)
+📝 Low: Documentation could be enhanced (When convenient)
+```
+
+## Context-Aware Suggestions
+
+The AI adapts suggestions based on context:
+
+**During Active Development:**
+
+- Focus on immediate functionality
+- Suggest quick wins only
+- Defer optimization suggestions
+
+**Before Committing:**
+
+- Emphasize tests and coverage
+- Highlight linting issues
+- Check formatting
+
+**Pre-Deployment:**
+
+- Workers compatibility checks
+- Security audit
+- Environment variable validation
+- Performance review
+
+**Post-Deployment:**
+
+- Optimization opportunities
+- Refactoring suggestions
+- Documentation improvements
+
+## Integration with Other Rules
+
+Suggestions reference specialized rules when needed:
+
+- **Type Issues** → [TypeScript](mdc:.cursor/rules/typescript.mdc)
+- **Test Gaps** → [Testing](mdc:.cursor/rules/testing.mdc)
+- **Workers Compatibility** → [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc)
+- **Documentation** → [Documentation](mdc:.cursor/rules/documentation.mdc)
+- **Security** → [Enterprise Standards](mdc:.cursor/rules/enterprise-standards.mdc)
+
+## Summary
+
+This automation strategy:
+
+- ✅ Suggests fixes without automatic changes
+- ✅ Provides exact code/commands
+- ✅ Explains rationale for each suggestion
+- ✅ Groups related fixes for efficiency
+- ✅ Prioritizes by impact and urgency
+- ✅ Adapts to development context
+- ✅ Maintains human oversight
+
+Result: Maximum velocity with enterprise-grade quality and complete human control.

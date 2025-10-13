@@ -4,9 +4,33 @@ globs: *.test.ts,*.spec.ts,*_test.ts,**/_spec.ts
 
 # Bun Native Test Runner Standards
 
+> **Bun-native testing for 10-30x faster execution**
+
+## Quick Navigation
+
+- 🚀 [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Start here
+- 🔧 [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - Test coverage suggestions
+- 🧰 [Bun-First Standards](mdc:.cursor/rules/bun-first.mdc) - Bun development
+- 🏗️ [MCP Servers](mdc:.cursor/rules/mcp-servers.mdc) - Server test patterns
+- 📘 [TypeScript](mdc:.cursor/rules/typescript.mdc) - Type safety in tests
+
 ## Core Testing Principle
 
 **EXCLUSIVELY use Bun's native test runner.** Alternative test frameworks are PROHIBITED.
+
+## Test Coverage Quick-Check
+
+```bash
+# Quick coverage check (must be 90%+)
+bun test --coverage
+
+# Coverage with threshold enforcement
+bun test --coverage --coverage-threshold=90
+
+# Generate HTML report for detailed view
+bun test --coverage --coverage-reporter=html
+open coverage/index.html  # macOS
+```
 
 ```typescript
 // ✅ Correct
@@ -195,6 +219,146 @@ If updating existing tests:
 4. Move configuration to [bunfig.toml](mdc:bunfig.toml)
 5. Update mocking: Use `jest.fn()` or `vi.fn()` (both supported)
 
+## Test Pattern Templates
+
+### Template 1: MCP Server Tests
+
+```typescript
+import { describe, it, expect, beforeEach } from "bun:test";
+import { MyMCPServer } from "../src/index";
+
+describe("MyMCPServer", () => {
+  let server: MyMCPServer;
+
+  beforeEach(() => {
+    server = new MyMCPServer();
+  });
+
+  describe("processOperation", () => {
+    it("should handle valid input", () => {
+      const result = server.processOperation({ field: "value" });
+      expect(result.isError).toBeUndefined();
+      expect(result.content[0].text).toContain("success");
+    });
+
+    it("should reject invalid input", () => {
+      const result = server.processOperation(null);
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("Error");
+    });
+
+    it("should validate required fields", () => {
+      const result = server.processOperation({});
+      expect(result.isError).toBe(true);
+    });
+  });
+});
+```
+
+### Template 2: Edge Case Testing
+
+```typescript
+describe("Edge Cases", () => {
+  it("should handle empty arrays", () => {
+    const result = process([]);
+    expect(result).toEqual(defaultValue);
+  });
+
+  it("should handle null values", () => {
+    expect(() => process(null)).toThrow();
+  });
+
+  it("should handle large datasets", () => {
+    const largeData = Array(10000).fill({ value: 1 });
+    const result = process(largeData);
+    expect(result).toBeDefined();
+  });
+
+  it("should handle concurrent operations", async () => {
+    const promises = Array(100)
+      .fill(null)
+      .map(() => processAsync(data));
+    const results = await Promise.all(promises);
+    expect(results).toHaveLength(100);
+  });
+});
+```
+
+### Template 3: Async Operation Tests
+
+```typescript
+describe("Async Operations", () => {
+  it("should handle successful async operations", async () => {
+    const result = await asyncOperation();
+    expect(result).toBeDefined();
+  });
+
+  it("should handle async errors gracefully", async () => {
+    await expect(failingAsyncOperation()).rejects.toThrow();
+  });
+
+  it("should timeout long operations", async () => {
+    const timeout = 1000;
+    await expect(
+      Promise.race([
+        longOperation(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), timeout))
+      ])
+    ).rejects.toThrow("Timeout");
+  });
+});
+```
+
+## Testing Workflow One-Pager
+
+### Pre-Commit Workflow
+
+```bash
+1. bun test --watch          # Develop with live feedback
+2. bun test --coverage       # Verify 90%+ coverage
+3. bun run lint              # Fix linting issues
+4. bun run check             # TypeScript validation
+5. git commit                # Commit changes
+```
+
+### CI/CD Workflow
+
+```yaml
+# Automated in GitHub Actions
+- bun test --coverage --coverage-threshold=90
+- bun run lint
+- bun run check
+- bun run build
+```
+
+### Coverage Gap Resolution
+
+```bash
+# 1. Identify gaps
+bun test --coverage
+
+# 2. Review HTML report
+bun test --coverage --coverage-reporter=html
+open coverage/index.html
+
+# 3. Add missing tests for:
+#    - Uncovered functions
+#    - Uncovered branches (if/else, switch)
+#    - Edge cases
+#    - Error handling paths
+
+# 4. Verify improvement
+bun test --coverage
+```
+
 ## Prohibited
 
 ❌ Vitest ❌ Jest ❌ Mocha ❌ Jasmine ❌ Any external test framework
+
+## See Also
+
+- [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Complete workflow guide
+- [Bun-First Standards](mdc:.cursor/rules/bun-first.mdc) - Bun development patterns
+- [MCP Servers](mdc:.cursor/rules/mcp-servers.mdc) - Server implementation patterns
+- [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - Test coverage suggestions
+- [TypeScript](mdc:.cursor/rules/typescript.mdc) - Type safety in tests
