@@ -88,6 +88,14 @@
           "proseWrap": "never",
           "objectWrap": "collapse"
         }
+      },
+      {
+        "files": [
+          ".cursor/rules/*.mdc"
+        ],
+        "options": {
+          "parser": "markdown"
+        }
       }
     ]
   }
