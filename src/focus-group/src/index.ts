@@ -747,6 +747,27 @@ Key features:
   }
 };
 
+/**
+ * Creates and configures the Focus Group MCP server instance.
+ *
+ * Purpose: Initializes an MCP `Server`, instantiates `FocusGroupServer`,
+ * and registers tool handlers for tools/list and tools/call.
+ *
+ * Side effects:
+ * - Instantiates an internal FocusGroupServer
+ * - Registers ListToolsRequestSchema and CallToolRequestSchema handlers
+ *
+ * @returns Server Configured MCP server ready to be connected to a transport
+ *
+ * @example
+ * import createServer from "./index.js";
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.error("Focus Group MCP Server running on stdio");
+ */
 export default function createServer(): Server {
   const server = new Server(
     {
@@ -790,8 +811,32 @@ if (import.meta.main) {
 
   async function runServer() {
     const transport = new StdioServerTransport();
-    await server.connect(transport);
-    console.error("Focus Group MCP Server running on stdio");
+
+    try {
+      await server.connect(transport);
+      console.error("Focus Group MCP Server running on stdio");
+    } catch (error) {
+      // Log detailed error information
+      console.error("Failed to connect to transport:", error);
+
+      // Additional error details if available
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+      }
+
+      // Attempt to clean up the transport if possible
+      try {
+        if (transport && typeof transport.close === "function") {
+          await transport.close();
+        }
+      } catch (cleanupError) {
+        console.error("Error during cleanup:", cleanupError);
+      }
+
+      // Exit with non-zero code to indicate failure
+      process.exit(1);
+    }
   }
 
   runServer().catch((error) => {
