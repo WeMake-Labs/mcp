@@ -250,6 +250,29 @@ You should:
   }
 };
 
+/**
+ * Factory function that creates and configures a sequential thinking MCP server instance.
+ *
+ * This function initializes a Server with the name "sequential-thinking-server" and version "0.3.0",
+ * registers the SEQUENTIAL_THINKING_TOOL, and sets up request handlers for listing available tools
+ * and processing sequential thinking requests. The CallTool handler calls SequentialThinkingServer.process
+ * when req.params.name === "sequentialThinking". The function constructs and configures a Server
+ * instance for the SequentialThinking service and registers request handlers for ListToolsRequestSchema
+ * and CallToolRequestSchema.
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Sequential Thinking Server running");
+ * ```
+ */
 export default function createServer(): Server {
   const server = new Server(
     {

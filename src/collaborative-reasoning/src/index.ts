@@ -944,6 +944,27 @@ Key features:
   }
 };
 
+/**
+ * Factory function that creates and configures a collaborative reasoning MCP server instance.
+ *
+ * This function initializes a Server with collaborative reasoning capabilities, registers
+ * the collaborative reasoning tool, and sets up request handlers for listing available
+ * tools and processing collaborative reasoning requests. The server facilitates
+ * multi-persona discussions and collaborative problem-solving.
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Collaborative Reasoning Server running");
+ * ```
+ */
 export default function createServer(): Server {
   const server = new Server(
     {
@@ -982,6 +1003,12 @@ export default function createServer(): Server {
   return server;
 }
 
+/**
+ * Main execution block that runs the collaborative reasoning server when executed as a script.
+ *
+ * This block initializes the server, connects it to stdio transport, and starts the server
+ * process. It handles graceful shutdown and error handling for the server execution.
+ */
 if (import.meta.main) {
   const server = createServer();
 

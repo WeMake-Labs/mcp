@@ -1088,11 +1088,11 @@ if (import.meta.main) {
   async function runServer() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error("Decision Framework MCP Server running on stdio");
+    console.error(chalk.green("Decision Framework MCP Server running on stdio"));
   }
 
   runServer().catch((error) => {
-    console.error("Fatal error running server:", error);
+    console.error(chalk.red("Fatal error running server:"), error);
     process.exit(1);
   });
 }

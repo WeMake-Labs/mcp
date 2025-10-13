@@ -260,6 +260,28 @@ class KnowledgeGraphManager {
   }
 }
 
+/**
+ * Factory function that creates and configures a knowledge graph memory MCP server instance.
+ *
+ * This function initializes a Server with the name "memory-server" and version "0.3.0",
+ * creates a KnowledgeGraphManager instance, and sets up request handlers for listing
+ * available tools and processing CRUD operations on the knowledge graph. The server
+ * provides tools for creating entities and relations, adding observations, reading,
+ * searching, and deleting graph data.
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Knowledge Graph Memory Server running");
+ * ```
+ */
 export default function createServer(): Server {
   const knowledgeGraphManager = new KnowledgeGraphManager();
 
@@ -459,8 +481,42 @@ export default function createServer(): Server {
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
-    // Minimal runtime guard for args to ensure it’s an object
+
+    // Validation helper functions
     const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object";
+    const validateArray = <T>(value: unknown, validator: (item: unknown) => item is T): value is T[] => {
+      return Array.isArray(value) && value.every(validator);
+    };
+    const validateEntity = (item: unknown): item is Entity => {
+      return (
+        isObj(item) &&
+        typeof (item as Record<string, unknown>).name === "string" &&
+        typeof (item as Record<string, unknown>).entityType === "string" &&
+        Array.isArray((item as Record<string, unknown>).observations)
+      );
+    };
+    const validateRelation = (item: unknown): item is Relation => {
+      return (
+        isObj(item) &&
+        typeof (item as Record<string, unknown>).from === "string" &&
+        typeof (item as Record<string, unknown>).to === "string" &&
+        typeof (item as Record<string, unknown>).relationType === "string"
+      );
+    };
+    const validateObservation = (item: unknown): item is { entityName: string; contents: string[] } => {
+      return (
+        isObj(item) &&
+        typeof (item as Record<string, unknown>).entityName === "string" &&
+        Array.isArray((item as Record<string, unknown>).contents)
+      );
+    };
+    const validateDeletion = (item: unknown): item is { entityName: string; observations: string[] } => {
+      return (
+        isObj(item) &&
+        typeof (item as Record<string, unknown>).entityName === "string" &&
+        Array.isArray((item as Record<string, unknown>).observations)
+      );
+    };
 
     if (name === "read_graph") {
       return {
@@ -479,48 +535,57 @@ export default function createServer(): Server {
 
     switch (name) {
       case "create_entities":
+        if (!validateArray(args.entities, validateEntity)) {
+          throw new Error(`Invalid entities array for tool: ${name}`);
+        }
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(await knowledgeGraphManager.createEntities(args.entities as Entity[]), null, 2)
+              text: JSON.stringify(await knowledgeGraphManager.createEntities(args.entities), null, 2)
             }
           ]
         };
       case "create_relations":
+        if (!validateArray(args.relations, validateRelation)) {
+          throw new Error(`Invalid relations array for tool: ${name}`);
+        }
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(await knowledgeGraphManager.createRelations(args.relations as Relation[]), null, 2)
+              text: JSON.stringify(await knowledgeGraphManager.createRelations(args.relations), null, 2)
             }
           ]
         };
       case "add_observations":
+        if (!validateArray(args.observations, validateObservation)) {
+          throw new Error(`Invalid observations array for tool: ${name}`);
+        }
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(
-                await knowledgeGraphManager.addObservations(
-                  args.observations as { entityName: string; contents: string[] }[]
-                ),
-                null,
-                2
-              )
+              text: JSON.stringify(await knowledgeGraphManager.addObservations(args.observations), null, 2)
             }
           ]
         };
       case "search_nodes":
+        if (typeof args.query !== "string") {
+          throw new Error(`Invalid query parameter for tool: ${name}`);
+        }
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(await knowledgeGraphManager.searchNodes(args.query as string), null, 2)
+              text: JSON.stringify(await knowledgeGraphManager.searchNodes(args.query), null, 2)
             }
           ]
         };
       case "open_nodes":
+        if (!Array.isArray(args.names) || !args.names.every((n: unknown) => typeof n === "string")) {
+          throw new Error(`Invalid names array for tool: ${name}`);
+        }
         return {
           content: [
             {
@@ -530,6 +595,9 @@ export default function createServer(): Server {
           ]
         };
       case "delete_entities":
+        if (!Array.isArray(args.entityNames) || !args.entityNames.every((n: unknown) => typeof n === "string")) {
+          throw new Error(`Invalid entityNames array for tool: ${name}`);
+        }
         return {
           content: [
             {
@@ -539,26 +607,26 @@ export default function createServer(): Server {
           ]
         };
       case "delete_observations":
+        if (!validateArray(args.deletions, validateDeletion)) {
+          throw new Error(`Invalid deletions array for tool: ${name}`);
+        }
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(
-                await knowledgeGraphManager.deleteObservations(
-                  args.deletions as { entityName: string; observations: string[] }[]
-                ),
-                null,
-                2
-              )
+              text: JSON.stringify(await knowledgeGraphManager.deleteObservations(args.deletions), null, 2)
             }
           ]
         };
       case "delete_relations":
+        if (!validateArray(args.relations, validateRelation)) {
+          throw new Error(`Invalid relations array for tool: ${name}`);
+        }
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(await knowledgeGraphManager.deleteRelations(args.relations as Relation[]), null, 2)
+              text: JSON.stringify(await knowledgeGraphManager.deleteRelations(args.relations), null, 2)
             }
           ]
         };

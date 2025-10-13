@@ -801,6 +801,27 @@ Key features:
   }
 };
 
+/**
+ * Factory function that creates and configures a metacognitive monitoring MCP server instance.
+ *
+ * This function initializes a Server with the name "metacognitive-monitoring-server" and version "0.3.1",
+ * registers the metacognitive monitoring tool, and sets up request handlers for listing available
+ * tools and processing metacognitive monitoring requests. The server facilitates systematic
+ * self-monitoring of knowledge and reasoning quality across various domains and reasoning tasks.
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Metacognitive Monitoring Server running");
+ * ```
+ */
 export default function createServer(): Server {
   const server = new Server(
     {

@@ -63,6 +63,27 @@ export class NarrativePlannerServer {
 
 import { readFileSync } from "node:fs";
 
+/**
+ * Factory function that creates and configures a narrative planner MCP server instance.
+ *
+ * This function initializes a Server with the name "narrative-planner-server", reads the version
+ * from the package.json file, registers the NARRATIVE_PLANNER_TOOL, and sets up request handlers
+ * for listing available tools and processing narrative planning requests. The CallTool handler
+ * calls NarrativePlannerServer.process when req.params.name === "narrativePlanner".
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Narrative Planner Server running");
+ * ```
+ */
 export default function createServer(): Server {
   const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf-8"));
   const server = new Server(

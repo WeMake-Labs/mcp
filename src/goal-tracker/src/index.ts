@@ -80,6 +80,27 @@ const GOAL_TRACKER_TOOL = {
 
 // src/goal-tracker/src/index.ts (around lines 52–53)
 
+/**
+ * Factory function that creates and configures a goal tracking MCP server instance.
+ *
+ * This function initializes a Server with the name "goal-tracker-server", derives the version
+ * from process.env.PKG_VERSION (falling back to "0.3.0"), registers the GOAL_TRACKER_TOOL,
+ * and sets up request handlers for listing available tools and processing goal tracking requests.
+ * The CallTool handler calls GoalTracker.handle when req.params.name === "goalTracker".
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Goal Tracker Server running");
+ * ```
+ */
 export default function createServer(): Server {
   // derive version from build/env rather than hard-coding
   const version = process.env.PKG_VERSION ?? "0.3.0";

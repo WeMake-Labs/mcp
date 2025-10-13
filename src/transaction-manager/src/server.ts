@@ -158,6 +158,27 @@ async function handleTransactionCallback(args: TxnRequestArgs): Promise<CallTool
 
 // -- Server Initialization (Refactored) --
 
+/**
+ * Factory function that creates and configures a transaction manager MCP server instance.
+ *
+ * This function initializes an McpServer with the name "transaction-manager" and version "0.3.0",
+ * registers the "transaction" tool with Zod schema validation, and sets up the transaction
+ * handling callback. The server manages simple stateful transactions with start, resume,
+ * and close operations using Redis for state storage.
+ *
+ * @returns A configured McpServer instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import { createServer } from './server.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Transaction Manager Server running");
+ * ```
+ */
 export function createServer(): McpServer {
   const mcpServer = new McpServer({
     name: "transaction-manager",

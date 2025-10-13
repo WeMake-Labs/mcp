@@ -58,6 +58,29 @@ export class MultimodalSynthServer {
   }
 }
 
+/**
+ * Factory function that creates and configures a multimodal synthesizer MCP server instance.
+ *
+ * This function initializes a Server with the name "multimodal-synthesizer-server" and version "0.3.0",
+ * registers the MULTIMODAL_SYNTH_TOOL, and sets up request handlers for listing available tools
+ * and processing multimodal synthesis requests. The CallTool handler calls MultimodalSynthServer.process
+ * when req.params.name === "multimodalSynth".
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Multimodal Synthesizer Server running");
+ * ```
+ *
+ * @see {@link https://modelcontextprotocol.io/} for MCP protocol documentation
+ */
 export default function createServer(): Server {
   const server = new Server(
     { name: "multimodal-synthesizer-server", version: "0.3.0" },

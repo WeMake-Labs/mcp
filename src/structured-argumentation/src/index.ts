@@ -487,6 +487,27 @@ Parameters explained:
   }
 };
 
+/**
+ * Factory function that creates and configures a structured argumentation MCP server instance.
+ *
+ * This function initializes a Server with the name "structured-argumentation-server" and version "0.3.0",
+ * registers the STRUCTURED_ARGUMENTATION_TOOL, and sets up request handlers for listing available tools
+ * and processing structured argumentation requests. The CallTool handler calls StructuredArgumentationServer.process
+ * when req.params.name === "structuredArgumentation".
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Structured Argumentation Server running");
+ * ```
+ */
 export default function createServer(): Server {
   const server = new Server(
     {

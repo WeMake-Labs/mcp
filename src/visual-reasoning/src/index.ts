@@ -49,6 +49,28 @@ function isTransformationType(value: unknown): value is VisualOperationData["tra
   return typeof value === "string" && ["rotate", "move", "resize", "recolor", "regroup"].includes(value);
 }
 
+/**
+ * Server class for visual reasoning functionality in the MCP protocol.
+ *
+ * This class provides the core logic for visual reasoning operations including
+ * element manipulation, transformation tracking, and visual state management.
+ * It validates input operations, processes visual reasoning requests, and maintains
+ * state across multiple visual reasoning sessions with audit trail capabilities.
+ *
+ * @export
+ * @public
+ * @class VisualReasoningServer
+ * @example
+ * ```typescript
+ * const server = new VisualReasoningServer();
+ * const result = server.process({
+ *   operation: "move",
+ *   elementId: "element-1",
+ *   targetPosition: { x: 100, y: 200 }
+ * });
+ * console.log(result.content[0].text);
+ * ```
+ */
 export class VisualReasoningServer {
   private visualStateHistory: Record<string, VisualOperationData[]> = {};
   private currentVisualState: Record<string, Record<string, VisualElement>> = {};
@@ -405,6 +427,40 @@ export class VisualReasoningServer {
     return output;
   }
 
+  /**
+   * Processes visual reasoning operation requests by validating and executing visual operations.
+   *
+   * This method validates the input operation data, processes visual operations such as
+   * element manipulation, transformation tracking, and state management. It maintains
+   * visual state history, updates the current visual state, and returns structured
+   * results with visual reasoning analysis and operation outcomes.
+   *
+   * @param input - The input object containing visual operation data
+   * @param input.operation - The type of visual operation to perform
+   * @param input.elementId - Unique identifier for the visual element
+   * @param input.targetPosition - Target position for move operations
+   * @param input.targetSize - Target size for resize operations
+   * @param input.targetColor - Target color for recolor operations
+   * @param input.transformationType - Type of transformation to apply
+   * @param input.elements - Visual elements to operate on
+   * @param input.diagramId - Identifier for the diagram being modified
+   * @param input.diagramType - Type of diagram (graph, flowchart, etc.)
+   * @param input.iteration - Current iteration of the visual reasoning process
+   * @returns Structured result containing visual operation analysis or error information
+   * @throws {Error} If input validation fails or processing encounters an error
+   *
+   * @example
+   * ```typescript
+   * const result = server.processVisualOperation({
+   *   operation: "move",
+   *   elementId: "element-1",
+   *   targetPosition: { x: 100, y: 200 },
+   *   diagramId: "diagram-1",
+   *   iteration: 1
+   * });
+   * // Returns visual reasoning analysis for the move operation
+   * ```
+   */
   public processVisualOperation(input: unknown): { content: Array<{ type: string; text: string }>; isError?: boolean } {
     try {
       const validatedInput = this.validateOperationData(input);
@@ -593,6 +649,31 @@ Parameters explained:
   }
 };
 
+/**
+ * Factory function that creates and configures a visual reasoning MCP server instance.
+ *
+ * This function initializes a Server with the name "visual-reasoning-server" and version "0.3.0",
+ * registers the VISUAL_REASONING_TOOL, and sets up request handlers for listing available tools
+ * and processing visual reasoning operations. The CallTool handler calls VisualReasoningServer.processVisualOperation
+ * when req.params.name === "visualReasoning". The server supports visual element manipulation,
+ * transformation tracking, and state management for visual reasoning workflows.
+ *
+ * @returns A configured Server instance ready for MCP communication
+ * @throws {Error} If server initialization fails or configuration is invalid
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Visual Reasoning Server running");
+ * ```
+ *
+ * @public
+ */
 export default function createServer(): Server {
   const server = new Server(
     {
