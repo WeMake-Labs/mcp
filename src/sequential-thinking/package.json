@@ -9,7 +9,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Clarity-BI/mcp.git",
-    "directory": "src/sequential-reasoning"
+    "directory": "src/sequential-thinking"
   },
   "publishConfig": {
     "access": "public",
@@ -33,7 +33,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun'",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' && tsc",
     "start": "bun run ./dist/index.js",
     "test": "bun test"
   },

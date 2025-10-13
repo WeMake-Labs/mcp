@@ -1,6 +1,7 @@
 {
   "name": "@wemake.cx/goal-tracker",
   "version": "0.3.0",
+  "type": "module",
   "description": "MCP server for tracking and completing simple goals",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -34,7 +35,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun'",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' && tsc",
     "start": "bun run ./dist/index.js",
     "test": "bun test"
   },
