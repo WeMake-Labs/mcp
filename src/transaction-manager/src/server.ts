@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolResult, McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
+export type { CallToolResult };
 import { z } from "zod";
 import chalk from "chalk";
 import { v4 as uuidv4 } from "uuid";
@@ -15,7 +16,7 @@ const TxnRequestSchema = z.object({
 });
 
 // Infer the type from the Zod schema
-type TxnRequestArgs = z.infer<typeof TxnRequestSchema>;
+export type TxnRequestArgs = z.infer<typeof TxnRequestSchema>;
 
 // -- Types for Response Payload (unchanged) --
 
@@ -47,7 +48,7 @@ function calculateExpiry(ttlSeconds: number): string {
 
 // -- Main Handler Logic (Refactored) --
 
-async function handleTransactionCallback(args: TxnRequestArgs): Promise<CallToolResult> {
+export async function handleTransactionCallback(args: TxnRequestArgs): Promise<CallToolResult> {
   const { action, token: requestToken, payload, ttlSeconds: requestTtl } = args;
   let effectiveTtl = Math.min(requestTtl ?? DEFAULT_TTL_SECONDS, MAX_TTL_SECONDS);
   if (effectiveTtl <= 0) effectiveTtl = DEFAULT_TTL_SECONDS;
@@ -158,10 +159,31 @@ async function handleTransactionCallback(args: TxnRequestArgs): Promise<CallTool
 
 // -- Server Initialization (Refactored) --
 
-export async function runServer(): Promise<void> {
+/**
+ * Factory function that creates and configures a transaction manager MCP server instance.
+ *
+ * This function initializes an McpServer with the name "transaction-manager" and version "0.3.0",
+ * registers the "transaction" tool with Zod schema validation, and sets up the transaction
+ * handling callback. The server manages simple stateful transactions with start, resume,
+ * and close operations using Redis for state storage.
+ *
+ * @returns A configured McpServer instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import { createServer } from './server.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Transaction Manager Server running");
+ * ```
+ */
+export function createServer(): McpServer {
   const mcpServer = new McpServer({
     name: "transaction-manager",
-    version: "0.2.13" // Updated version
+    version: "0.3.0" // Updated version
   });
 
   // Register the single tool
@@ -171,6 +193,12 @@ export async function runServer(): Promise<void> {
     TxnRequestSchema.shape, // Pass the shape for Zod validation
     handleTransactionCallback
   );
+
+  return mcpServer;
+}
+
+export async function runServer(): Promise<void> {
+  const mcpServer = createServer();
 
   // Connect using stdio
   const transport = new StdioServerTransport();

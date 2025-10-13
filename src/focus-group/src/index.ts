@@ -71,7 +71,7 @@ interface FocusGroupData {
   suggestedFocusArea?: string;
 }
 
-class FocusGroupServer {
+export class FocusGroupServer {
   private personaRegistry: Record<string, Record<string, FocusGroupPersona>> = {};
   private feedbackHistory: Record<string, Feedback[]> = {};
   private focusAreaTracker: Record<string, FocusAreaAnalysis[]> = {};
@@ -747,47 +747,100 @@ Key features:
   }
 };
 
-const server = new Server(
-  {
-    name: "focus-group-server",
-    version: "0.2.13"
-  },
-  {
-    capabilities: {
-      tools: {}
-    }
-  }
-);
-
-const focusGroupServer = new FocusGroupServer();
-
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [FOCUS_GROUP_TOOL]
-}));
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "focusGroup") {
-    return focusGroupServer.processFocusGroup(request.params.arguments);
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: `Unknown tool: ${request.params.name}`
+/**
+ * Creates and configures the Focus Group MCP server instance.
+ *
+ * Purpose: Initializes an MCP `Server`, instantiates `FocusGroupServer`,
+ * and registers tool handlers for tools/list and tools/call.
+ *
+ * Side effects:
+ * - Instantiates an internal FocusGroupServer
+ * - Registers ListToolsRequestSchema and CallToolRequestSchema handlers
+ *
+ * @returns Server Configured MCP server ready to be connected to a transport
+ *
+ * @example
+ * import createServer from "./index.js";
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.error("Focus Group MCP Server running on stdio");
+ */
+export default function createServer(): Server {
+  const server = new Server(
+    {
+      name: "focus-group-server",
+      version: "0.3.0"
+    },
+    {
+      capabilities: {
+        tools: {}
       }
-    ],
-    isError: true
-  };
-});
+    }
+  );
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Focus Group MCP Server running on stdio");
+  const focusGroupServer = new FocusGroupServer();
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [FOCUS_GROUP_TOOL]
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name === "focusGroup") {
+      return focusGroupServer.processFocusGroup(request.params.arguments);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Unknown tool: ${request.params.name}`
+        }
+      ],
+      isError: true
+    };
+  });
+
+  return server;
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error running server:", error);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+
+    try {
+      await server.connect(transport);
+      console.error("Focus Group MCP Server running on stdio");
+    } catch (error) {
+      // Log detailed error information
+      console.error("Failed to connect to transport:", error);
+
+      // Additional error details if available
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+      }
+
+      // Attempt to clean up the transport if possible
+      try {
+        if (transport && typeof transport.close === "function") {
+          await transport.close();
+        }
+      } catch (cleanupError) {
+        console.error("Error during cleanup:", cleanupError);
+      }
+
+      // Exit with non-zero code to indicate failure
+      process.exit(1);
+    }
+  }
+
+  runServer().catch((error) => {
+    console.error("Fatal error running server:", error);
+    process.exit(1);
+  });
+}

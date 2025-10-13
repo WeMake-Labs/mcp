@@ -103,7 +103,6 @@ git commit -m "fix: resolve memory leak in pattern matching"
   "version": "1.0.0",
   "description": "Package description",
   "license": "MIT",
-  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "scripts": {

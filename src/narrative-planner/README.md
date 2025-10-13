@@ -92,7 +92,7 @@ The planner incorporates thematic considerations:
   "mcpServers": {
     "Narrative Planner": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/narrative-planner@latest"]
+      "args": ["@wemake.cx/narrative-planner@latest"]
     }
   }
 }
@@ -105,7 +105,7 @@ The planner incorporates thematic considerations:
   "mcpServers": {
     "Narrative Planner": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/narrative-planner@latest"],
+      "args": ["@wemake.cx/narrative-planner@latest"],
       "env": {
         "NARRATIVE_STYLE": "detailed",
         "DEFAULT_GENRE": "drama",

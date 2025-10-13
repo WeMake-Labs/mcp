@@ -4,10 +4,46 @@ globs: src/*/src/index.ts
 
 # MCP Server Implementation Patterns
 
+> **Copy-paste templates for maximum velocity**
+
+## Quick Navigation
+
+- 🚀 [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Start here
+- 📚 [MCP Protocol](mdc:.cursor/rules/mcp-protocol.mdc) - MCP standards
+- 🔧 [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - Boilerplate generation
+- 🧪 [Testing](mdc:.cursor/rules/testing.mdc) - Testing patterns
+- 📖 [Documentation](mdc:.cursor/rules/documentation.mdc) - README templates
+
 ## Standard MCP Server Structure
 
 All MCP servers in this monorepo follow a consistent architecture pattern. Reference:
 [src/decision-framework/src/index.ts](mdc:src/decision-framework/src/index.ts)
+
+## Server Architecture Decision Tree
+
+```
+New MCP Server?
+│
+├─ Simple stateless operation?
+│  └─ Use: Basic validation + single process method
+│      Example: [sequential-thinking](mdc:src/sequential-thinking/src/index.ts)
+│
+├─ Stateful with history tracking?
+│  └─ Use: History registry + session management
+│      Example: [memory](mdc:src/memory/src/index.ts)
+│
+├─ Multi-stage workflow?
+│  └─ Use: Stage tracking + iterative operations
+│      Example: [decision-framework](mdc:src/decision-framework/src/index.ts)
+│
+├─ Multi-persona simulation?
+│  └─ Use: Persona registry + dialogue tracking
+│      Example: [collaborative-reasoning](mdc:src/collaborative-reasoning/src/index.ts)
+│
+└─ Transaction management?
+   └─ Use: Transaction state + rollback support
+       Example: [transaction-manager](mdc:src/transaction-manager/src/server.ts)
+```
 
 ## Required Components
 
@@ -295,6 +331,98 @@ class MyMCPServer {
 }
 ```
 
+## When to Use Each Pattern
+
+| Pattern              | Use When                              | Key Features                         | Example                 |
+| -------------------- | ------------------------------------- | ------------------------------------ | ----------------------- |
+| **Basic Validation** | Simple, stateless operations          | Input validation, single output      | Sequential Thinking     |
+| **History Tracking** | Need audit trails, session continuity | Session management, GDPR cleanup     | Memory                  |
+| **Multi-Stage**      | Complex workflows with stages         | Stage tracking, iteration support    | Decision Framework      |
+| **Multi-Persona**    | Simulating multiple viewpoints        | Persona registry, dialogue tracking  | Collaborative Reasoning |
+| **Transaction**      | Need atomic operations with rollback  | State snapshots, rollback capability | Transaction Manager     |
+
+### Quick Pattern Selection
+
+**Ask yourself:**
+
+1. Does it need to remember previous operations? → Use History Tracking
+2. Does it have multiple stages or iterations? → Use Multi-Stage
+3. Does it simulate multiple agents/personas? → Use Multi-Persona
+4. Must operations be atomic with rollback? → Use Transaction
+5. Otherwise → Use Basic Validation
+
+## Copy-Paste Templates
+
+### Template 1: Basic Server (Stateless)
+
+```typescript
+class BasicServer {
+  private validateInput(input: unknown): ValidatedType {
+    if (typeof input !== "object" || input === null) {
+      throw new Error("Invalid input");
+    }
+    return input as ValidatedType;
+  }
+
+  public processOperation(input: unknown): Result {
+    try {
+      const validated = this.validateInput(input);
+      const result = this.process(validated);
+      return { content: [{ type: "text", text: result }] };
+    } catch (error) {
+      return {
+        content: [{ type: "text", text: `Error: ${error.message}` }],
+        isError: true
+      };
+    }
+  }
+}
+```
+
+### Template 2: History Tracking Server
+
+```typescript
+class HistoryServer {
+  private history: Record<string, Data[]> = {};
+  private sessionOrder: string[] = [];
+  private readonly maxSessions = 100;
+
+  private updateHistory(sessionId: string, data: Data): void {
+    if (!this.history[sessionId]) {
+      this.history[sessionId] = [];
+      this.sessionOrder.push(sessionId);
+    }
+    this.history[sessionId].push(data);
+
+    // GDPR: Cleanup old sessions
+    while (this.sessionOrder.length > this.maxSessions) {
+      const oldest = this.sessionOrder.shift()!;
+      delete this.history[oldest];
+    }
+  }
+}
+```
+
+### Template 3: Multi-Stage Server
+
+```typescript
+class MultiStageServer {
+  private stages: Record<string, { stage: string; iteration: number }> = {};
+
+  private updateStage(id: string, stage: string, iteration: number): void {
+    this.stages[id] = { stage, iteration };
+  }
+
+  private getNextStage(current: string): string {
+    const stageFlow = ["stage1", "stage2", "stage3"];
+    const idx = stageFlow.indexOf(current);
+    return stageFlow[idx + 1] || current;
+  }
+}
+```
+
+**For complete implementations:** See Reference Implementations below
+
 ## Reference Implementations
 
 Study these for patterns:
@@ -304,3 +432,11 @@ Study these for patterns:
 - [src/sequential-thinking/src/index.ts](mdc:src/sequential-thinking/src/index.ts) - Simple state tracking
 - [src/collaborative-reasoning/src/index.ts](mdc:src/collaborative-reasoning/src/index.ts) - Multi-persona management
 - [src/transaction-manager/src/server.ts](mdc:src/transaction-manager/src/server.ts) - Transaction handling
+
+## See Also
+
+- [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Complete workflow guide
+- [MCP Protocol](mdc:.cursor/rules/mcp-protocol.mdc) - MCP standards and tool handlers
+- [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - AI-generated boilerplate
+- [Testing](mdc:.cursor/rules/testing.mdc) - Test patterns for servers
+- [Documentation](mdc:.cursor/rules/documentation.mdc) - Server README templates

@@ -31,7 +31,7 @@ interface ArgumentData {
   suggestedNextTypes?: ("thesis" | "antithesis" | "synthesis" | "objection" | "rebuttal")[];
 }
 
-class ArgumentationServer {
+export class ArgumentationServer {
   private argumentHistory: ArgumentData[] = [];
   private relationshipGraph: Record<
     string,
@@ -487,47 +487,76 @@ Parameters explained:
   }
 };
 
-const server = new Server(
-  {
-    name: "structured-argumentation-server",
-    version: "0.2.13"
-  },
-  {
-    capabilities: {
-      tools: {}
-    }
-  }
-);
-
-const argumentationServer = new ArgumentationServer();
-
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [STRUCTURED_ARGUMENTATION_TOOL]
-}));
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "structuredArgumentation") {
-    return argumentationServer.processArgument(request.params.arguments);
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: `Unknown tool: ${request.params.name}`
+/**
+ * Factory function that creates and configures a structured argumentation MCP server instance.
+ *
+ * This function initializes a Server with the name "structured-argumentation-server" and version "0.3.0",
+ * registers the STRUCTURED_ARGUMENTATION_TOOL, and sets up request handlers for listing available tools
+ * and processing structured argumentation requests. The CallTool handler calls StructuredArgumentationServer.process
+ * when req.params.name === "structuredArgumentation".
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Structured Argumentation Server running");
+ * ```
+ */
+export default function createServer(): Server {
+  const server = new Server(
+    {
+      name: "structured-argumentation-server",
+      version: "0.3.0"
+    },
+    {
+      capabilities: {
+        tools: {}
       }
-    ],
-    isError: true
-  };
-});
+    }
+  );
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Structured Argumentation MCP Server running on stdio");
+  const argumentationServer = new ArgumentationServer();
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [STRUCTURED_ARGUMENTATION_TOOL]
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name === "structuredArgumentation") {
+      return argumentationServer.processArgument(request.params.arguments);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Unknown tool: ${request.params.name}`
+        }
+      ],
+      isError: true
+    };
+  });
+
+  return server;
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error running server:", error);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Structured Argumentation MCP Server running on stdio");
+  }
+
+  runServer().catch((error) => {
+    console.error("Fatal error running server:", error);
+    process.exit(1);
+  });
+}

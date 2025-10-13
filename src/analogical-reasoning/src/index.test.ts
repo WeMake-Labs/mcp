@@ -1121,7 +1121,7 @@ describe("Schema and Data Structure Validation", () => {
  * Business Context: Direct unit testing of server methods ensures comprehensive
  * coverage of validation, processing, and visualization logic.
  *
- * Decision Rationale: Test server methods directly to achieve 90%+ coverage
+ * Decision Rationale: Test server methods directly to achieve 80%+ coverage
  * without requiring a connected MCP transport.
  */
 describe("Direct Server Method Tests", () => {

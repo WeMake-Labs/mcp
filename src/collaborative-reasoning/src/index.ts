@@ -67,7 +67,7 @@ interface CollaborativeReasoningData {
   suggestedContributionTypes?: string[];
 }
 
-class CollaborativeReasoningServer {
+export class CollaborativeReasoningServer {
   private personaRegistry: Record<string, Record<string, Persona>> = {};
   private contributionHistory: Record<string, Contribution[]> = {};
   private disagreementTracker: Record<string, Disagreement[]> = {};
@@ -944,47 +944,82 @@ Key features:
   }
 };
 
-const server = new Server(
-  {
-    name: "collaborative-reasoning-server",
-    version: "0.2.13"
-  },
-  {
-    capabilities: {
-      tools: {}
-    }
-  }
-);
-
-const collaborativeReasoningServer = new CollaborativeReasoningServer();
-
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [COLLABORATIVE_REASONING_TOOL]
-}));
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "collaborativeReasoning") {
-    return collaborativeReasoningServer.processCollaborativeReasoning(request.params.arguments);
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: `Unknown tool: ${request.params.name}`
+/**
+ * Factory function that creates and configures a collaborative reasoning MCP server instance.
+ *
+ * This function initializes a Server with collaborative reasoning capabilities, registers
+ * the collaborative reasoning tool, and sets up request handlers for listing available
+ * tools and processing collaborative reasoning requests. The server facilitates
+ * multi-persona discussions and collaborative problem-solving.
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Collaborative Reasoning Server running");
+ * ```
+ */
+export default function createServer(): Server {
+  const server = new Server(
+    {
+      name: "collaborative-reasoning-server",
+      version: "0.3.0"
+    },
+    {
+      capabilities: {
+        tools: {}
       }
-    ],
-    isError: true
-  };
-});
+    }
+  );
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Collaborative Reasoning MCP Server running on stdio");
+  const collaborativeReasoningServer = new CollaborativeReasoningServer();
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [COLLABORATIVE_REASONING_TOOL]
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name === "collaborativeReasoning") {
+      return collaborativeReasoningServer.processCollaborativeReasoning(request.params.arguments);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Unknown tool: ${request.params.name}`
+        }
+      ],
+      isError: true
+    };
+  });
+
+  return server;
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error running server:", error);
-  process.exit(1);
-});
+/**
+ * Main execution block that runs the collaborative reasoning server when executed as a script.
+ *
+ * This block initializes the server, connects it to stdio transport, and starts the server
+ * process. It handles graceful shutdown and error handling for the server execution.
+ */
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Collaborative Reasoning MCP Server running on stdio");
+  }
+
+  runServer().catch((error) => {
+    console.error("Fatal error running server:", error);
+    process.exit(1);
+  });
+}

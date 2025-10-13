@@ -30,5 +30,7 @@
     "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": false
-  }
+  },
+
+  "include": ["src/test-helpers/*.ts"]
 }

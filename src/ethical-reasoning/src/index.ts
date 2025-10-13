@@ -19,7 +19,28 @@ interface EthicalRequestData {
   suggestedNext?: FrameworkType[];
 }
 
-class EthicalReasoningServer {
+/**
+ * Server class for ethical reasoning functionality in the MCP protocol.
+ *
+ * This class provides the core logic for analyzing ethical scenarios and actions,
+ * tracking reasoning history, and providing structured ethical analysis results.
+ * It validates input data and processes ethical reasoning requests according to
+ * established ethical frameworks.
+ *
+ * @export
+ * @public
+ * @class EthicalReasoningServer
+ * @example
+ * ```typescript
+ * const server = new EthicalReasoningServer();
+ * const result = server.process({
+ *   scenario: "A doctor must decide...",
+ *   action: "Administer treatment"
+ * });
+ * console.log(result.content[0].text);
+ * ```
+ */
+export class EthicalReasoningServer {
   private history: EthicalRequestData[] = [];
 
   private validateData(input: unknown): EthicalRequestData {
@@ -82,6 +103,29 @@ class EthicalReasoningServer {
     }
   }
 
+  /**
+   * Processes ethical reasoning requests by analyzing scenarios and actions across multiple frameworks.
+   *
+   * This method validates the input data, analyzes the ethical scenario using various ethical
+   * frameworks, tracks the reasoning history, and returns structured results with guidance
+   * from each framework and overall recommendations.
+   *
+   * @param input - The input object containing scenario and action to analyze
+   * @param input.scenario - The ethical scenario description
+   * @param input.action - The proposed action to evaluate
+   * @param input.frameworks - Optional array of frameworks to use (defaults to all)
+   * @returns Structured result containing ethical analysis or error information
+   * @throws {Error} If input validation fails or processing encounters an error
+   *
+   * @example
+   * ```typescript
+   * const result = server.process({
+   *   scenario: "A doctor must decide whether to administer experimental treatment",
+   *   action: "Administer the experimental treatment"
+   * });
+   * // Returns ethical analysis from multiple frameworks
+   * ```
+   */
   public process(input: unknown): { content: Array<{ type: string; text: string }>; isError?: boolean } {
     try {
       const data = this.validateData(input);
@@ -147,26 +191,55 @@ const ETHICAL_REASONING_TOOL: Tool = {
   }
 };
 
-const server = new Server({ name: "ethical-reasoning-server", version: "0.2.13" }, { capabilities: { tools: {} } });
-const ethicalServer = new EthicalReasoningServer();
+/**
+ * Factory function that creates and configures an ethical reasoning MCP server instance.
+ *
+ * This function initializes a Server with the name "ethical-reasoning-server" and version "0.3.0",
+ * registers the ETHICAL_REASONING_TOOL, and sets up request handlers for listing available tools
+ * and processing ethical reasoning requests. The CallTool handler calls EthicalReasoningServer.process
+ * when req.params.name === "ethicalReasoning" and returns an error response for unknown tool names.
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Ethical Reasoning Server running");
+ * ```
+ */
+export default function createServer(): Server {
+  const server = new Server({ name: "ethical-reasoning-server", version: "0.3.0" }, { capabilities: { tools: {} } });
+  const ethicalServer = new EthicalReasoningServer();
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ETHICAL_REASONING_TOOL] }));
-server.setRequestHandler(CallToolRequestSchema, async (req) => {
-  if (req.params.name === "ethicalReasoning") {
-    return ethicalServer.process(req.params.arguments);
-  }
-  return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
-});
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ETHICAL_REASONING_TOOL] }));
+  server.setRequestHandler(CallToolRequestSchema, async (req) => {
+    if (req.params.name === "ethicalReasoning") {
+      return ethicalServer.process(req.params.arguments);
+    }
+    return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
+  });
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Ethical Reasoning MCP Server running on stdio");
-  process.once("SIGINT", () => process.exit(0));
-  process.once("SIGTERM", () => process.exit(0));
+  return server;
 }
 
-runServer().catch((err) => {
-  console.error("Fatal error running server:", err);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Ethical Reasoning MCP Server running on stdio");
+    process.once("SIGINT", () => process.exit(0));
+    process.once("SIGTERM", () => process.exit(0));
+  }
+
+  runServer().catch((err) => {
+    console.error("Fatal error running server:", err);
+    process.exit(1);
+  });
+}

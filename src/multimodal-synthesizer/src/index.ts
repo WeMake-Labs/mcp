@@ -39,7 +39,7 @@ const MULTIMODAL_SYNTH_TOOL = {
   }
 };
 
-class MultimodalSynthServer {
+export class MultimodalSynthServer {
   async process(input: unknown): Promise<Result> {
     if (!input || typeof input !== "object") {
       return { content: [{ type: "text", text: "Invalid input" }], isError: true };
@@ -58,29 +58,60 @@ class MultimodalSynthServer {
   }
 }
 
-const server = new Server(
-  { name: "multimodal-synthesizer-server", version: "0.2.13" },
-  { capabilities: { tools: {} } }
-);
-const synthServer = new MultimodalSynthServer();
+/**
+ * Factory function that creates and configures a multimodal synthesizer MCP server instance.
+ *
+ * This function initializes a Server with the name "multimodal-synthesizer-server" and version "0.3.0",
+ * registers the MULTIMODAL_SYNTH_TOOL, and sets up request handlers for listing available tools
+ * and processing multimodal synthesis requests. The CallTool handler calls MultimodalSynthServer.process
+ * when req.params.name === "multimodalSynth".
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Multimodal Synthesizer Server running");
+ * ```
+ *
+ * @see {@link https://modelcontextprotocol.io/} for MCP protocol documentation
+ */
+export default function createServer(): Server {
+  const server = new Server(
+    { name: "multimodal-synthesizer-server", version: "0.3.0" },
+    { capabilities: { tools: {} } }
+  );
+  const synthServer = new MultimodalSynthServer();
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [MULTIMODAL_SYNTH_TOOL] }));
-server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
-  if (req.params.name === "multimodalSynth") {
-    return await synthServer.process(req.params.arguments);
-  }
-  return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
-});
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [MULTIMODAL_SYNTH_TOOL] }));
+  server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
+    if (req.params.name === "multimodalSynth") {
+      return await synthServer.process(req.params.arguments);
+    }
+    return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
+  });
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  process.once("SIGINT", () => process.exit(0));
-  process.once("SIGTERM", () => process.exit(0));
-  console.error("Multimodal Synthesizer MCP Server running on stdio");
+  return server;
 }
 
-runServer().catch((err) => {
-  console.error("Fatal error running server:", err);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    process.once("SIGINT", () => process.exit(0));
+    process.once("SIGTERM", () => process.exit(0));
+    console.error("Multimodal Synthesizer MCP Server running on stdio");
+  }
+
+  runServer().catch((err) => {
+    console.error("Fatal error running server:", err);
+    process.exit(1);
+  });
+}

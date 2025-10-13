@@ -141,7 +141,7 @@ Example:
   "mcpServers": {
     "Memory": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/memory@latest"]
+      "args": ["@wemake.cx/memory@latest"]
     }
   }
 }
@@ -156,7 +156,7 @@ The server can be configured using the following environment variables:
   "mcpServers": {
     "Memory": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/memory@latest"],
+      "args": ["@wemake.cx/memory@latest"],
       "env": {
         "MEMORY_FILE_PATH": "/path/to/custom/memory.jsonl"
       }

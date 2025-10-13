@@ -1,0 +1,938 @@
+---
+alwaysApply: true
+---
+
+# Cloudflare Workers Deployment - Complete Guide
+
+> **All knowledge for deploying MCP servers to Cloudflare Workers**
+
+This rule consolidates all deployment knowledge: Workers compatibility, remote MCP setup, OAuth authentication, and
+production deployment workflows.
+
+## Quick Navigation
+
+- 🚀 [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Start here
+- 🔧 [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - Pre-deployment checks
+- 🧰 [Bun-First Standards](mdc:.cursor/rules/bun-first.mdc) - Local development
+- 📚 [MCP Protocol](mdc:.cursor/rules/mcp-protocol.mdc) - MCP server patterns
+- 🏢 [Enterprise Standards](mdc:.cursor/rules/enterprise-standards.mdc) - Security & GDPR
+
+## Local to Workers Workflow
+
+```
+┌─────────────────┐
+│ Local Dev (Bun) │  Development with Bun-specific APIs
+└────────┬────────┘
+         │ bun run build
+         ▼
+┌─────────────────┐
+│ Workers Build   │  Replace Bun APIs with Workers alternatives
+└────────┬────────┘
+         │ bunx wrangler dev
+         ▼
+┌─────────────────┐
+│ Local Testing   │  Test Workers compatibility locally
+└────────┬────────┘
+         │ MCP Inspector validation
+         ▼
+┌─────────────────┐
+│ Deploy Workers  │  bunx wrangler deploy
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Production Test │  Validate with MCP Inspector
+└─────────────────┘
+```
+
+## Quick Deployment Checklist
+
+Use this checklist before every deployment:
+
+- [ ] **Tests**: All tests pass with 80%+ coverage (`bun test --coverage`)
+- [ ] **Linting**: No linter errors (`bun run lint`)
+- [ ] **Type Check**: TypeScript validates (`bun run check`)
+- [ ] **Format**: Code formatted (`bun run format`)
+- [ ] **No Bun APIs**: Verified no `bun:sqlite`, `Bun.file`, `Bun.$`, etc.
+- [ ] **Complete Imports**: All imports explicit (no Bun auto-imports)
+- [ ] **Single-File Bundle**: Build outputs single file (`dist/worker.js`)
+- [ ] **Environment Variables**: All variables documented and typed
+- [ ] **No Secrets in Code**: Secrets in environment/Wrangler secrets only
+- [ ] **wrangler.toml**: Configured with correct bindings
+- [ ] **OAuth Setup**: Dev and prod OAuth apps created (if needed)
+- [ ] **Local Test**: Tested with `bunx wrangler dev`
+- [ ] **MCP Inspector**: Validated with Inspector locally
+- [ ] **Dry Run**: `bunx wrangler deploy --dry-run` successful
+- [ ] **README Updated**: Deployment instructions current
+
+## Workers Compatibility Requirements
+
+### Prohibited Bun-Only APIs
+
+These Bun APIs DO NOT work in Cloudflare Workers:
+
+| Bun API             | Why Prohibited               | Workers Alternative               |
+| ------------------- | ---------------------------- | --------------------------------- |
+| `bun:sqlite`        | Native SQLite not available  | Cloudflare D1 (SQLite-compatible) |
+| `Bun.redis`         | Native Redis not available   | Cloudflare KV or Durable Objects  |
+| `Bun.$`             | Shell commands not available | Use HTTP APIs or Workers APIs     |
+| `Bun.file`          | File system not available    | Workers APIs or R2 for files      |
+| `Bun.password`      | Native crypto not available  | Web Crypto API                    |
+| `Bun.serve()`       | Workers use fetch handler    | Workers `fetch()` handler         |
+| FFI/native bindings | Native modules not supported | Pure JavaScript/TypeScript only   |
+
+### Workers-Compatible Alternatives
+
+#### Database: Cloudflare D1
+
+```typescript
+export interface Env {
+  DB: D1Database;
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const result = await env.DB.prepare("SELECT * FROM users").all();
+    return Response.json(result);
+  }
+};
+```
+
+#### Key-Value Storage: Cloudflare KV
+
+```typescript
+export interface Env {
+  KV: KVNamespace;
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    await env.KV.put("key", "value");
+    const value = await env.KV.get("key");
+    return new Response(value);
+  }
+};
+```
+
+#### Stateful Storage: Durable Objects
+
+```typescript
+export class MyDurableObject {
+  constructor(
+    private state: DurableObjectState,
+    private env: Env
+  ) {}
+
+  async fetch(request: Request): Promise<Response> {
+    // Maintain state across requests
+    const count = (await this.state.storage.get("count")) || 0;
+    await this.state.storage.put("count", count + 1);
+    return Response.json({ count });
+  }
+}
+```
+
+#### Password Hashing: Web Crypto API
+
+```typescript
+const encoder = new TextEncoder();
+const data = encoder.encode(password);
+const hash = await crypto.subtle.digest("SHA-256", data);
+
+// Convert to hex string
+const hashArray = Array.from(new Uint8Array(hash));
+const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+```
+
+#### File Storage: R2
+
+```typescript
+export interface Env {
+  BUCKET: R2Bucket;
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    // Upload file
+    await env.BUCKET.put("file.txt", "content");
+
+    // Download file
+    const object = await env.BUCKET.get("file.txt");
+    return new Response(object?.body);
+  }
+};
+```
+
+## Remote vs Local MCP Servers
+
+### Local MCP (stdio) - Current Implementation
+
+```typescript
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
+```
+
+**Characteristics:**
+
+- Process-based communication (stdin/stdout)
+- Single user per instance
+- Local development and testing
+- No authentication required (runs in user's context)
+- Configured in Claude Desktop/Cursor as command-line tools
+
+### Remote MCP (SSE) - Production Deployment
+
+```typescript
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/sse") {
+      const server = new Server({ name: "my-mcp-server", version: "1.0.0" }, { capabilities: { tools: {} } });
+
+      // Register handlers
+      server.setRequestHandler(ListToolsRequestSchema, async () => ({
+        tools: [
+          /* tool definitions */
+        ]
+      }));
+
+      const transport = new SSEServerTransport("/messages", request);
+      await server.connect(transport);
+      return transport.response;
+    }
+
+    return new Response("Not Found", { status: 404 });
+  }
+};
+```
+
+**Characteristics:**
+
+- HTTP/SSE-based communication
+- Multi-user support with authentication
+- Production-ready deployment
+- OAuth-based authentication
+- Accessible from any MCP client over network
+- Scalable and globally distributed
+
+### When to Use Remote Servers
+
+Use Remote MCP servers for:
+
+- **Production deployments**: Enterprise high availability
+- **Multi-user scenarios**: Team collaboration
+- **Cross-platform access**: Web, desktop, mobile clients
+- **Managed authentication**: OAuth with enterprise identity providers
+- **Scalability**: Cloudflare Workers global distribution
+- **GDPR compliance**: Centralized audit logging
+
+## OAuth Authentication Setup
+
+### GitHub OAuth Configuration
+
+#### Step 1: Create OAuth Apps
+
+Create **two** GitHub OAuth Apps at [github.com/settings/developers](https://github.com/settings/developers):
+
+**Development OAuth App:**
+
+- Application name: `My MCP Server (local)`
+- Homepage URL: `http://localhost:8787`
+- Authorization callback URL: `http://localhost:8787/callback`
+
+**Production OAuth App:**
+
+- Application name: `My MCP Server (production)`
+- Homepage URL: `https://your-worker.your-account.workers.dev`
+- Authorization callback URL: `https://your-worker.your-account.workers.dev/callback`
+
+#### Step 2: Configure Environment Variables
+
+**Local Development** (`.dev.vars`):
+
+```env
+GITHUB_CLIENT_ID="dev-client-id-here"
+GITHUB_CLIENT_SECRET="dev-client-secret-here"
+```
+
+**Production** (Wrangler secrets):
+
+```sh
+bunx wrangler secret put GITHUB_CLIENT_ID --env production
+bunx wrangler secret put GITHUB_CLIENT_SECRET --env production
+```
+
+#### Step 3: Environment Interface
+
+```typescript
+export interface Env {
+  // OAuth credentials
+  GITHUB_CLIENT_ID: string;
+  GITHUB_CLIENT_SECRET: string;
+
+  // Cloudflare bindings
+  DB?: D1Database;
+  KV?: KVNamespace;
+}
+```
+
+### OAuth Implementation Pattern
+
+```typescript
+import { OAuthProvider } from "@modelcontextprotocol/server-oauth";
+import GitHubHandler from "./github-handler";
+
+export default new OAuthProvider({
+  apiRoute: "/sse",
+  apiHandler: MyMCP.Router,
+  defaultHandler: GitHubHandler,
+  authorizeEndpoint: "/authorize",
+  tokenEndpoint: "/token",
+  clientRegistrationEndpoint: "/register"
+});
+```
+
+**OAuth Endpoints:**
+
+- `/sse` - Server-Sent Events endpoint for MCP communication
+- `/authorize` - OAuth authorization endpoint
+- `/token` - OAuth token exchange endpoint
+- `/register` - Client registration endpoint
+- `/callback` - OAuth callback handler
+
+### Alternative OAuth Providers
+
+Support for multiple identity providers:
+
+- **GitHub**: Development and personal use
+- **Google**: Enterprise G Suite integration
+- **Auth0**: Unified identity management
+- **WorkOS**: Enterprise SSO (SAML, OIDC)
+- **Microsoft**: Azure AD integration
+
+### Human-in-the-Loop Authorization
+
+```typescript
+server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
+  const { name, arguments: args } = request.params;
+
+  // Extract user context from OAuth session
+  const userContext = extra?.context?.user;
+
+  if (name === "delete_data") {
+    // Verify user has permission
+    if (!userContext?.permissions?.includes("delete")) {
+      throw new Error("Insufficient permissions for delete operation");
+    }
+
+    // Log for audit trail (GDPR compliance)
+    await logOperation({
+      user: userContext.id,
+      action: "delete_data",
+      timestamp: new Date().toISOString(),
+      args: args
+    });
+  }
+
+  return processToolCall(name, args);
+});
+```
+
+## Build Configuration
+
+### TypeScript Configuration
+
+Ensure complete imports (no Bun auto-imports):
+
+```typescript
+// ✅ Explicitly import everything
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import type { Request, Response } from "@cloudflare/workers-types";
+
+// ❌ Relying on Bun auto-imports (won't work in Workers)
+// (Missing imports)
+```
+
+### Single-File Bundle
+
+Workers require single-file bundles:
+
+```sh
+# Build Workers-compatible bundle
+bun build src/index.ts \
+  --outfile=dist/worker.js \
+  --target=browser \
+  --format=esm \
+  --minify \
+  --sourcemap
+```
+
+**Critical**: Use `--target=browser` for Workers compatibility.
+
+### Package.json Scripts
+
+```json
+{
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "bun build src/index.ts --outfile=dist/index.js --target=browser --format=esm",
+    "deploy": "wrangler deploy --env production",
+    "deploy:dev": "wrangler deploy --env development"
+  }
+}
+```
+
+### Workers-Specific Entry Point
+
+Create separate entry if needed:
+
+```typescript
+// src/worker.ts - Cloudflare Workers entry
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    // Handle HTTP requests
+    return new Response("OK");
+  }
+};
+```
+
+## Wrangler Configuration
+
+### Basic wrangler.toml
+
+```toml
+name = "mcp-server-name"
+main = "dist/index.js"
+compatibility_date = "2024-01-01"
+node_compat = true
+
+# Workers settings
+workers_dev = true
+
+# Build configuration
+[build]
+command = "bun run build"
+
+# Environment: Development
+[env.development]
+name = "mcp-server-name-dev"
+vars = { ENVIRONMENT = "development" }
+
+# Environment: Production
+[env.production]
+name = "mcp-server-name-production"
+vars = { ENVIRONMENT = "production" }
+```
+
+### Advanced Configuration with Bindings
+
+```toml
+name = "mcp-decision-framework"
+main = "dist/worker.js"
+compatibility_date = "2024-01-01"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "mcp_decisions"
+database_id = "your-d1-database-id"
+
+# KV binding
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "your-kv-namespace-id"
+
+# R2 binding
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "mcp-files"
+
+# Durable Objects
+[[durable_objects.bindings]]
+name = "DECISION_STATE"
+class_name = "DecisionDurableObject"
+
+# Analytics Engine
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+```
+
+### Environment Variables Strategy
+
+**Public configuration** (in `wrangler.toml`):
+
+```toml
+[env.production.vars]
+MAX_SESSIONS = "1000"
+ENABLE_LOGGING = "true"
+RATE_LIMIT_PER_HOUR = "100"
+```
+
+**Secrets** (via CLI, NEVER in version control):
+
+```sh
+# Set secrets for production
+bunx wrangler secret put GITHUB_CLIENT_ID --env production
+bunx wrangler secret put GITHUB_CLIENT_SECRET --env production
+bunx wrangler secret put API_ENCRYPTION_KEY --env production
+```
+
+**Local development** (`.dev.vars` file, add to `.gitignore`):
+
+```env
+GITHUB_CLIENT_ID=local-dev-client-id
+GITHUB_CLIENT_SECRET=local-dev-client-secret
+API_ENCRYPTION_KEY=local-encryption-key
+```
+
+## Testing Workflows
+
+### Local Testing with MCP Inspector
+
+#### Step 1: Start Development Server
+
+```sh
+cd src/decision-framework
+bun run dev  # or: bunx wrangler dev
+```
+
+Server runs at: `http://localhost:8787/sse`
+
+#### Step 2: Launch MCP Inspector
+
+```sh
+bunx @modelcontextprotocol/inspector@latest
+```
+
+Inspector opens at: `http://localhost:5173`
+
+#### Step 3: Connect and Test
+
+1. Enter server URL: `http://localhost:8787/sse`
+2. Click **Connect**
+3. Complete OAuth flow (if enabled)
+4. Click **List Tools** to see available tools
+5. Select a tool and test with inputs
+6. Verify responses and error handling
+
+### Production Testing
+
+#### Deploy to Workers
+
+```sh
+# Build for production
+bun run build
+
+# Deploy to Cloudflare Workers
+bunx wrangler deploy --env production
+
+# View deployment URL
+bunx wrangler deployments list
+```
+
+Deployed URL: `https://mcp-server-name-production.your-account.workers.dev/sse`
+
+#### Test with MCP Inspector
+
+1. Open MCP Inspector
+2. Enter production URL
+3. Complete OAuth flow
+4. Test all tools
+5. Verify OAuth token persistence
+6. Test error handling and rate limiting
+
+#### Monitoring and Logs
+
+```sh
+# View real-time logs
+bunx wrangler tail --env production
+
+# View deployment history
+bunx wrangler deployments list
+```
+
+### Testing with Claude Desktop
+
+Configure Claude Desktop via `mcp-remote` proxy:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json` **Windows**:
+`%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "decision-framework": {
+      "command": "bunx",
+      "args": ["mcp-remote", "https://mcp-decision-framework.your-account.workers.dev/sse"]
+    }
+  }
+}
+```
+
+**Restart Claude Desktop** after configuration.
+
+### Testing with Cursor
+
+Cursor MCP configuration: `.cursor/mcp.json` (workspace root)
+
+```json
+{
+  "mcpServers": {
+    "decision-framework": {
+      "command": "bunx mcp-remote https://mcp-decision-framework.your-account.workers.dev/sse"
+    }
+  }
+}
+```
+
+## Security Best Practices
+
+### Never Commit OAuth Secrets
+
+**Add to `.gitignore`:**
+
+```gitignore
+# Local development secrets
+.dev.vars
+.env
+.env.local
+.env.*.local
+
+# Wrangler local state
+.wrangler/
+
+# OAuth credentials
+**/oauth-config.json
+**/client-secrets.json
+```
+
+**Use environment variables:**
+
+```typescript
+// ✅ Correct
+export interface Env {
+  GITHUB_CLIENT_SECRET: string;
+}
+
+export default {
+  async fetch(request: Request, env: Env) {
+    const secret = env.GITHUB_CLIENT_SECRET;
+  }
+};
+
+// ❌ NEVER do this
+const GITHUB_CLIENT_SECRET = "ghp_1234567890abcdef";
+```
+
+### Separate OAuth Apps for Dev/Production
+
+**Never use production OAuth credentials in development.**
+
+**Development:**
+
+- Callback URL: `http://localhost:8787/callback`
+- Limited scope permissions
+- Test credentials in `.dev.vars`
+
+**Production:**
+
+- Callback URL: `https://your-worker.workers.dev/callback`
+- Production scope permissions
+- Production credentials via `wrangler secret put`
+
+### CORS Configuration
+
+```typescript
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    // Handle CORS preflight
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          "Access-Control-Max-Age": "86400"
+        }
+      });
+    }
+
+    const response = await handleRequest(request, env);
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    return response;
+  }
+};
+```
+
+**Production**: Restrict CORS to specific origins:
+
+```typescript
+const allowedOrigins = ["https://claude.ai", "https://your-app.com"];
+const origin = request.headers.get("Origin");
+if (origin && allowedOrigins.includes(origin)) {
+  response.headers.set("Access-Control-Allow-Origin", origin);
+}
+```
+
+### Rate Limiting
+
+```typescript
+// Rate limit by IP address
+const clientIP = request.headers.get("CF-Connecting-IP") || "unknown";
+
+const limiter = new RateLimiter({
+  namespace: env.RATE_LIMITER,
+  limit: 100, // requests per window
+  window: 3600 // 1 hour in seconds
+});
+
+const { success } = await limiter.limit(clientIP);
+
+if (!success) {
+  return new Response("Rate limit exceeded", { status: 429 });
+}
+```
+
+## Workers Runtime Constraints
+
+### No File System Access
+
+Workers have no traditional file system:
+
+- ❌ `fs.readFile`, `Bun.file`
+- ✅ Use R2 for object storage, KV for small values
+
+### No Child Processes
+
+Workers cannot spawn processes:
+
+- ❌ `child_process`, `Bun.$`
+- ✅ Use HTTP APIs or Workers for Workers
+
+### Limited Execution Time
+
+Workers have CPU time limits:
+
+- 50ms (free tier)
+- 30 seconds (paid tier with Unbound Workers)
+
+Design for quick responses; use Durable Objects for long-running tasks.
+
+### No Native Modules
+
+Workers cannot use native Node.js modules:
+
+- ❌ Native addons, C bindings, FFI
+- ✅ Pure JavaScript/TypeScript only
+
+## CI/CD Pipeline
+
+### GitHub Actions Deployment
+
+Create `.github/workflows/deploy-mcp-servers.yml`:
+
+```yaml
+name: Deploy MCP Servers to Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        server:
+          - decision-framework
+          - memory
+          - scientific-method
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.2.0"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build ${{ matrix.server }}
+        run: |
+          cd src/${{ matrix.server }}
+          bun run build
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: src/${{ matrix.server }}
+          command: deploy --env production
+```
+
+### Required GitHub Secrets
+
+Configure in repository settings:
+
+- `CLOUDFLARE_API_TOKEN`: Cloudflare API token with Workers edit permissions
+- `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID
+- `GITHUB_CLIENT_ID`: OAuth client ID (production)
+- `GITHUB_CLIENT_SECRET`: OAuth client secret (production)
+
+## Migration Checklist
+
+Converting existing stdio MCP servers to remote (SSE) deployment:
+
+- [ ] **Transport Layer**
+  - [ ] Replace `StdioServerTransport` with `SSEServerTransport`
+  - [ ] Update server initialization to export fetch handler
+  - [ ] Add `/sse` endpoint routing
+
+- [ ] **Authentication**
+  - [ ] Choose OAuth provider
+  - [ ] Create development OAuth app
+  - [ ] Create production OAuth app
+  - [ ] Implement OAuth provider integration
+  - [ ] Add user context to tool handlers
+
+- [ ] **Configuration**
+  - [ ] Create `wrangler.toml` in server directory
+  - [ ] Configure environment variables
+  - [ ] Set up `.dev.vars` (add to .gitignore)
+  - [ ] Document required secrets
+
+- [ ] **Build Configuration**
+  - [ ] Update `package.json` scripts
+  - [ ] Configure Bun build with `--target=browser`
+  - [ ] Verify single-file bundle output
+  - [ ] Test Workers compatibility
+
+- [ ] **Local Testing**
+  - [ ] Start dev server: `bun run dev`
+  - [ ] Launch MCP Inspector
+  - [ ] Connect to `http://localhost:8787/sse`
+  - [ ] Test OAuth flow
+  - [ ] Verify all tools work
+
+- [ ] **Deployment**
+  - [ ] Build for production: `bun run build`
+  - [ ] Deploy: `bunx wrangler deploy --env production`
+  - [ ] Set production secrets
+  - [ ] Verify deployment URL
+
+- [ ] **Production Testing**
+  - [ ] Test with MCP Inspector on production URL
+  - [ ] Verify OAuth flow in production
+  - [ ] Test all tools
+  - [ ] Monitor logs: `bunx wrangler tail`
+
+- [ ] **Client Configuration**
+  - [ ] Configure Claude Desktop with `mcp-remote`
+  - [ ] Configure Cursor MCP settings
+  - [ ] Test from each client
+  - [ ] Verify OAuth persistence
+
+- [ ] **Security Audit**
+  - [ ] No secrets in source code
+  - [ ] Separate dev/prod OAuth apps
+  - [ ] CORS configuration reviewed
+  - [ ] Rate limiting implemented
+  - [ ] Audit logging for sensitive operations
+
+- [ ] **Documentation**
+  - [ ] Update README with remote deployment instructions
+  - [ ] Document OAuth setup process
+  - [ ] Add client configuration examples
+  - [ ] Include troubleshooting guide
+
+## Troubleshooting Decision Tree
+
+```
+Deployment Issue?
+│
+├─ Build fails?
+│  ├─ TypeScript errors? → Run `bun run check` and fix type issues
+│  ├─ Missing dependencies? → Run `bun install`
+│  └─ Bun API usage? → Check compatibility, replace with Workers APIs
+│
+├─ Wrangler deploy fails?
+│  ├─ Config invalid? → Validate `wrangler.toml` syntax
+│  ├─ Auth failed? → Check `CLOUDFLARE_API_TOKEN`
+│  └─ Bindings missing? → Verify D1/KV/R2 IDs in config
+│
+├─ Server won't start?
+│  ├─ Port conflict? → Kill process on 8787: `lsof -ti:8787 | xargs kill -9`
+│  ├─ Missing env vars? → Check `.dev.vars` file
+│  └─ Runtime error? → Check console for stack trace
+│
+├─ MCP Inspector can't connect?
+│  ├─ Wrong URL? → Verify `/sse` endpoint path
+│  ├─ CORS error? → Add CORS headers to response
+│  └─ OAuth fails? → Check OAuth app callback URL matches
+│
+└─ Production issues?
+   ├─ 500 errors? → Check `bunx wrangler tail` logs
+   ├─ Timeout? → Optimize for Workers CPU limits
+   └─ Auth fails? → Verify production OAuth secrets set
+```
+
+## Quick Commands Reference
+
+```sh
+# Local development
+bunx wrangler dev                       # Start local Workers server
+bunx @modelcontextprotocol/inspector@latest  # Open MCP Inspector
+
+# Build and deploy
+bun run build                           # Build for Workers
+bunx wrangler deploy --dry-run          # Validate before deploy
+bunx wrangler deploy --env production   # Deploy to production
+
+# Secrets management
+bunx wrangler secret put SECRET_NAME --env production
+bunx wrangler secret list --env production
+
+# Monitoring
+bunx wrangler tail --env production     # Real-time logs
+bunx wrangler deployments list          # Deployment history
+
+# Testing
+bun test --coverage                     # Run tests with coverage
+bun run check                           # TypeScript validation
+```
+
+## Resources
+
+### Cloudflare Documentation
+
+- [Remote MCP Server Guide](https://developers.cloudflare.com/agents/guides/remote-mcp-server/)
+- [Testing Remote MCP Servers](https://developers.cloudflare.com/agents/guides/test-remote-mcp-server/)
+- [MCP Authorization](https://developers.cloudflare.com/agents/model-context-protocol/authorization/)
+- [Cloudflare Workers](https://developers.cloudflare.com/workers/)
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/)
+
+### MCP Protocol
+
+- [MCP Specification](https://modelcontextprotocol.io/)
+- [MCP Inspector](https://github.com/modelcontextprotocol/inspector)
+
+### OAuth Setup Guides
+
+- [GitHub OAuth](https://docs.github.com/en/developers/apps/building-oauth-apps)
+- [Google OAuth](https://developers.google.com/identity/protocols/oauth2)
+
+## See Also
+
+- [Bun-First Standards](mdc:.cursor/rules/bun-first.mdc) - Local development patterns
+- [MCP Protocol](mdc:.cursor/rules/mcp-protocol.mdc) - MCP server architecture
+- [Enterprise Standards](mdc:.cursor/rules/enterprise-standards.mdc) - Security & GDPR
+- [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - Pre-deployment checks

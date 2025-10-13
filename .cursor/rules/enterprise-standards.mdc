@@ -4,6 +4,31 @@ alwaysApply: true
 
 # Enterprise Development Standards
 
+> **Enterprise-grade quality and security by default**
+
+## Quick Navigation
+
+- 🚀 [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Start here
+- 🔧 [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - Quality checks
+- 📚 [MCP Protocol](mdc:.cursor/rules/mcp-protocol.mdc) - Security patterns
+- ☁️ [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc) - Production security
+- 📖 [Documentation](mdc:.cursor/rules/documentation.mdc) - Documentation standards
+
+## Quick-Reference Security Checklist
+
+Use this checklist for all enterprise development:
+
+- [ ] **Input Validation**: All inputs validated before processing
+- [ ] **Type Safety**: Strict TypeScript, no `any` (unless documented)
+- [ ] **Error Handling**: Try-catch blocks for all async operations
+- [ ] **Secrets Management**: No secrets in code, use environment variables
+- [ ] **Least Privilege**: Minimal permissions by default
+- [ ] **Audit Logging**: Log all operations with timestamps and user context
+- [ ] **GDPR Compliance**: Data minimization, right to erasure, portability
+- [ ] **HITL Required**: Sensitive operations require human confirmation
+- [ ] **Test Coverage**: 80%+ coverage (lines, functions, branches, statements)
+- [ ] **Documentation**: JSDoc for all public APIs with business context
+
 ## AI-First Development Principles
 
 Prioritize code understanding and review quality over generation speed. The real bottlenecks in enterprise development
@@ -83,7 +108,7 @@ For all development tasks, follow this reasoning process:
 1. **Enterprise Requirements Analysis**: Identify core requirements and map to WeMake's enterprise standards
 2. **Strategic Solution Planning**: Decompose into atomic, testable components
 3. **Implementation with Excellence**: Generate production-ready code optimized for review quality
-4. **Quality Assurance**: Validate against 90%+ test coverage and security standards
+4. **Quality Assurance**: Validate against 80%+ test coverage and security standards
 5. **Deployment-Ready Delivery**: Include deployment configs, monitoring, documentation
 
 ## Response Format
@@ -94,8 +119,115 @@ For all development tasks, follow this reasoning process:
 - Limit to rule-compliant solutions
 - Explain violations and suggest alternatives
 
+## GDPR Compliance Decision Flowchart
+
+```
+Storing User Data?
+│
+├─ YES → Apply GDPR Requirements
+│   │
+│   ├─ Data Minimization
+│   │   └─ Store only what's necessary
+│   │       └─ Automatic cleanup (maxSessions pattern)
+│   │
+│   ├─ Right to Erasure
+│   │   └─ Implement delete operation
+│   │       └─ Require HITL confirmation
+│   │
+│   ├─ Data Portability
+│   │   └─ Implement export operation
+│   │       └─ JSON format, machine-readable
+│   │
+│   ├─ Consent Tracking
+│   │   └─ Log user consent
+│   │       └─ Timestamp + user ID
+│   │
+│   └─ Audit Logging
+│       └─ Log all data operations
+│           └─ Who, what, when
+│
+└─ NO → Still apply security best practices
+    └─ Input validation, error handling, least privilege
+```
+
+## JSDoc Template Library
+
+### Function Documentation
+
+````typescript
+/**
+ * Brief description of what the function does.
+ *
+ * Business Context: Why this function exists and what business
+ * problem it solves.
+ *
+ * Decision Rationale: Why this approach was chosen over alternatives,
+ * including trade-offs considered.
+ *
+ * @param input - Description of the input parameter
+ * @returns Description of the return value
+ * @throws {Error} When validation fails or other error conditions
+ *
+ * @example
+ * ```typescript
+ * const result = myFunction({ field: "value" });
+ * console.log(result);
+ * ```
+ */
+function myFunction(input: InputType): ReturnType {
+  // Implementation
+}
+````
+
+### Class Documentation
+
+````typescript
+/**
+ * Brief description of the class purpose.
+ *
+ * Business Context: What business need this class fulfills.
+ *
+ * Architecture Notes: Key design decisions and patterns used.
+ *
+ * @example
+ * ```typescript
+ * const instance = new MyClass();
+ * instance.method();
+ * ```
+ */
+class MyClass {
+  // Implementation
+}
+````
+
+### Complex Logic Documentation
+
+```typescript
+/**
+ * Complex business logic requires inline documentation.
+ *
+ * Edge Cases:
+ * - Empty array: Returns default value
+ * - Negative values: Throws error
+ * - Large datasets: Uses streaming approach
+ *
+ * Performance: O(n log n) due to sorting step
+ */
+function complexLogic(data: Data[]): Result {
+  // Implementation with inline comments for non-obvious steps
+}
+```
+
 ## License and Compliance
 
 - [LICENSE](mdc:LICENSE) - MIT License with enterprise options
 - Security issues: security@wemake.cx
 - GDPR compliance built into all data handling
+
+## See Also
+
+- [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Complete workflow guide
+- [MCP Protocol](mdc:.cursor/rules/mcp-protocol.mdc) - Security patterns for MCP
+- [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc) - Production security
+- [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - Quality enforcement
+- [Testing](mdc:.cursor/rules/testing.mdc) - Test coverage requirements

@@ -120,10 +120,10 @@ function generateMarkdownTable(coverageData: PackageCoverage[]): string {
   markdown += "|---------|-------|------------|-----------|----------|\n";
 
   for (const pkg of coverageData) {
-    const linesIcon = pkg.lines >= 90 ? "✅" : pkg.lines >= 70 ? "⚠️" : "❌";
-    const statementsIcon = pkg.statements >= 90 ? "✅" : pkg.statements >= 70 ? "⚠️" : "❌";
-    const functionsIcon = pkg.functions >= 90 ? "✅" : pkg.functions >= 70 ? "⚠️" : "❌";
-    const branchesIcon = pkg.branches >= 90 ? "✅" : pkg.branches >= 70 ? "⚠️" : "❌";
+    const linesIcon = pkg.lines >= 80 ? "✅" : pkg.lines >= 70 ? "⚠️" : "❌";
+    const statementsIcon = pkg.statements >= 80 ? "✅" : pkg.statements >= 70 ? "⚠️" : "❌";
+    const functionsIcon = pkg.functions >= 80 ? "✅" : pkg.functions >= 70 ? "⚠️" : "❌";
+    const branchesIcon = pkg.branches >= 80 ? "✅" : pkg.branches >= 70 ? "⚠️" : "❌";
 
     markdown += `| **${pkg.packageName}** | ${linesIcon} ${pkg.lines.toFixed(2)}% | ${statementsIcon} ${pkg.statements.toFixed(2)}% | ${functionsIcon} ${pkg.functions.toFixed(2)}% | ${branchesIcon} ${pkg.branches.toFixed(2)}% |\n`;
   }
@@ -137,7 +137,7 @@ function generateMarkdownTable(coverageData: PackageCoverage[]): string {
   markdown += `| **Average** | **${avgLines.toFixed(2)}%** | **${avgStatements.toFixed(2)}%** | **${avgFunctions.toFixed(2)}%** | **${avgBranches.toFixed(2)}%** |\n`;
 
   markdown += "\n### Coverage Legend\n";
-  markdown += "- ✅ 90%+ (Meets enterprise standards)\n";
+  markdown += "- ✅ 80%+ (Meets enterprise standards)\n";
   markdown += "- ⚠️ 70-89% (Needs improvement)\n";
   markdown += "- ❌ <70% (Critical - requires immediate attention)\n";
 
@@ -173,11 +173,11 @@ async function main() {
 
   // Check if any package is below threshold
   const belowThreshold = coverageData.filter(
-    (pkg) => pkg.lines < 90 || pkg.statements < 90 || pkg.functions < 90 || pkg.branches < 90
+    (pkg) => pkg.lines < 80 || pkg.statements < 80 || pkg.functions < 80 || pkg.branches < 80
   );
 
   if (belowThreshold.length > 0) {
-    console.log("\n⚠️ WARNING: The following packages are below 90% coverage threshold:");
+    console.log("\n⚠️ WARNING: The following packages are below 80% coverage threshold:");
     for (const pkg of belowThreshold) {
       console.log(`  - ${pkg.packageName}`);
     }

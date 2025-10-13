@@ -1,8 +1,15 @@
 #!/usr/bin/env bun
 
-import { runServer } from "./server.js";
+import { createServer as createMcpServer, runServer } from "./server.js";
 
-runServer().catch((error) => {
-  console.error("Failed to run server:", error);
-  process.exit(1);
-});
+// Export the createServer function for testing
+export { createMcpServer as createServer };
+export default createMcpServer;
+
+// Run the server if this is the main module
+if (import.meta.main) {
+  runServer().catch((error) => {
+    console.error("Failed to run server:", error);
+    process.exit(1);
+  });
+}

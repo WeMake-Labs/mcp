@@ -4,9 +4,31 @@ alwaysApply: true
 
 # Bun-First Development Standards
 
+> **Bun exclusively for maximum development velocity**
+
+## Quick Navigation
+
+- 🚀 [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Start here
+- 🔧 [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - AI-suggested fixes
+- ☁️ [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc) - Production deployment
+- 🧪 [Testing](mdc:.cursor/rules/testing.mdc) - Testing with Bun
+- 📘 [TypeScript](mdc:.cursor/rules/typescript.mdc) - TypeScript patterns
+
 ## Core Requirement
 
 **EXCLUSIVELY use Bun for all operations.** This is a Bun-first monorepo with zero tolerance for alternative tooling.
+
+## Quick Command Reference
+
+| Operation                | Command            | Performance                         |
+| ------------------------ | ------------------ | ----------------------------------- |
+| **Install dependencies** | `bun install`      | 10-30x faster than npm              |
+| **Run scripts**          | `bun run <script>` | Native TypeScript, no transpilation |
+| **Run tests**            | `bun test`         | 10-30x faster than Jest/Vitest      |
+| **Build application**    | `bun build`        | Built-in bundling & minification    |
+| **Execute package**      | `bunx <package>`   | Equivalent to npx                   |
+| **Run file**             | `bun run file.ts`  | Direct TypeScript execution         |
+| **Shell command**        | `Bun.$\`command\`` | Better than child_process           |
 
 ## Mandatory Bun Commands
 
@@ -32,93 +54,31 @@ Use Bun's native APIs exclusively. External alternatives are PROHIBITED:
 ## Production Deployment (Cloudflare Workers)
 
 For production deployments on Cloudflare Workers, Bun-specific APIs must be replaced with Workers-compatible
-alternatives. This enables using Bun for local development while deploying to Workers for production.
+alternatives.
 
-### Runtime API Substitutions
+**See complete deployment guide:** [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc)
 
-| Bun API (Local Development) | Workers Alternative (Production)                     |
-| --------------------------- | ---------------------------------------------------- |
-| `bun:sqlite`                | Cloudflare D1 (SQLite-compatible)                    |
-| `Bun.redis`                 | Cloudflare KV or Durable Objects                     |
-| `Bun.$` (shell commands)    | Not available - use HTTP APIs or Workers for Workers |
-| `Bun.file`                  | Workers APIs or R2 for files                         |
-| `Bun.password`              | Web Crypto API                                       |
-| `Bun.serve()`               | Workers fetch handler                                |
-| FFI/native bindings         | Not supported                                        |
+### Key Compatibility Points
 
-### Dual Runtime Architecture Pattern
+- `bun:sqlite` → Cloudflare D1
+- `Bun.redis` → Cloudflare KV or Durable Objects
+- `Bun.$` → Not available in Workers
+- `Bun.file` → Workers APIs or R2
+- `Bun.password` → Web Crypto API
+- `Bun.serve()` → Workers fetch handler
 
-Separate business logic from platform adapters to maintain compatibility:
+### Dual Runtime Pattern
+
+Keep business logic platform-agnostic:
 
 ```
 src/
-  core/
-    logic.ts       # Shared business logic (runtime-agnostic)
-  index.ts         # Bun-first development version
-  worker.ts        # Workers-compatible version
+  core/logic.ts      # Shared business logic
+  index.ts           # Bun-first (local dev)
+  worker.ts          # Workers-compatible (production)
 ```
 
-### Implementation Strategy
-
-1. **Core Business Logic**: Keep platform-agnostic in `core/` directory
-2. **Platform Adapters**: Create thin adapter layers for each runtime
-3. **Conditional Exports**: Use package.json exports for different environments
-
-```typescript
-// Example: Database abstraction
-interface DatabaseAdapter {
-  query(sql: string, params?: any[]): Promise<any[]>;
-  prepare(sql: string): PreparedStatement;
-}
-
-// Bun implementation (local development)
-class BunDatabaseAdapter implements DatabaseAdapter {
-  private db: Database;
-
-  constructor(dbPath: string) {
-    this.db = new Database(dbPath);
-  }
-
-  query(sql: string, params?: any[]): Promise<any[]> {
-    return this.db.query(sql, params).all();
-  }
-}
-
-// Workers implementation (production)
-class WorkersDatabaseAdapter implements DatabaseAdapter {
-  private db: D1Database;
-
-  constructor(db: D1Database) {
-    this.db = db;
-  }
-
-  query(sql: string, params?: any[]): Promise<any[]> {
-    return this.db
-      .prepare(sql)
-      .bind(...(params || []))
-      .all();
-  }
-}
-```
-
-### Configuration Strategy
-
-Use environment-specific configuration:
-
-```typescript
-// Detect runtime environment
-const isWorkers = typeof globalThis.WebSocketPair !== "undefined";
-
-// Select appropriate implementation
-const dbAdapter = isWorkers ? new WorkersDatabaseAdapter(env.DB) : new BunDatabaseAdapter("./local.db");
-```
-
-### References
-
-For detailed implementation patterns, see:
-
-- [cloudflare-workers.mdc](mdc:.cursor/rules/cloudflare-workers.mdc) - General Workers deployment patterns
-- [remote-mcp-servers.mdc](mdc:.cursor/rules/remote-mcp-servers.mdc) - Remote MCP server deployment on Workers
+**Complete guide:** [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc)
 
 ## Prohibited Tools
 
@@ -137,9 +97,113 @@ NEVER use these alternatives:
 - [bunfig.toml](mdc:bunfig.toml) - Bun configuration
 - [package.json](mdc:package.json) - Workspace and script definitions
 
+## Common Pitfalls and Solutions
+
+### Pitfall 1: Using npm/node/yarn
+
+**Problem:** Falling back to npm/node habits
+
+```sh
+# ❌ Wrong
+npm install
+node index.js
+npm run test
+```
+
+**Solution:** Use Bun exclusively
+
+```sh
+# ✅ Correct
+bun install
+bun run index.ts
+bun test
+```
+
+### Pitfall 2: Missing .js Extensions in Imports
+
+**Problem:** Forgetting file extensions required for ESM
+
+```typescript
+// ❌ Wrong
+import { helper } from "./helper";
+```
+
+**Solution:** Always include .js extension
+
+```typescript
+// ✅ Correct
+import { helper } from "./helper.js";
+```
+
+### Pitfall 3: Using Bun APIs in Workers Build
+
+**Problem:** Using `bun:sqlite`, `Bun.file`, etc. in code destined for Workers
+
+```typescript
+// ❌ Wrong (for Workers deployment)
+import { Database } from "bun:sqlite";
+```
+
+**Solution:** Use Workers-compatible alternatives or runtime detection
+
+```typescript
+// ✅ Correct
+// See [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc)
+export interface Env {
+  DB: D1Database;
+}
+```
+
+### Pitfall 4: Not Checking Workers Compatibility
+
+**Problem:** Building for Workers without testing compatibility
+
+**Solution:** Always test Workers build locally
+
+```sh
+bunx wrangler dev  # Test Workers compatibility
+```
+
+### Pitfall 5: Skipping Tests Before Commit
+
+**Problem:** Committing without running tests
+
+**Solution:** Always run tests with coverage
+
+```sh
+bun test --coverage  # 80%+ required
+```
+
 ## Performance Benefits
 
-- 10-30x faster test execution than Jest/Vitest
-- Native TypeScript support without transpilation
-- Built-in bundling and minification
-- Zero-config SQLite, Redis, PostgreSQL support
+### Real Benchmarks
+
+| Operation                | Bun    | Node/npm               | Speedup       |
+| ------------------------ | ------ | ---------------------- | ------------- |
+| **Test execution**       | 0.5s   | 5-15s                  | 10-30x faster |
+| **Package install**      | 2s     | 20-60s                 | 10-30x faster |
+| **TypeScript execution** | Native | Requires transpilation | Instant       |
+| **Build time**           | 1-3s   | 5-15s                  | 3-5x faster   |
+| **Cold start**           | <100ms | 200-500ms              | 2-5x faster   |
+
+### Key Advantages
+
+- **No transpilation**: Direct TypeScript execution
+- **Native performance**: Written in Zig, optimized for speed
+- **Built-in tooling**: Bundler, test runner, package manager all-in-one
+- **Zero configuration**: SQLite, Redis, PostgreSQL work out-of-the-box
+- **ESM by default**: Modern module system without configuration
+
+### Developer Experience Wins
+
+- **Single tool**: No need for separate test runner, bundler, or package manager
+- **Fast feedback**: Instant test runs and hot reload
+- **Better errors**: Clear, actionable error messages
+- **Works out of the box**: Minimal configuration needed
+
+## See Also
+
+- [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Complete development workflow
+- [Workers Deployment](mdc:.cursor/rules/workers-deployment.mdc) - Production deployment
+- [Testing](mdc:.cursor/rules/testing.mdc) - Bun native test runner
+- [TypeScript](mdc:.cursor/rules/typescript.mdc) - TypeScript standards

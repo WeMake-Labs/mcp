@@ -4,8 +4,34 @@ globs: *.md,**/README.md
 
 # MCP Documentation Standards
 
+> **Standardized templates for velocity and consistency**
+
+## Quick Navigation
+
+- 🚀 [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Start here
+- 🔧 [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - Auto-doc generation
+- 🏗️ [MCP Servers](mdc:.cursor/rules/mcp-servers.mdc) - Implementation patterns
+- 📚 [MCP Protocol](mdc:.cursor/rules/mcp-protocol.mdc) - MCP standards
+
 All MCP server READMEs must follow a standardized template for consistency and clarity. Reference:
 [README.md](mdc:README.md)
+
+## README Generation Checklist
+
+Creating documentation for a new server? Use this checklist:
+
+- [ ] **Title**: Server name + "MCP Server"
+- [ ] **Executive Summary**: One-sentence purpose and value
+- [ ] **Overview**: 2-3 sentences on what it does and why
+- [ ] **Capabilities**: List all tools with schemas and examples
+- [ ] **Installation**: Bun commands only (never npm/node/yarn)
+- [ ] **Configuration**: Environment variables with defaults
+- [ ] **Usage**: Concrete examples with expected output
+- [ ] **System Prompt**: Template for AI integration
+- [ ] **Security**: Enterprise security patterns
+- [ ] **Testing**: Coverage requirements (80%+)
+- [ ] **License**: MIT with enterprise licensing info
+- [ ] **Support**: Links to issues, security email, website
 
 ## Required README Sections
 
@@ -148,7 +174,7 @@ bun test --coverage
 
 bun test --watch \`\`\`
 
-Required coverage: 90%+ (lines, functions, branches, statements)
+Required coverage: 80%+ (lines, functions, branches, statements)
 ```
 
 ### 10. License and Links
@@ -232,6 +258,70 @@ Reference these well-documented servers:
 - Individual server READMEs in `src/*/README.md`
 - Documentation files in `src/*/docs/*.md`
 
+## Template Variables for Quick Generation
+
+Use these placeholder variables when generating new server documentation:
+
+````markdown
+# {{SERVER_NAME}} MCP Server
+
+> {{ONE_SENTENCE_VALUE_PROPOSITION}}
+
+{{SERVER_DESCRIPTION}} (2-3 sentences)
+
+## Capabilities
+
+### {{TOOL_NAME}}
+
+**Description**: {{TOOL_DESCRIPTION}}
+
+**Input Schema**:
+
+```json
+{{TOOL_INPUT_SCHEMA}}
+```
+````
+
+**Output**: {{TOOL_OUTPUT_DESCRIPTION}}
+
+```
+
+**AI Instructions:**
+When generating documentation, replace all {{VARIABLES}} with actual content.
+
+## Documentation Health Check
+
+Before finalizing documentation, verify:
+
+✅ **Completeness**
+- All required sections present
+- All tools documented with schemas
+- Environment variables listed
+- Examples are copy-paste ready
+
+✅ **Accuracy**
+- Commands tested and working
+- Schemas match actual implementation
+- Examples produce described output
+- Links resolve correctly
+
+✅ **Bun-First Language**
+- Only `bun` commands (no npm/node/yarn)
+- Correct Bun API references
+- Workers compatibility noted if applicable
+
+✅ **Style Guide Compliance**
+- Line length ≤ 120 chars
+- Code blocks have language specified
+- Professional tone maintained
+- Clear and scannable structure
+
+✅ **Enterprise Standards**
+- Security patterns documented
+- GDPR compliance noted
+- Audit logging mentioned
+- HITL for sensitive operations
+
 ## Markdownlint Configuration
 
 This repository uses markdownlint. See [.markdownlint.jsonc](mdc:.markdownlint.jsonc) for rules.
@@ -242,3 +332,12 @@ Common rules:
 - MD033: Inline HTML allowed
 - MD041: First line must be H1 heading
 - MD047: Files must end with newline
+
+## See Also
+
+- [Velocity Hub](mdc:.cursor/rules/velocity.mdc) - Complete workflow guide
+- [MCP Servers](mdc:.cursor/rules/mcp-servers.mdc) - Server implementation patterns
+- [MCP Protocol](mdc:.cursor/rules/mcp-protocol.mdc) - Tool handler templates
+- [Automation Suggestions](mdc:.cursor/rules/automation-suggestions.mdc) - AI-generated docs
+- [Enterprise Standards](mdc:.cursor/rules/enterprise-standards.mdc) - Security documentation
+```

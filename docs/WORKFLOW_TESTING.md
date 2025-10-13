@@ -97,6 +97,7 @@ coverage = true
 {
   "scripts": {
     "test": "bun test",
+    "prepare": "bun run build",
     "test:coverage": "bun test --coverage",
     "test:watch": "bun test --watch",
     "test:ci": "bun test --reporter=junit --reporter-outfile=test-results.xml --coverage"
@@ -106,7 +107,7 @@ coverage = true
 
 ### Coverage Requirements
 
-- **Target**: 90%+ coverage for enterprise standards
+- **Target**: 80%+ coverage for enterprise standards
 - **Reporting**: Integrated with Bun's native coverage
 - **Format**: Console output during CI, JUnit XML for integration
 

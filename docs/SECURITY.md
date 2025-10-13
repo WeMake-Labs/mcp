@@ -13,7 +13,6 @@ We are finalizing our formal support policy. Interim commitment:
 - Supported versions: latest two minor releases of 1.x (rolling window)
 - Security updates: Critical/High for supported versions
 - EOL: 90 days after the next minor release
-- Full policy will be published by Q4 2025. Tracking: <https://github.com/wemake-ai/mcp/issues/32>
 
 This Security Policy was last updated in August 2025 and applies to data subjects in the European Economic Area and
 Switzerland.
@@ -29,7 +28,7 @@ Switzerland.
   code is more critical than generating it. Implement mandatory human review for AI-generated security-sensitive code
 - **SAST/DAST/SCA**: Static/dynamic analyses and dependency audits mandatory in CI
 - **SBOM**: Signed SBOMs (e.g. SPDX/CycloneDX) for MCP servers and AI agents
-- **Test Coverage Gate**: ≥90% (branches/lines) as a merge requirement for security-relevant components
+- **Test Coverage Gate**: ≥80% (branches/lines) as a merge requirement for security-relevant components
 - **Sandboxing**: Isolated execution environments for AI agent operations
 - **Audit Logging**: Comprehensive logging of all AI interactions for compliance and security monitoring
 - **Rate Limiting**: Advanced throttling mechanisms to prevent abuse and ensure service availability

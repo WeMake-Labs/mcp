@@ -47,7 +47,6 @@ jobs:
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: bun nx-cloud record -- echo Hello World
-      - run: bun nx affected -t lint test build
 
       - name: Generate coverage reports
         if: always()

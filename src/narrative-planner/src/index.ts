@@ -39,7 +39,7 @@ const NARRATIVE_PLANNER_TOOL = {
   }
 };
 
-class NarrativePlannerServer {
+export class NarrativePlannerServer {
   async process(input: unknown): Promise<Result> {
     if (!input || typeof input !== "object") {
       return { content: [{ type: "text", text: "Invalid input" }], isError: true };
@@ -62,25 +62,58 @@ class NarrativePlannerServer {
 }
 
 import { readFileSync } from "node:fs";
-const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf-8"));
-const server = new Server({ name: "narrative-planner-server", version: pkg.version }, { capabilities: { tools: {} } });
-const narrativeServer = new NarrativePlannerServer();
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [NARRATIVE_PLANNER_TOOL] }));
-server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
-  if (req.params.name === "narrativePlanner") {
-    return await narrativeServer.process(req.params.arguments ?? {});
-  }
-  return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
-});
+/**
+ * Factory function that creates and configures a narrative planner MCP server instance.
+ *
+ * This function initializes a Server with the name "narrative-planner-server", reads the version
+ * from the package.json file, registers the NARRATIVE_PLANNER_TOOL, and sets up request handlers
+ * for listing available tools and processing narrative planning requests. The CallTool handler
+ * calls NarrativePlannerServer.process when req.params.name === "narrativePlanner".
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Narrative Planner Server running");
+ * ```
+ */
+export default function createServer(): Server {
+  const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf-8"));
+  const server = new Server(
+    { name: "narrative-planner-server", version: pkg.version },
+    { capabilities: { tools: {} } }
+  );
+  const narrativeServer = new NarrativePlannerServer();
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Narrative Planner MCP Server running on stdio");
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [NARRATIVE_PLANNER_TOOL] }));
+  server.setRequestHandler(CallToolRequestSchema, async (req: CallToolRequest) => {
+    if (req.params.name === "narrativePlanner") {
+      return await narrativeServer.process(req.params.arguments ?? {});
+    }
+    return { content: [{ type: "text", text: `Unknown tool: ${req.params.name}` }], isError: true };
+  });
+
+  return server;
 }
 
-runServer().catch((err) => {
-  console.error("Fatal error running server:", err);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Narrative Planner MCP Server running on stdio");
+  }
+
+  runServer().catch((err) => {
+    console.error("Fatal error running server:", err);
+    process.exit(1);
+  });
+}

@@ -1,6 +1,6 @@
 {
   "name": "@wemake.cx/analogical-reasoning",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "MCP server for structured analogical reasoning and domain mapping",
   "keywords": [
     "mcp",
@@ -27,11 +27,8 @@
     "directory": "src/analogical-reasoning"
   },
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' && tsc",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' && tsc",
     "start": "bun run ./dist/index.js",
-    "prepare": "bun run build",
-    "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch",
     "test": "bun test"
   },
   "dependencies": {

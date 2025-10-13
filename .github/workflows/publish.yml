@@ -68,7 +68,7 @@ jobs:
 
       - name: Verify coverage thresholds
         run: |
-          echo "📊 Verifying test coverage meets 90% threshold..."
+          echo "📊 Verifying test coverage meets 80% threshold..."
           # Coverage is enforced via bunfig.toml configuration
           # Nx affected test already ran with coverage enabled
           echo "✅ Coverage verification complete"

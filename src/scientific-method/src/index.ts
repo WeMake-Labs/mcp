@@ -79,7 +79,28 @@ interface ScientificInquiryData {
   nextStageNeeded: boolean;
 }
 
-class ScientificMethodServer {
+/**
+ * Server class for scientific method functionality in the MCP protocol.
+ *
+ * This class implements the scientific method workflow including hypothesis generation,
+ * experimental design, data collection, and conclusion drawing. It maintains state
+ * across multiple inquiries and provides structured scientific reasoning capabilities.
+ *
+ * @export
+ * @public
+ * @class ScientificMethodServer
+ * @example
+ * ```typescript
+ * const server = new ScientificMethodServer();
+ * const result = server.process({
+ *   stage: "hypothesis",
+ *   hypothesis: "Increasing temperature will increase reaction rate",
+ *   evidence: "Chemical kinetics theory"
+ * });
+ * console.log(result.content[0].text);
+ * ```
+ */
+export class ScientificMethodServer {
   private inquiryHistory: Record<string, ScientificInquiryData[]> = {};
   private hypothesisRegistry: Record<string, HypothesisData> = {};
   private experimentRegistry: Record<string, ExperimentData> = {};
@@ -725,6 +746,39 @@ class ScientificMethodServer {
     return output;
   }
 
+  /**
+   * Processes scientific inquiry requests by guiding through the scientific method workflow.
+   *
+   * This method validates the input data, processes the inquiry through various stages
+   * of the scientific method (observation, question, hypothesis, experiment, analysis,
+   * conclusion, iteration), maintains inquiry history, and returns structured results
+   * with guidance for each stage and overall process recommendations.
+   *
+   * @param input - The input object containing scientific inquiry data
+   * @param input.stage - Current stage in the scientific process
+   * @param input.inquiryId - Unique identifier for the inquiry
+   * @param input.iteration - Current iteration of the process
+   * @param input.observation - Observed phenomenon or data
+   * @param input.question - Research question being investigated
+   * @param input.hypothesis - Proposed explanation or prediction
+   * @param input.experiment - Experimental design and methodology
+   * @param input.results - Experimental results and data
+   * @param input.analysis - Analysis of results and conclusions
+   * @returns Structured result containing scientific analysis or error information
+   * @throws {Error} If input validation fails or processing encounters an error
+   *
+   * @example
+   * ```typescript
+   * const result = server.processScientificInquiry({
+   *   stage: "hypothesis",
+   *   inquiryId: "inquiry-001",
+   *   iteration: 1,
+   *   hypothesis: "Increasing temperature will increase reaction rate",
+   *   evidence: "Chemical kinetics theory"
+   * });
+   * // Returns scientific method guidance for hypothesis stage
+   * ```
+   */
   public processScientificInquiry(input: unknown): {
     content: Array<{ type: string; text: string }>;
     isError?: boolean;
@@ -1012,47 +1066,79 @@ Key features:
   }
 };
 
-const server = new Server(
-  {
-    name: "scientific-method-server",
-    version: "0.2.13"
-  },
-  {
-    capabilities: {
-      tools: {}
-    }
-  }
-);
-
-const scientificMethodServer = new ScientificMethodServer();
-
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [SCIENTIFIC_METHOD_TOOL]
-}));
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "scientificMethod") {
-    return scientificMethodServer.processScientificInquiry(request.params.arguments);
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: `Unknown tool: ${request.params.name}`
+/**
+ * Factory function that creates and configures a scientific method MCP server instance.
+ *
+ * This function initializes a Server with the name "scientific-method-server" and version "0.3.0",
+ * registers the SCIENTIFIC_METHOD_TOOL, and sets up request handlers for listing available tools
+ * and processing scientific method inquiries. The CallTool handler calls ScientificMethodServer.processScientificInquiry
+ * when req.params.name === "scientificMethod".
+ *
+ * @returns A configured Server instance ready for MCP communication
+ * @throws {Error} If server initialization fails or configuration is invalid
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Scientific Method Server running");
+ * ```
+ *
+ * @public
+ */
+export default function createServer(): Server {
+  const server = new Server(
+    {
+      name: "scientific-method-server",
+      version: "0.3.0"
+    },
+    {
+      capabilities: {
+        tools: {}
       }
-    ],
-    isError: true
-  };
-});
+    }
+  );
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Scientific Method MCP Server running on stdio");
+  const scientificMethodServer = new ScientificMethodServer();
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [SCIENTIFIC_METHOD_TOOL]
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name === "scientificMethod") {
+      return scientificMethodServer.processScientificInquiry(request.params.arguments);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Unknown tool: ${request.params.name}`
+        }
+      ],
+      isError: true
+    };
+  });
+
+  return server;
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error running server:", error);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Scientific Method MCP Server running on stdio");
+  }
+
+  runServer().catch((error) => {
+    console.error("Fatal error running server:", error);
+    process.exit(1);
+  });
+}

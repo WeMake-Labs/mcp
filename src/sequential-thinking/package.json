@@ -1,16 +1,15 @@
 {
   "name": "@wemake.cx/sequential-thinking",
-  "version": "0.2.13",
+  "version": "0.3.0",
   "description": "MCP server for sequential thinking and problem solving",
   "license": "MIT",
-  "type": "module",
   "main": "./dist/index.js",
   "exports": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/WeMake-AI/mcp.git",
-    "directory": "src/sequential-reasoning"
+    "url": "git+https://github.com/Clarity-BI/mcp.git",
+    "directory": "src/sequential-thinking"
   },
   "publishConfig": {
     "access": "public",
@@ -19,10 +18,12 @@
   "engines": {
     "bun": ">=1.3.0"
   },
-  "homepage": "https://github.com/WeMake-AI/mcp/tree/main/src/sequential-thinking",
-  "author": "heyFlorentin",
+  "bugs": {
+    "url": "https://github.com/Clarity-BI/mcp/issues"
+  },
+  "homepage": "https://github.com/Clarity-BI/mcp/tree/main/src/sequential-thinking",
+  "author": "Phichayut 'Florentin' Sakwiset <florentin@wemake.cx> (https://github.com/heyFlorentin)",
   "keywords": [
-    "model-context-protocol",
     "sequential-thinking"
   ],
   "bin": {
@@ -32,11 +33,9 @@
     "dist"
   ],
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' && tsc",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' && tsc",
     "start": "bun run ./dist/index.js",
-    "prepare": "bun run build",
-    "watch": "bun build ./src/index.ts --outdir='./dist' --target='bun' --sourcemap='linked' --watch"
+    "test": "bun test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",

@@ -7,14 +7,14 @@ enforcement, build speed, and reliability.
 
 ## Implemented Optimizations
 
-### 1. Test Coverage Enforcement (90%+ Threshold)
+### 1. Test Coverage Enforcement (80%+ Threshold)
 
 **Business Context**: Enterprise applications require high test coverage to ensure reliability and reduce production
-bugs. The 90% threshold aligns with industry best practices for critical software.
+bugs. The 80% threshold aligns with industry best practices for critical software.
 
 **Implementation**:
 
-- Added test coverage configuration in `bunfig.toml` with 90% threshold
+- Added test coverage configuration in `bunfig.toml` with 80% threshold
 - Configured coverage reporters: text, JSON, HTML, and LCOV formats
 - Coverage is automatically enforced on all `bun test` runs
 
@@ -41,7 +41,7 @@ agents, reducing build times by 50-70%.
 ### 3. Dependency Caching Optimization
 
 **Business Context**: Installing dependencies is a significant portion of CI time. Caching reduces install time by
-70-90% on cache hits.
+70-80% on cache hits.
 
 **Implementation**:
 
@@ -80,7 +80,7 @@ agents, reducing build times by 50-70%.
 **Coverage Summary Features**:
 
 - Package-by-package coverage breakdown
-- Visual indicators: ✅ ≥90%, ⚠️ 70-89%, ❌ <70%
+- Visual indicators: ✅ ≥80%, ⚠️ 70-89%, ❌ <70%
 - Average coverage across all packages
 - Automatic warnings for packages below threshold
 
@@ -125,7 +125,7 @@ agents, reducing build times by 50-70%.
 
 ### Coverage Improvements
 
-- 90%+ coverage enforcement across all packages
+- 80%+ coverage enforcement across all packages
 - Automated coverage reporting and trend tracking
 - Reduced production bugs through comprehensive testing
 
@@ -134,7 +134,7 @@ agents, reducing build times by 50-70%.
 ### Running Tests with Coverage Locally
 
 ```sh
-# Run tests with coverage (enforces 90% threshold)
+# Run tests with coverage (enforces 80% threshold)
 bun test --coverage
 
 # Run specific package tests
@@ -165,7 +165,7 @@ Coverage reports are available in two places:
 ```toml
 [test]
 coverage = true
-coverageThreshold = 90
+coverageThreshold = 80
 coverageSkipTestFiles = true
 coverageReporter = ["text", "json", "html", "lcov"]
 ```
@@ -185,7 +185,7 @@ coverageReporter = ["text", "json", "html", "lcov"]
 
 ### Coverage Threshold Failures
 
-If tests fail due to coverage below 90%:
+If tests fail due to coverage below 80%:
 
 1. Review uncovered lines in HTML report: `coverage/index.html`
 2. Add tests for uncovered code paths

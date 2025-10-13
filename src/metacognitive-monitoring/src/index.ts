@@ -801,47 +801,74 @@ Key features:
   }
 };
 
-const server = new Server(
-  {
-    name: "metacognitive-monitoring-server",
-    version: "0.3.0"
-  },
-  {
-    capabilities: {
-      tools: {}
-    }
-  }
-);
-
-const metacognitiveMonitoringServer = new MetacognitiveMonitoringServer();
-
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [METACOGNITIVE_MONITORING_TOOL]
-}));
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "metacognitiveMonitoring") {
-    return metacognitiveMonitoringServer.processMetacognitiveMonitoring(request.params.arguments);
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: `Unknown tool: ${request.params.name}`
+/**
+ * Factory function that creates and configures a metacognitive monitoring MCP server instance.
+ *
+ * This function initializes a Server with the name "metacognitive-monitoring-server" and version "0.3.1",
+ * registers the metacognitive monitoring tool, and sets up request handlers for listing available
+ * tools and processing metacognitive monitoring requests. The server facilitates systematic
+ * self-monitoring of knowledge and reasoning quality across various domains and reasoning tasks.
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Metacognitive Monitoring Server running");
+ * ```
+ */
+export default function createServer(): Server {
+  const server = new Server(
+    {
+      name: "metacognitive-monitoring-server",
+      version: "0.3.1"
+    },
+    {
+      capabilities: {
+        tools: {}
       }
-    ],
-    isError: true
-  };
-});
+    }
+  );
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Metacognitive Monitoring MCP Server running on stdio");
+  const metacognitiveMonitoringServer = new MetacognitiveMonitoringServer();
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [METACOGNITIVE_MONITORING_TOOL]
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name === "metacognitiveMonitoring") {
+      return metacognitiveMonitoringServer.processMetacognitiveMonitoring(request.params.arguments);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Unknown tool: ${request.params.name}`
+        }
+      ],
+      isError: true
+    };
+  });
+
+  return server;
 }
 
 if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Metacognitive Monitoring MCP Server running on stdio");
+  }
+
   runServer().catch((error) => {
     console.error("Fatal error running server:", error);
     process.exit(1);

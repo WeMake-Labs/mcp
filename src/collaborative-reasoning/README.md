@@ -103,7 +103,7 @@ The system tracks and resolves disagreements through:
   "mcpServers": {
     "Collaborative Reasoning": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/collaborative-reasoning@latest"]
+      "args": ["@wemake.cx/collaborative-reasoning@latest"]
     }
   }
 }
@@ -118,7 +118,7 @@ The server supports various configuration options:
   "mcpServers": {
     "Collaborative Reasoning": {
       "command": "bunx",
-      "args": ["-y", "@wemake.cx/collaborative-reasoning@latest"],
+      "args": ["@wemake.cx/collaborative-reasoning@latest"],
       "env": {
         "COLLABORATION_MAX_PERSONAS": "8",
         "COLLABORATION_MAX_ITERATIONS": "20",

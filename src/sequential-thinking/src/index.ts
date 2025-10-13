@@ -18,7 +18,7 @@ interface ThoughtData {
   nextThoughtNeeded: boolean;
 }
 
-class SequentialThinkingServer {
+export class SequentialThinkingServer {
   private thoughtHistory: ThoughtData[] = [];
   private branches: Record<string, ThoughtData[]> = {};
   private disableThoughtLogging: boolean;
@@ -116,6 +116,10 @@ class SequentialThinkingServer {
                 thoughtNumber: validatedInput.thoughtNumber,
                 totalThoughts: validatedInput.totalThoughts,
                 nextThoughtNeeded: validatedInput.nextThoughtNeeded,
+                isRevision: validatedInput.isRevision,
+                revisesThought: validatedInput.revisesThought,
+                branchFromThought: validatedInput.branchFromThought,
+                branchId: validatedInput.branchId,
                 branches: Object.keys(this.branches),
                 thoughtHistoryLength: this.thoughtHistory.length
               },
@@ -250,47 +254,78 @@ You should:
   }
 };
 
-const server = new Server(
-  {
-    name: "sequential-thinking-server",
-    version: "0.2.13"
-  },
-  {
-    capabilities: {
-      tools: {}
-    }
-  }
-);
-
-const thinkingServer = new SequentialThinkingServer();
-
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [SEQUENTIAL_THINKING_TOOL]
-}));
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "sequentialthinking") {
-    return thinkingServer.processThought(request.params.arguments);
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: `Unknown tool: ${request.params.name}`
+/**
+ * Factory function that creates and configures a sequential thinking MCP server instance.
+ *
+ * This function initializes a Server with the name "sequential-thinking-server" and version "0.3.0",
+ * registers the SEQUENTIAL_THINKING_TOOL, and sets up request handlers for listing available tools
+ * and processing sequential thinking requests. The CallTool handler calls SequentialThinkingServer.process
+ * when req.params.name === "sequentialThinking". The function constructs and configures a Server
+ * instance for the SequentialThinking service and registers request handlers for ListToolsRequestSchema
+ * and CallToolRequestSchema.
+ *
+ * @returns A configured Server instance ready for MCP communication
+ *
+ * @example
+ * ```typescript
+ * import createServer from './index.js';
+ * import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+ *
+ * const server = createServer();
+ * const transport = new StdioServerTransport();
+ * await server.connect(transport);
+ * console.log("Sequential Thinking Server running");
+ * ```
+ */
+export default function createServer(): Server {
+  const server = new Server(
+    {
+      name: "sequential-thinking-server",
+      version: "0.3.0"
+    },
+    {
+      capabilities: {
+        tools: {}
       }
-    ],
-    isError: true
-  };
-});
+    }
+  );
 
-async function runServer() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Sequential Thinking MCP Server running on stdio");
+  const thinkingServer = new SequentialThinkingServer();
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [SEQUENTIAL_THINKING_TOOL]
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name === "sequentialthinking") {
+      return thinkingServer.processThought(request.params.arguments);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Unknown tool: ${request.params.name}`
+        }
+      ],
+      isError: true
+    };
+  });
+
+  return server;
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error running server:", error);
-  process.exit(1);
-});
+if (import.meta.main) {
+  const server = createServer();
+
+  async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Sequential Thinking MCP Server running on stdio");
+  }
+
+  runServer().catch((error) => {
+    console.error("Fatal error running server:", error);
+    process.exit(1);
+  });
+}
