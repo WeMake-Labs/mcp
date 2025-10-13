@@ -80,7 +80,7 @@ export class DecisionFrameworkServer {
   private criteriaRegistry: Record<string, Record<string, Criterion>> = {};
   private nextElementId = 1;
 
-  protected validateDecisionAnalysisData(input: unknown): DecisionAnalysisData {
+  private validateDecisionAnalysisData(input: unknown): DecisionAnalysisData {
     const data = input as Record<string, unknown>;
 
     // Validate required fields

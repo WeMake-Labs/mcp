@@ -436,29 +436,28 @@ export class VisualReasoningServer {
    * results with visual reasoning analysis and operation outcomes.
    *
    * @param input - The input object containing visual operation data
+   * @param input.elements - Array of visual elements to operate on
    * @param input.operation - The type of visual operation to perform
-   * @param input.elementId - Unique identifier for the visual element
-   * @param input.targetPosition - Target position for move operations
-   * @param input.targetSize - Target size for resize operations
-   * @param input.targetColor - Target color for recolor operations
    * @param input.transformationType - Type of transformation to apply
-   * @param input.elements - Visual elements to operate on
    * @param input.diagramId - Identifier for the diagram being modified
    * @param input.diagramType - Type of diagram (graph, flowchart, etc.)
    * @param input.iteration - Current iteration of the visual reasoning process
+   * @param input.nextOperationNeeded - Whether another operation is needed
    * @returns Structured result containing visual operation analysis or error information
    * @throws {Error} If input validation fails or processing encounters an error
    *
    * @example
    * ```typescript
    * const result = server.processVisualOperation({
-   *   operation: "move",
-   *   elementId: "element-1",
-   *   targetPosition: { x: 100, y: 200 },
+   *   operation: "transform",
+   *   elements: [{ id: "element-1", type: "node", properties: { x: 100, y: 200 } }],
    *   diagramId: "diagram-1",
-   *   iteration: 1
+   *   diagramType: "graph",
+   *   iteration: 1,
+   *   nextOperationNeeded: false,
+   *   transformationType: "move"
    * });
-   * // Returns visual reasoning analysis for the move operation
+   * // Returns visual reasoning analysis for the transform operation
    * ```
    */
   public processOperation(input: unknown): { content: Array<{ type: string; text: string }>; isError?: boolean } {

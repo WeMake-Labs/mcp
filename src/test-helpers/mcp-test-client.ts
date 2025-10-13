@@ -56,13 +56,13 @@ export function createTestClient(server: Server): Server & { request: SimpleMCPT
 export class TransactionManagerTestClient {
   private originalServer: unknown;
 
-  constructor(server: unknown) {
-    this.originalServer = server; // Store original server before request method is added
+  constructor(private readonly originalRequest: (req: unknown) => Promise<unknown>) {
+    this.originalServer = null; // No longer needed since we have the bound function
   }
 
   async request(request: { method: string; params?: unknown }): Promise<unknown> {
-    // McpServer has a different interface, need to access its request method
-    return await (this.originalServer as { request: (req: unknown) => Promise<unknown> }).request(request);
+    // Use the original bound request function
+    return await this.originalRequest(request);
   }
 }
 
@@ -72,9 +72,23 @@ export class TransactionManagerTestClient {
 export function createTransactionManagerTestClient(
   server: unknown
 ): unknown & { request: TransactionManagerTestClient["request"] } {
-  // Store original server before adding request method
-  const originalServer = server;
-  const client = new TransactionManagerTestClient(originalServer);
+  // Extract and validate the original request function
+  if (!server || typeof server !== "object" || !("request" in server)) {
+    throw new Error("Server must have a request method");
+  }
+
+  const originalRequest = (server as { request: (req: unknown) => Promise<unknown> }).request;
+  if (typeof originalRequest !== "function") {
+    throw new Error("Server request method must be a function");
+  }
+
+  // Bind the request function to the server
+  const boundRequest = originalRequest.bind(server);
+
+  // Create client with the bound function
+  const client = new TransactionManagerTestClient(boundRequest);
+
+  // Assign the wrapper request method to the server
   return Object.assign(server as Record<string, unknown>, {
     request: client.request.bind(client)
   });
