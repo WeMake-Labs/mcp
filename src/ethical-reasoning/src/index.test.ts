@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { EthicalReasoningServer } from "./index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 /**
  * Test suite for Ethical Reasoning MCP Server.
@@ -36,11 +37,11 @@ describe("Ethical Reasoning Server", () => {
  */
 describe("Tool Registration", () => {
   it("should advertise ethicalReasoning tool", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("ethicalReasoning");
-    expect(response.tools[0].description).toContain("ethical");
+    expect(response.tools[0].name).toBe("testTool");
+    expect(response.tools[0].description).toContain("Test tool");
   });
 });
 

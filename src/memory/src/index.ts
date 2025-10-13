@@ -36,7 +36,7 @@ interface KnowledgeGraph {
 }
 
 // The KnowledgeGraphManager class contains all operations to interact with the knowledge graph
-class KnowledgeGraphManager {
+export class KnowledgeGraphManager {
   private async loadGraph(): Promise<KnowledgeGraph> {
     try {
       const data = await fs.readFile(MEMORY_FILE_PATH, "utf-8");

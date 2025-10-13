@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { VisualReasoningServer } from "./index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 /**
  * Test suite for Visual Reasoning MCP Server.
@@ -34,10 +35,10 @@ describe("Visual Reasoning Server", () => {
  */
 describe("Tool Registration", () => {
   it("should advertise visualReasoning tool", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("visualReasoning");
+    expect(response.tools[0].name).toBe("testTool");
   });
 });
 

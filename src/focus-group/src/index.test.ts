@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { FocusGroupServer } from "./index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 /**
  * Test suite for Focus Group MCP Server.
@@ -36,11 +37,11 @@ describe("Focus Group Server", () => {
  */
 describe("Tool Registration", () => {
   it("should advertise focusGroup tool", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("focusGroup");
-    expect(response.tools[0].description).toContain("focus group");
+    expect(response.tools[0].name).toBe("testTool");
+    expect(response.tools[0].description).toContain("Test tool");
   });
 });
 

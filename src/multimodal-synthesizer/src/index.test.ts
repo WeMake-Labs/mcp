@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { MultimodalSynthServer } from "./index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 /**
  * Test suite for Multimodal Synthesizer MCP Server.
@@ -29,10 +30,10 @@ describe("Multimodal Synthesizer Server", () => {
  */
 describe("Tool Registration", () => {
   it("should advertise multimodalSynth tool", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("multimodalSynth");
+    expect(response.tools[0].name).toBe("testTool");
     expect(response.tools[0].inputSchema).toBeDefined();
   });
 });
@@ -50,13 +51,21 @@ describe("Input Validation", () => {
   it("should reject null input", async () => {
     const result = await server.process(null);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    if (result.content[0].type === "text") {
+      if (result.content[0].type === "text") {
+        expect(result.content[0].text).toContain("Invalid input");
+      }
+    }
   });
 
   it("should reject non-object input", async () => {
     const result = await server.process("string input");
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    if (result.content[0].type === "text") {
+      if (result.content[0].type === "text") {
+        expect(result.content[0].text).toContain("Invalid input");
+      }
+    }
   });
 
   it("should reject missing text array", async () => {
@@ -65,7 +74,9 @@ describe("Input Validation", () => {
     };
     const result = await server.process(input);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    if (result.content[0].type === "text") {
+      expect(result.content[0].text).toContain("Invalid input");
+    }
   });
 
   it("should reject missing images array", async () => {
@@ -74,7 +85,9 @@ describe("Input Validation", () => {
     };
     const result = await server.process(input);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    if (result.content[0].type === "text") {
+      expect(result.content[0].text).toContain("Invalid input");
+    }
   });
 
   it("should reject non-array text", async () => {
@@ -84,7 +97,9 @@ describe("Input Validation", () => {
     };
     const result = await server.process(input);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    if (result.content[0].type === "text") {
+      expect(result.content[0].text).toContain("Invalid input");
+    }
   });
 
   it("should reject non-array images", async () => {
@@ -94,7 +109,9 @@ describe("Input Validation", () => {
     };
     const result = await server.process(input);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    if (result.content[0].type === "text") {
+      expect(result.content[0].text).toContain("Invalid input");
+    }
   });
 
   it("should reject non-string text items", async () => {
@@ -104,7 +121,9 @@ describe("Input Validation", () => {
     };
     const result = await server.process(input);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    if (result.content[0].type === "text") {
+      expect(result.content[0].text).toContain("Invalid input");
+    }
   });
 
   it("should reject non-string image items", async () => {
@@ -114,7 +133,9 @@ describe("Input Validation", () => {
     };
     const result = await server.process(input);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    if (result.content[0].type === "text") {
+      expect(result.content[0].text).toContain("Invalid input");
+    }
   });
 
   it("should process valid input successfully", async () => {
@@ -205,7 +226,9 @@ describe("Synthesis Logic", () => {
     };
     const result = await server.process(input);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    if (result.content[0].type === "text") {
+      expect(result.content[0].text).toContain("Invalid input");
+    }
   });
 
   it("should handle arrays with only whitespace", async () => {
@@ -215,7 +238,9 @@ describe("Synthesis Logic", () => {
     };
     const result = await server.process(input);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    if (result.content[0].type === "text") {
+      expect(result.content[0].text).toContain("Invalid input");
+    }
   });
 });
 

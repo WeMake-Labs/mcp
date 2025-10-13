@@ -3,6 +3,15 @@ import createServer, { DecisionFrameworkServer } from "./index.js";
 import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 /**
+ * Test subclass to access protected methods for testing
+ */
+class TestableDecisionFrameworkServer extends DecisionFrameworkServer {
+  public testValidateDecisionAnalysisData(input: unknown) {
+    return this.validateDecisionAnalysisData(input);
+  }
+}
+
+/**
  * Test suite for Decision Framework MCP Server.
  *
  * Business Context: Ensures the decision framework correctly validates complex
@@ -39,10 +48,10 @@ describe("Decision Framework Server", () => {
  * enum values, and complex nested structures.
  */
 describe("Decision Analysis Data Validation", () => {
-  let serverInstance: DecisionFrameworkServer;
+  let serverInstance: TestableDecisionFrameworkServer;
 
   beforeEach(() => {
-    serverInstance = new DecisionFrameworkServer();
+    serverInstance = new TestableDecisionFrameworkServer();
   });
 
   it("validates complete decision analysis structure", () => {
@@ -80,7 +89,7 @@ describe("Decision Analysis Data Validation", () => {
       nextStageNeeded: false
     };
 
-    const result = serverInstance.validateDecisionAnalysisData(validInput);
+    const result = serverInstance.testValidateDecisionAnalysisData(validInput);
     expect(result.decisionStatement).toBe("Should we invest in new technology infrastructure?");
     expect(result.options).toHaveLength(2);
     expect(result.criteria).toHaveLength(1);
@@ -111,7 +120,7 @@ describe("Decision Analysis Data Validation", () => {
       nextStageNeeded: true
     };
 
-    const result = serverInstance.validateDecisionAnalysisData(inputWithoutIds);
+    const result = serverInstance.testValidateDecisionAnalysisData(inputWithoutIds);
     expect(result.options[0].id).toMatch(/^option-\d+$/);
     expect(result.options[1].id).toMatch(/^option-\d+$/);
     expect(result.options[0].id).not.toBe(result.options[1].id);
@@ -135,7 +144,7 @@ describe("Decision Analysis Data Validation", () => {
         nextStageNeeded: false
       };
 
-      const result = serverInstance.validateDecisionAnalysisData(input);
+      const result = serverInstance.testValidateDecisionAnalysisData(input);
       expect(result.analysisType).toBe(analysisType);
     }
   });
@@ -158,7 +167,7 @@ describe("Decision Analysis Data Validation", () => {
         nextStageNeeded: false
       };
 
-      const result = serverInstance.validateDecisionAnalysisData(input);
+      const result = serverInstance.testValidateDecisionAnalysisData(input);
       expect(result.stage).toBe(stage);
     }
   });
@@ -181,7 +190,7 @@ describe("Decision Analysis Data Validation", () => {
         nextStageNeeded: false
       };
 
-      const result = serverInstance.validateDecisionAnalysisData(input);
+      const result = serverInstance.testValidateDecisionAnalysisData(input);
       expect(result.riskTolerance).toBe(riskTolerance);
     }
   });
@@ -234,7 +243,7 @@ describe("Decision Analysis Data Validation", () => {
       nextStageNeeded: false
     };
 
-    const result = serverInstance.validateDecisionAnalysisData(inputWithEvaluations);
+    const result = serverInstance.testValidateDecisionAnalysisData(inputWithEvaluations);
     expect(result.criteriaEvaluations).toHaveLength(2);
     expect(result.criteriaEvaluations[0].score).toBe(0.7);
     expect(result.criteriaEvaluations[0].justification).toBe("Lower cost than alternative");
@@ -265,7 +274,7 @@ describe("Decision Analysis Data Validation", () => {
       nextStageNeeded: false
     };
 
-    const result = serverInstance.validateDecisionAnalysisData(inputWithOutcomes);
+    const result = serverInstance.testValidateDecisionAnalysisData(inputWithOutcomes);
     expect(result.possibleOutcomes).toHaveLength(1);
     expect(result.possibleOutcomes[0].probability).toBe(0.8);
     expect(result.possibleOutcomes[0].value).toBe(100000);
@@ -294,7 +303,7 @@ describe("Decision Analysis Data Validation", () => {
       suggestedNextStage: "criteria"
     };
 
-    const result = serverInstance.validateDecisionAnalysisData(inputWithGaps);
+    const result = serverInstance.testValidateDecisionAnalysisData(inputWithGaps);
     expect(result.informationGaps).toHaveLength(1);
     expect(result.informationGaps[0].impact).toBe(0.7);
     expect(result.informationGaps[0].researchMethod).toBe("Survey analysis");
@@ -328,7 +337,7 @@ describe("Decision Analysis Data Validation", () => {
       nextStageNeeded: false
     };
 
-    const result = serverInstance.validateDecisionAnalysisData(inputWithResults);
+    const result = serverInstance.testValidateDecisionAnalysisData(inputWithResults);
     expect(result.expectedValues?.opt1).toBe(85000);
     expect(result.multiCriteriaScores?.opt1).toBe(0.75);
     expect(result.sensitivityInsights).toHaveLength(2);
@@ -366,7 +375,7 @@ describe("Input Validation Errors", () => {
       nextStageNeeded: false
     };
 
-    expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid decisionStatement");
+    expect(() => serverInstance.testValidateDecisionAnalysisData(invalidInput)).toThrow("Invalid decisionStatement");
   });
 
   it("rejects non-string decisionStatement", () => {
@@ -384,7 +393,7 @@ describe("Input Validation Errors", () => {
       nextStageNeeded: false
     };
 
-    expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid decisionStatement");
+    expect(() => serverInstance.testValidateDecisionAnalysisData(invalidInput)).toThrow("Invalid decisionStatement");
   });
 
   it("rejects invalid analysisType", () => {
@@ -402,7 +411,7 @@ describe("Input Validation Errors", () => {
       nextStageNeeded: false
     };
 
-    expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid analysisType");
+    expect(() => serverInstance.testValidateDecisionAnalysisData(invalidInput)).toThrow("Invalid analysisType");
   });
 
   it("rejects invalid stage", () => {
@@ -420,7 +429,7 @@ describe("Input Validation Errors", () => {
       nextStageNeeded: false
     };
 
-    expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid stage");
+    expect(() => serverInstance.testValidateDecisionAnalysisData(invalidInput)).toThrow("Invalid stage");
   });
 
   it("rejects invalid riskTolerance", () => {
@@ -438,7 +447,7 @@ describe("Input Validation Errors", () => {
       nextStageNeeded: false
     };
 
-    expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid riskTolerance");
+    expect(() => serverInstance.testValidateDecisionAnalysisData(invalidInput)).toThrow("Invalid riskTolerance");
   });
 
   it("rejects negative iteration", () => {
@@ -456,7 +465,7 @@ describe("Input Validation Errors", () => {
       nextStageNeeded: false
     };
 
-    expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid iteration");
+    expect(() => serverInstance.testValidateDecisionAnalysisData(invalidInput)).toThrow("Invalid iteration");
   });
 
   it("rejects non-boolean nextStageNeeded", () => {
@@ -474,7 +483,7 @@ describe("Input Validation Errors", () => {
       nextStageNeeded: "yes"
     };
 
-    expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid nextStageNeeded");
+    expect(() => serverInstance.testValidateDecisionAnalysisData(invalidInput)).toThrow("Invalid nextStageNeeded");
   });
 
   it("rejects non-array options", () => {
@@ -492,7 +501,7 @@ describe("Input Validation Errors", () => {
       nextStageNeeded: false
     };
 
-    expect(() => serverInstance.validateDecisionAnalysisData(invalidInput)).toThrow("Invalid options");
+    expect(() => serverInstance.testValidateDecisionAnalysisData(invalidInput)).toThrow("Invalid options");
   });
 });
 
@@ -708,7 +717,7 @@ describe("MCP Server Integration", () => {
     };
 
     const serverInstance = new DecisionFrameworkServer();
-    const result = serverInstance.validateDecisionAnalysisData(validInput);
+    const result = serverInstance.testValidateDecisionAnalysisData(validInput);
     expect(result.decisionStatement).toBe("Should we implement the new feature?");
     expect(result.options).toHaveLength(2);
   });
@@ -751,7 +760,7 @@ describe("Edge Cases and Performance", () => {
       nextStageNeeded: false
     };
 
-    const result = serverInstance.validateDecisionAnalysisData(input);
+    const result = serverInstance.testValidateDecisionAnalysisData(input);
     expect(result.options).toHaveLength(50);
   });
 
@@ -805,7 +814,7 @@ describe("Edge Cases and Performance", () => {
       suggestedNextStage: "recommendation"
     };
 
-    const result = serverInstance.validateDecisionAnalysisData(complexInput);
+    const result = serverInstance.testValidateDecisionAnalysisData(complexInput);
     expect(result.criteriaEvaluations[0].justification).toContain("Complex justification");
     expect(result.possibleOutcomes[0].description).toContain("Complex outcome");
     expect(result.informationGaps[0].researchMethod).toContain("Comprehensive market analysis");
@@ -826,7 +835,7 @@ describe("Edge Cases and Performance", () => {
       nextStageNeeded: true
     };
 
-    const result = serverInstance.validateDecisionAnalysisData(input);
+    const result = serverInstance.testValidateDecisionAnalysisData(input);
     expect(result.iteration).toBe(0);
   });
 
@@ -849,7 +858,7 @@ describe("Edge Cases and Performance", () => {
       nextStageNeeded: false
     };
 
-    const result = serverInstance.validateDecisionAnalysisData(input);
+    const result = serverInstance.testValidateDecisionAnalysisData(input);
     expect(result.criteria || []).toHaveLength(0);
     expect(result.criteriaEvaluations || []).toHaveLength(0);
     expect(result.possibleOutcomes || []).toHaveLength(0);

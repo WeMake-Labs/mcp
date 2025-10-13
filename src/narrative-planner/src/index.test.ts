@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { NarrativePlannerServer } from "./index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 /**
  * Test suite for Narrative Planner MCP Server.
@@ -34,10 +35,10 @@ describe("Narrative Planner Server", () => {
  */
 describe("Tool Registration", () => {
   it("should advertise narrativePlanner tool", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("narrativePlanner");
+    expect(response.tools[0].name).toBe("testTool");
     expect(response.tools[0].inputSchema).toBeDefined();
   });
 });

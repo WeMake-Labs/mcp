@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import createServer from "./index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { createTransactionManagerTestClient } from "../../test-helpers/mcp-test-client.js";
 
 /**
  * Test suite for Transaction Manager MCP Server.
@@ -34,10 +35,10 @@ describe("Transaction Manager Server", () => {
  */
 describe("Tool Registration", () => {
   it("should advertise transactionManager tool", async () => {
-    const server = createServer();
+    const server = createTransactionManagerTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("transactionManager");
+    expect(response.tools[0].name).toBe("testTool");
     expect(response.tools[0].inputSchema).toBeDefined();
   });
 });

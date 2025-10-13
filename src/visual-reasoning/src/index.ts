@@ -461,6 +461,10 @@ export class VisualReasoningServer {
    * // Returns visual reasoning analysis for the move operation
    * ```
    */
+  public processOperation(input: unknown): { content: Array<{ type: string; text: string }>; isError?: boolean } {
+    return this.processVisualOperation(input);
+  }
+
   public processVisualOperation(input: unknown): { content: Array<{ type: string; text: string }>; isError?: boolean } {
     try {
       const validatedInput = this.validateOperationData(input);

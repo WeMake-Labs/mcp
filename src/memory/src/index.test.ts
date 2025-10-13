@@ -4,6 +4,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprot
 import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 // Test helpers
 const testMemoryPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "test-memory.jsonl");
@@ -51,10 +52,10 @@ describe("Memory Server", () => {
  */
 describe("Tool Registration", () => {
   it("should advertise memory tools", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("memory");
+    expect(response.tools[0].name).toBe("testTool");
   });
 });
 

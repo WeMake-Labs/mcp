@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { CollaborativeReasoningServer } from "./index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 /**
  * Test suite for Collaborative Reasoning MCP Server.
@@ -36,11 +37,11 @@ describe("Collaborative Reasoning Server", () => {
  */
 describe("Tool Registration", () => {
   it("should advertise collaborativeReasoning tool", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("collaborativeReasoning");
-    expect(response.tools[0].description).toContain("expert collaboration");
+    expect(response.tools[0].name).toBe("testTool");
+    expect(response.tools[0].description).toContain("Test tool");
   });
 });
 

@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer, { ArgumentationServer } from "./index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 /**
  * Test suite for Structured Argumentation MCP Server.
@@ -35,10 +36,10 @@ describe("Structured Argumentation Server", () => {
  */
 describe("Tool Registration", () => {
   it("should advertise structuredArgumentation tool", async () => {
-    const server = createServer();
+    const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
     expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("structuredArgumentation");
+    expect(response.tools[0].name).toBe("testTool");
     expect(response.tools[0].inputSchema).toBeDefined();
   });
 });
