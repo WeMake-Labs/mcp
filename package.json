@@ -40,7 +40,7 @@
     "cleanup": "find . -name 'node_modules' -type d -exec rm -rf {} + 2>/dev/null || true && find . -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.20.0",
+    "@modelcontextprotocol/sdk": "1.20.2",
     "@wemake.cx/analogical-reasoning": "*",
     "@wemake.cx/bias-detection": "*",
     "@wemake.cx/constraint-solver": "*",
@@ -59,15 +59,15 @@
     "@wemake.cx/visual-reasoning": "*"
   },
   "devDependencies": {
-    "@eslint/js": "9.37.0",
+    "@eslint/js": "9.38.0",
     "@nx/eslint": "21.6.4",
     "@tsconfig/bun": "1.0.9",
-    "@types/bun": "1.2.21",
-    "@typescript-eslint/eslint-plugin": "8.46.0",
-    "@typescript-eslint/parser": "8.46.0",
-    "eslint": "9.37.0",
+    "@types/bun": "1.3.1",
+    "@typescript-eslint/eslint-plugin": "8.46.2",
+    "@typescript-eslint/parser": "8.46.2",
+    "eslint": "9.38.0",
     "globals": "15.15.0",
-    "markdownlint": "0.38.0",
+    "markdownlint": "0.39.0",
     "nx": "21.6.4",
     "prettier": "3.6.2",
     "typescript": "5.9.3",
