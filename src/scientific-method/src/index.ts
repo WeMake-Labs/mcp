@@ -107,6 +107,9 @@ export class ScientificMethodServer {
   private nextInquiryId = 1;
 
   private validateScientificInquiryData(input: unknown): ScientificInquiryData {
+    if (!input || typeof input !== "object") {
+      throw new Error("Invalid input: must be an object");
+    }
     const data = input as Record<string, unknown>;
 
     // Validate required fields
