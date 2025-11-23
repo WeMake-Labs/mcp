@@ -13,7 +13,9 @@ interface ConstraintSolverInput {
 
 function evaluateConstraint(expr: string, vars: Record<string, number>): boolean {
   try {
-    const ast = Parser.parse(expr);
+    // Replace C-style operators with expr-eval style
+    const sanitizedExpr = expr.replace(/&&/g, " and ").replace(/\|\|/g, " or ");
+    const ast = Parser.parse(sanitizedExpr);
     return Boolean(ast.evaluate(vars));
   } catch {
     return false;
