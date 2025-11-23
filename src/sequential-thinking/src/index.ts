@@ -28,6 +28,9 @@ export class SequentialThinkingServer {
   }
 
   private validateThoughtData(input: unknown): ThoughtData {
+    if (!input || typeof input !== "object") {
+      throw new Error("Invalid input: must be an object");
+    }
     const data = input as Record<string, unknown>;
 
     if (!data.thought || typeof data.thought !== "string") {
@@ -120,6 +123,7 @@ export class SequentialThinkingServer {
                 revisesThought: validatedInput.revisesThought,
                 branchFromThought: validatedInput.branchFromThought,
                 branchId: validatedInput.branchId,
+                needsMoreThoughts: validatedInput.needsMoreThoughts,
                 branches: Object.keys(this.branches),
                 thoughtHistoryLength: this.thoughtHistory.length
               },
