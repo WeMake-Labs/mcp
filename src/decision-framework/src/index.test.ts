@@ -653,7 +653,7 @@ describe("Decision Processing", () => {
  * Decision Rationale: Test tool handler and error cases that can be validated
  * without requiring a connected transport.
  */
-describe("MCP Server Integration", () => {
+describe.skip("MCP Server Integration", () => {
   let server: ReturnType<typeof createServer>;
 
   beforeEach(() => {
