@@ -55,6 +55,18 @@ export class NarrativePlannerServer {
     ) {
       return { content: [{ type: "text", text: "Invalid input" }], isError: true };
     }
+
+    const validCharacters = data.characters.filter((c) => c.trim().length > 0);
+    const validArcs = data.arcs.filter((a) => a.trim().length > 0);
+
+    if (validCharacters.length === 0 || validArcs.length === 0) {
+      return {
+        content: [
+          { type: "text", text: "Invalid input: characters and arcs must contain at least one non-empty string" }
+        ],
+        isError: true
+      };
+    }
     // After validation, we can safely cast to NarrativeInput since all required properties are confirmed
     const outline = planNarrative(data as NarrativeInput);
     return { content: [{ type: "text", text: JSON.stringify(outline) }] };

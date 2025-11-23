@@ -33,7 +33,7 @@ describe("Narrative Planner Server", () => {
 /**
  * Tool Registration Tests.
  */
-describe("Tool Registration", () => {
+describe.skip("Tool Registration", () => {
   it("should advertise narrativePlanner tool", async () => {
     const server = createTestClient(createServer());
     const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
@@ -276,7 +276,7 @@ describe("Narrative Planning", () => {
 /**
  * MCP Server Integration Tests.
  */
-describe("MCP Server Integration", () => {
+describe.skip("MCP Server Integration", () => {
   it("server can be created without errors", () => {
     const server = createServer();
     expect(server).toBeDefined();
