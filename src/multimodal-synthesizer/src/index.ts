@@ -53,6 +53,14 @@ export class MultimodalSynthServer {
     ) {
       return { content: [{ type: "text", text: "Invalid input" }], isError: true };
     }
+
+    const validText = data.text.filter((t) => t.trim().length > 0);
+    if (validText.length === 0) {
+      return {
+        content: [{ type: "text", text: "Invalid input: text must contain at least one non-empty string" }],
+        isError: true
+      };
+    }
     const result = synthesize({ text: data.text, images: data.images });
     return { content: [{ type: "json", json: result }] };
   }
