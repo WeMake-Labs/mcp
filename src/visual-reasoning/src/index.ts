@@ -77,6 +77,9 @@ export class VisualReasoningServer {
   private nextElementId = 1;
 
   private validateOperationData(input: unknown): VisualOperationData {
+    if (!input || typeof input !== "object") {
+      throw new Error("Invalid input: must be an object");
+    }
     const data = input as Record<string, unknown>;
 
     if (!data.operation || typeof data.operation !== "string") {
@@ -94,14 +97,19 @@ export class VisualReasoningServer {
     if (typeof data.iteration !== "number" || data.iteration < 0) {
       throw new Error("Invalid iteration: must be a non-negative number");
     }
+    if (!Number.isInteger(data.iteration)) {
+      throw new Error("Invalid iteration: must be an integer");
+    }
 
     if (typeof data.nextOperationNeeded !== "boolean") {
       throw new Error("Invalid nextOperationNeeded: must be a boolean");
     }
 
     // Validate transformationType
-    if (!data.transformationType) {
-      throw new Error("Missing required property: transformationType");
+    if (data.operation === "transform") {
+      if (!data.transformationType) {
+        throw new Error("Missing transformationType");
+      }
     }
 
     // Validate elements if provided
@@ -113,11 +121,38 @@ export class VisualReasoningServer {
         }
 
         if (!element.type || typeof element.type !== "string") {
-          throw new Error(`Invalid element type for element ${element.id}: must be a string`);
+          throw new Error(`Missing type for element ${element.id}`);
+        }
+
+        const validTypes = ["node", "edge", "container", "annotation"];
+        if (!validTypes.includes(element.type)) {
+          throw new Error(`Invalid element type: ${element.type}`);
         }
 
         if (!element.properties || typeof element.properties !== "object") {
           element.properties = {};
+        }
+
+        if (element.type === "edge") {
+          if (!element.source || typeof element.source !== "string") {
+            throw new Error(`Missing source/target for edge ${element.id}`);
+          }
+          if (!element.target || typeof element.target !== "string") {
+            throw new Error(`Missing source/target for edge ${element.id}`);
+          }
+        }
+
+        if (element.type === "container") {
+          if (element.contains !== undefined) {
+            if (!Array.isArray(element.contains)) {
+              throw new Error(`Invalid contains for container ${element.id}`);
+            }
+            for (const id of element.contains) {
+              if (typeof id !== "string") {
+                throw new Error(`Invalid contains for container ${element.id}`);
+              }
+            }
+          }
         }
 
         validatedElements.push(element as VisualElement);
