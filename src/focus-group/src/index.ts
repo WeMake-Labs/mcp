@@ -80,6 +80,9 @@ export class FocusGroupServer {
   private readonly maxSessions = Number(process.env.FOCUS_MAX_SESSIONS ?? "100");
 
   private validateFocusGroupData(input: unknown): FocusGroupData {
+    if (!input || typeof input !== "object") {
+      throw new Error("Invalid input: must be an object");
+    }
     const data = input as Record<string, unknown>;
 
     // Validate required fields
