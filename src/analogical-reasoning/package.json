@@ -32,10 +32,10 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
+    "@modelcontextprotocol/sdk": "^1.22.0",
     "chalk": "^5.3.0",
     "zod": "^3.23.8",
-    "zod-to-json-schema": "^3.23.5"
+    "zod-to-json-schema": "^3.25.0"
   },
   "devDependencies": {
     "@types/node": "^22",
