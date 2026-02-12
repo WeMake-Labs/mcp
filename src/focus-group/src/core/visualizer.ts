@@ -177,23 +177,9 @@ export class FocusGroupVisualizer {
 
     // Next steps
     if (data.nextFeedbackNeeded) {
-      const personaIds = data.personas.map((p) => p.id);
-      const currentIndex = personaIds.indexOf(data.activePersonaId);
-      // Logic duplicated here just for visualization display if needed, 
-      // but strictly speaking we should rely on the data passed in.
-      // The original code calculated nextPersonaId in visualizeFocusGroup only if it wasn't in data?
-      // Actually original code called `this.selectNextPersona(data)` inside `visualizeFocusGroup`.
-      // I should pass the next persona ID or object if possible, or replicate the logic slightly for display.
-      
-      // Better approach: The Logic class will calculate nextPersonaId and put it in data.
-      // So here we just look it up.
-      
-      let nextPersonaId = data.nextPersonaId;
-      if (!nextPersonaId) {
-          // Fallback if not computed yet
-          const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % personaIds.length;
-          nextPersonaId = personaIds[nextIndex];
-      }
+      // Use the nextPersonaId determined by the logic layer
+      const nextPersonaId = data.nextPersonaId;
+
 
       const nextPersona = data.personas.find((p) => p.id === nextPersonaId);
 

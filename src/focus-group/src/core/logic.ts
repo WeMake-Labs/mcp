@@ -8,6 +8,25 @@ export class FocusGroupLogic {
   private sessionOrder: string[] = [];
   private readonly maxSessions = Number(process.env.FOCUS_MAX_SESSIONS ?? "100");
 
+  /**
+   * Validates the Focus Group data structure.
+   * Ensures all required fields are present and valid according to the schema.
+   *
+   * Validation Criteria:
+   * - Personas: Must have unique IDs and all required fields (name, userType, etc.).
+   * - Feedback: Must reference existing persona IDs, have valid types, and severity between 0.0-1.0.
+   * - Focus Area Analyses: Must have valid structure and reference existing persona IDs.
+   * - Stage: Must be one of the predefined stage enums.
+   * - Active Persona: Must exist in the personas list.
+   *
+   * Limitations:
+   * - Does not validate the semantic content of strings (e.g., if a scenario is realistic).
+   * - Does not validate referenceIds in feedback against the feedback history (stateless validation).
+   *
+   * @param input - The raw input object to validate.
+   * @returns The validated FocusGroupData object.
+   * @throws Error if any validation rule is violated.
+   */
   public validateFocusGroupData(input: unknown): FocusGroupData {
     const data = input as Record<string, unknown>;
 
@@ -44,10 +63,82 @@ export class FocusGroupLogic {
       throw new Error("Invalid nextFeedbackNeeded: must be a boolean");
     }
 
-    // TODO: Add detailed validation for personas, feedback, and focusAreaAnalyses
-    // similar to the collaborative-reasoning server
+    // Validate Personas
+    const personaIds = new Set<string>();
+    for (const persona of data.personas) {
+      if (!persona.id || typeof persona.id !== "string") {
+        throw new Error("Invalid persona: missing or invalid 'id'");
+      }
+      if (personaIds.has(persona.id)) {
+        throw new Error(`Invalid persona: duplicate id '${persona.id}'`);
+      }
+      personaIds.add(persona.id);
 
-    // For now, return the data with minimal validation
+      if (!persona.name || typeof persona.name !== "string") {
+        throw new Error(`Invalid persona '${persona.id}': missing or invalid 'name'`);
+      }
+      if (!persona.userType || typeof persona.userType !== "string") {
+        throw new Error(`Invalid persona '${persona.id}': missing or invalid 'userType'`);
+      }
+      if (!persona.usageScenario || typeof persona.usageScenario !== "string") {
+        throw new Error(`Invalid persona '${persona.id}': missing or invalid 'usageScenario'`);
+      }
+      if (!persona.communication || typeof persona.communication.style !== "string" || typeof persona.communication.tone !== "string") {
+        throw new Error(`Invalid persona '${persona.id}': missing or invalid 'communication'`);
+      }
+    }
+
+    // Validate Feedback
+    const validFeedbackTypes = ["praise", "confusion", "suggestion", "usability", "feature", "bug", "summary"];
+    for (const feedback of data.feedback) {
+      if (!feedback.personaId || !personaIds.has(feedback.personaId)) {
+        throw new Error(`Invalid feedback: unknown personaId '${feedback.personaId}'`);
+      }
+      if (!feedback.content || typeof feedback.content !== "string") {
+        throw new Error("Invalid feedback: missing or invalid 'content'");
+      }
+      if (!validFeedbackTypes.includes(feedback.type)) {
+        throw new Error(`Invalid feedback type: '${feedback.type}'. Must be one of: ${validFeedbackTypes.join(", ")}`);
+      }
+      if (typeof feedback.severity !== "number" || feedback.severity < 0 || feedback.severity > 1) {
+        throw new Error("Invalid feedback severity: must be a number between 0.0 and 1.0");
+      }
+    }
+
+    // Validate Focus Area Analyses
+    if (data.focusAreaAnalyses) {
+      if (!Array.isArray(data.focusAreaAnalyses)) {
+        throw new Error("Invalid focusAreaAnalyses: must be an array");
+      }
+      for (const analysis of data.focusAreaAnalyses) {
+        if (!analysis.area || typeof analysis.area !== "string") {
+          throw new Error("Invalid focusAreaAnalysis: missing or invalid 'area'");
+        }
+        if (!Array.isArray(analysis.findings)) {
+          throw new Error(`Invalid focusAreaAnalysis '${analysis.area}': findings must be an array`);
+        }
+        for (const finding of analysis.findings) {
+          if (!finding.personaId || !personaIds.has(finding.personaId)) {
+            throw new Error(`Invalid finding in area '${analysis.area}': unknown personaId '${finding.personaId}'`);
+          }
+          if (!finding.finding || typeof finding.finding !== "string") {
+            throw new Error(`Invalid finding in area '${analysis.area}': missing or invalid 'finding' description`);
+          }
+        }
+      }
+    }
+
+    // Validate Stage
+    const validStages = ["introduction", "initial-impressions", "deep-dive", "synthesis", "recommendations", "prioritization"];
+    if (!validStages.includes(data.stage)) {
+       throw new Error(`Invalid stage: '${data.stage}'. Must be one of: ${validStages.join(", ")}`);
+    }
+
+    // Ensure activePersonaId exists
+    if (!personaIds.has(data.activePersonaId)) {
+      throw new Error(`Invalid activePersonaId: '${data.activePersonaId}' does not match any known persona`);
+    }
+
     return data as unknown as FocusGroupData;
   }
 
