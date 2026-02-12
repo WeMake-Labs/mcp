@@ -3,7 +3,9 @@
   "version": "0.4.0",
   "description": "MCP server for enabling memory for AI Agents through a knowledge graph",
   "license": "MIT",
-  "module": "dist/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/WeMake-Labs/mcp.git",
@@ -31,7 +33,7 @@
     "dist"
   ],
   "scripts": {
-     "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' && tsc -p tsconfig.build.json",  
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' && tsc -p tsconfig.build.json",
     "start": "bun run ./dist/index.js",
     "test": "bun test"
   },

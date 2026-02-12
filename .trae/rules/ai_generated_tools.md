@@ -5,9 +5,11 @@ description: Enforce clear documentation for AI-generated tools and workflows.
 
 # AI Generated Tools
 
-What: Ensure all AI-generated tools and workflows are accompanied by clear documentation detailing their purpose, limitations, and operational workflows.
+What: Ensure all AI-generated tools and workflows are accompanied by clear documentation detailing their purpose,
+limitations, and operational workflows.
 
-Why: Clear documentation fosters understanding, trust, and maintainability, which are essential for effective collaboration and quality assurance.
+Why: Clear documentation fosters understanding, trust, and maintainability, which are essential for effective
+collaboration and quality assurance.
 
 Good:
 
