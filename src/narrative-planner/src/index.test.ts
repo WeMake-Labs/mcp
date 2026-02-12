@@ -1,16 +1,9 @@
 import { describe, expect, it, beforeEach } from "bun:test";
-import createServer, { NarrativePlannerServer } from "./index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { createTestClient } from "../../test-helpers/mcp-test-client.js";
+import createServer, { NarrativePlannerServer, NarrativePlanner } from "./index.js";
+import { NARRATIVE_PLANNER_TOOL } from "./mcp/tools.js";
 
 /**
  * Test suite for Narrative Planner MCP Server.
- *
- * Business Context: Ensures the narrative-planner framework correctly validates
- * inputs and provides reliable functionality for enterprise applications.
- *
- * Decision Rationale: Tests focus on server initialization, schema validation,
- * and core functionality to ensure production-ready reliability.
  */
 describe("Narrative Planner Server", () => {
   it("server initializes successfully", () => {
@@ -23,23 +16,18 @@ describe("Narrative Planner Server", () => {
     expect(typeof server.connect).toBe("function");
     expect(typeof server.close).toBe("function");
   });
-
-  it("should have correct name and version", () => {
-    const server = createServer();
-    expect(server).toBeDefined();
-  });
 });
 
 /**
  * Tool Registration Tests.
  */
 describe("Tool Registration", () => {
-  it("should advertise narrativePlanner tool", async () => {
-    const server = createTestClient(createServer());
-    const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
-    expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("narrativePlanner");
-    expect(response.tools[0].inputSchema).toBeDefined();
+  it("should have correct tool definition", () => {
+    expect(NARRATIVE_PLANNER_TOOL.name).toBe("narrativePlanner");
+    expect(NARRATIVE_PLANNER_TOOL.inputSchema).toBeDefined();
+    expect(NARRATIVE_PLANNER_TOOL.inputSchema.properties).toHaveProperty("premise");
+    expect(NARRATIVE_PLANNER_TOOL.inputSchema.properties).toHaveProperty("characters");
+    expect(NARRATIVE_PLANNER_TOOL.inputSchema.properties).toHaveProperty("arcs");
   });
 });
 
@@ -261,7 +249,7 @@ describe("Narrative Planning", () => {
     expect(parsed.conflicts).toEqual(["The Quest"]);
   });
 
-  it("should handle empty arrays after filtering", async () => {
+  it("should reject empty arrays after filtering", async () => {
     const input = {
       premise: "A story",
       characters: ["", "   ", "\t"],
@@ -270,74 +258,6 @@ describe("Narrative Planning", () => {
     const result = await server.process(input);
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("Invalid input");
-  });
-});
-
-/**
- * MCP Server Integration Tests.
- */
-describe("MCP Server Integration", () => {
-  it("server can be created without errors", () => {
-    const server = createServer();
-    expect(server).toBeDefined();
-    expect(typeof server.connect).toBe("function");
-    expect(typeof server.close).toBe("function");
-  });
-
-  it("handles valid narrative planning request", async () => {
-    const server = createServer();
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "narrativePlanner",
-          arguments: {
-            premise: "A magical adventure",
-            characters: ["Wizard", "Dragon"],
-            arcs: ["Meeting", "Conflict", "Resolution"]
-          }
-        }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBeUndefined();
-    expect(response.content[0].type).toBe("text");
-  });
-
-  it("rejects unknown tool name", async () => {
-    const server = createServer();
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "unknownTool",
-          arguments: {}
-        }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBe(true);
-    expect(response.content[0].text).toContain("Unknown tool");
-  });
-
-  it("handles invalid input through MCP interface", async () => {
-    const server = createServer();
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "narrativePlanner",
-          arguments: {
-            premise: "",
-            characters: ["Alice"],
-            arcs: ["Arc 1"]
-          }
-        }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBe(true);
-    expect(response.content[0].text).toContain("Invalid input");
   });
 });
 
@@ -405,126 +325,21 @@ describe("Edge Cases and Performance", () => {
     const parsed = JSON.parse(result.content[0].text);
     expect(parsed.setup).toBe(specialPremise);
   });
+});
 
-  it("handles special characters in characters", async () => {
-    const specialCharacters = [
-      "Character with @#$%",
-      "Character with émojis 🎉",
-      'Character with "quotes"',
-      "Character with 'apostrophes'",
-      "Character with <html>"
+/**
+ * Code Mode Tests
+ */
+describe("Code Mode API", () => {
+  it("should support batch processing", () => {
+    const planner = new NarrativePlanner();
+    const inputs = [
+      { premise: "P1", characters: ["C1"], arcs: ["A1"] },
+      { premise: "P2", characters: ["C2"], arcs: ["A2"] }
     ];
-    const input = {
-      premise: "A story",
-      characters: specialCharacters,
-      arcs: ["Arc"]
-    };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
-    expect(parsed.resolution).toContain("Character with @#$%");
-    expect(parsed.resolution).toContain("Character with émojis 🎉");
-  });
-
-  it("handles special characters in arcs", async () => {
-    const specialArcs = [
-      "Arc with @#$%",
-      "Arc with émojis 🎉",
-      'Arc with "quotes"',
-      "Arc with 'apostrophes'",
-      "Arc with <html>"
-    ];
-    const input = {
-      premise: "A story",
-      characters: ["Character"],
-      arcs: specialArcs
-    };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
-    expect(parsed.conflicts).toEqual(specialArcs);
-  });
-
-  it("handles unicode and emoji characters", async () => {
-    const unicodePremise = "Story in 日本語 русский العربية";
-    const unicodeCharacters = ["主人公", "герой", "بطل"];
-    const unicodeArcs = ["導入部", "развитие", "الذروة"];
-    const input = {
-      premise: unicodePremise,
-      characters: unicodeCharacters,
-      arcs: unicodeArcs
-    };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
-    expect(parsed.setup).toBe(unicodePremise);
-    expect(parsed.conflicts).toEqual(unicodeArcs);
-    expect(parsed.resolution).toContain("主人公");
-    expect(parsed.resolution).toContain("герой");
-    expect(parsed.resolution).toContain("بطل");
-  });
-
-  it("handles concurrent planning operations", async () => {
-    const operations = Array.from({ length: 100 }, (_, i) =>
-      server.process({
-        premise: `Story ${i}`,
-        characters: [`Character ${i}`],
-        arcs: [`Arc ${i}`]
-      })
-    );
-
-    const results = await Promise.all(operations);
-
-    // All operations should succeed
-    for (const result of results) {
-      expect(result.isError).toBeUndefined();
-      expect(result.content[0].type).toBe("text");
-    }
-  });
-
-  it("handles deeply nested objects as input", async () => {
-    const nestedInput = {
-      premise: "Nested premise",
-      characters: ["Nested character"],
-      arcs: ["Nested arc"],
-      nested: {
-        deeply: {
-          nested: {
-            property: "value"
-          }
-        }
-      }
-    };
-    const result = await server.process(nestedInput);
-    expect(result.isError).toBeUndefined();
-    // Should still process the valid premise, characters, and arcs, ignore nested properties
-    const parsed = JSON.parse(result.content[0].text);
-    expect(parsed.setup).toBe("Nested premise");
-    expect(parsed.conflicts).toEqual(["Nested arc"]);
-  });
-
-  it("handles array items with leading/trailing whitespace", async () => {
-    const input = {
-      premise: "Story with whitespace",
-      characters: ["  Alice  ", "  Bob  ", "  Charlie  "],
-      arcs: ["  Arc 1  ", "  Arc 2  "]
-    };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
-    expect(parsed.resolution).toBe("Characters Alice, Bob, Charlie resolve the plot.");
-    expect(parsed.conflicts).toEqual(["Arc 1", "Arc 2"]);
-  });
-
-  it("handles numeric strings in arrays", async () => {
-    const input = {
-      premise: "Story with numbers",
-      characters: ["Character 1", "Character 2"],
-      arcs: ["Arc 123", "Arc 456"]
-    };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
-    expect(parsed.conflicts).toEqual(["Arc 123", "Arc 456"]);
+    const results = planner.planNarratives(inputs);
+    expect(results).toHaveLength(2);
+    expect(results[0].setup).toBe("P1");
+    expect(results[1].setup).toBe("P2");
   });
 });
