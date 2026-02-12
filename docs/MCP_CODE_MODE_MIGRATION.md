@@ -126,7 +126,7 @@ src/
 
 ### Priority 3: Collaboration & specialized
 
-- [ ] `collaborative-reasoning`
+- [x] `collaborative-reasoning`
 - [ ] `focus-group`
 - [ ] `visual-reasoning`
 - [ ] `multimodal-synthesizer`

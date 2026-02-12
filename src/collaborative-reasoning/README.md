@@ -66,7 +66,51 @@ The system tracks and resolves disagreements through:
 
 ## API
 
-### Tools
+### Code Mode Usage
+
+This server supports the MCP Code Mode architecture, allowing direct programmatic usage in TypeScript applications.
+
+#### Installation
+
+```bash
+npm install @wemake.cx/collaborative-reasoning
+```
+
+#### Example
+
+```typescript
+import { CollaborativeReasoning } from "@wemake.cx/collaborative-reasoning";
+
+const collaborativeReasoning = new CollaborativeReasoning();
+
+const result = await collaborativeReasoning.collaborate({
+  topic: "Should we use microservices?",
+  personas: [
+    {
+      id: "tech-lead",
+      name: "Sarah Chen",
+      expertise: ["Architecture"],
+      background: "Senior Architect",
+      perspective: "Scalability focused",
+      biases: [],
+      communication: { style: "direct", tone: "formal" }
+    }
+  ],
+  contributions: [],
+  stage: "problem-definition",
+  activePersonaId: "tech-lead",
+  sessionId: "session-1",
+  iteration: 1,
+  nextContributionNeeded: true
+});
+
+console.log(`Next persona: ${result.nextPersonaId}`);
+
+// Generate visualization
+console.log(collaborativeReasoning.visualize(result));
+```
+
+### MCP Tools
 
 - **collaborativeReasoning**
   - Simulates expert collaboration with diverse perspectives
