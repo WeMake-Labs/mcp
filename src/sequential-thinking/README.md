@@ -73,7 +73,7 @@ import { SequentialThinking } from "@wemake.cx/sequential-thinking";
 const thinker = new SequentialThinking();
 
 // Step 1: Initial thought
-await thinker.think({
+thinker.think({
   thought: "Analyzing the user's request to migrate to Code Mode",
   thoughtNumber: 1,
   totalThoughts: 3,
@@ -81,7 +81,7 @@ await thinker.think({
 });
 
 // Step 2: Detailed planning
-await thinker.think({
+thinker.think({
   thought: "I need to separate the Core logic from the MCP transport layer",
   thoughtNumber: 2,
   totalThoughts: 3,
@@ -89,7 +89,7 @@ await thinker.think({
 });
 
 // Step 3: Execution
-await thinker.think({
+thinker.think({
   thought: "Implementation complete. Verifying tests.",
   thoughtNumber: 3,
   totalThoughts: 3,

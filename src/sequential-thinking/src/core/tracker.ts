@@ -16,14 +16,14 @@ export class SequentialThinkingTracker {
     }
     const data = input as Record<string, unknown>;
 
-    if (!data.thought || typeof data.thought !== "string") {
-      throw new Error("Invalid thought: must be a string");
+    if (typeof data.thought !== "string" || data.thought.trim() === "") {
+      throw new Error("Invalid thought: must be a non-empty string");
     }
-    if (!data.thoughtNumber || typeof data.thoughtNumber !== "number") {
-      throw new Error("Invalid thoughtNumber: must be a number");
+    if (typeof data.thoughtNumber !== "number" || data.thoughtNumber < 1) {
+      throw new Error("Invalid thoughtNumber: must be a number >= 1");
     }
-    if (!data.totalThoughts || typeof data.totalThoughts !== "number") {
-      throw new Error("Invalid totalThoughts: must be a number");
+    if (typeof data.totalThoughts !== "number" || data.totalThoughts < 1) {
+      throw new Error("Invalid totalThoughts: must be a number >= 1");
     }
     if (typeof data.nextThoughtNeeded !== "boolean") {
       throw new Error("Invalid nextThoughtNeeded: must be a boolean");

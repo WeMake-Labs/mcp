@@ -59,7 +59,7 @@ bun start
 import { SequentialThinking } from "@wemake.cx/sequential-thinking";
 
 const thinker = new SequentialThinking();
-const result = await thinker.think({
+const result = thinker.think({
   thought: "Analyzing problem...",
   thoughtNumber: 1,
   totalThoughts: 5,
