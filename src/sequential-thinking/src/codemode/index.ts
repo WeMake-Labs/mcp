@@ -19,9 +19,9 @@ export class SequentialThinking {
    * Process a thought in the sequential thinking process.
    *
    * @param input - The thought data to process.
-   * @returns A promise resolving to the result of the thinking process.
+   * @returns The result of the thinking process.
    */
-  public async think(input: ThoughtData): Promise<ThinkingProcessResult> {
+  public think(input: ThoughtData): ThinkingProcessResult {
     // The tracker accepts unknown, but we enforce ThoughtData at this layer
     return this.tracker.processThought(input);
   }

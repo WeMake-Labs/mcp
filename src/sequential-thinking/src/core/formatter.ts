@@ -1,6 +1,12 @@
 import chalk from "chalk";
 import { ThoughtData } from "./types.js";
 
+function stripAnsi(str: string): string {
+  // Regex to strip ANSI escape codes
+  // eslint-disable-next-line no-control-regex
+  return str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
+}
+
 export function formatThought(thoughtData: ThoughtData): string {
   const { thoughtNumber, totalThoughts, thought, isRevision, revisesThought, branchFromThought, branchId } =
     thoughtData;
@@ -20,12 +26,21 @@ export function formatThought(thoughtData: ThoughtData): string {
   }
 
   const header = `${prefix} ${thoughtNumber}/${totalThoughts}${context}`;
-  const border = "─".repeat(Math.max(header.length, thought.length) + 4);
+  const headerLength = stripAnsi(header).length;
+
+  // Split thought into lines to handle multi-line content
+  const thoughtLines = thought.split("\n");
+  const maxLineLength = Math.max(...thoughtLines.map((line) => line.length));
+
+  const contentWidth = Math.max(headerLength, maxLineLength);
+  const border = "─".repeat(contentWidth + 2);
+
+  const formattedLines = thoughtLines.map((line) => `│ ${line.padEnd(contentWidth)} │`).join("\n");
 
   return `
 ┌${border}┐
-│ ${header} │
+│ ${header}${" ".repeat(contentWidth - headerLength)} │
 ├${border}┤
-│ ${thought.padEnd(border.length - 2)} │
+${formattedLines}
 └${border}┘`;
 }

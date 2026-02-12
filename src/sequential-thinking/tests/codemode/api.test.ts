@@ -13,7 +13,7 @@ describe("Sequential Thinking Code Mode API", () => {
     expect(sequentialThinking).toBeDefined();
   });
 
-  it("should process a valid thought", async () => {
+  it("should process a valid thought", () => {
     const thought: ThoughtData = {
       thought: "Test thought",
       thoughtNumber: 1,
@@ -21,32 +21,32 @@ describe("Sequential Thinking Code Mode API", () => {
       nextThoughtNeeded: true
     };
 
-    const result = await sequentialThinking.think(thought);
+    const result = sequentialThinking.think(thought);
     expect(result.isError).toBeUndefined();
     expect(result.content[0].text).toContain('"thoughtNumber": 1');
   });
 
-  it("should handle invalid input gracefully", async () => {
+  it("should handle invalid input gracefully", () => {
     // We cast to unknown to simulate runtime type issues if called from JS,
     // though TS would block this.
     const invalidInput = {
       thought: "Missing fields"
     } as unknown as ThoughtData;
 
-    const result = await sequentialThinking.think(invalidInput);
+    const result = sequentialThinking.think(invalidInput);
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("Invalid thoughtNumber");
   });
 
-  it("should maintain state between calls", async () => {
-    await sequentialThinking.think({
+  it("should maintain state between calls", () => {
+    sequentialThinking.think({
       thought: "Thought 1",
       thoughtNumber: 1,
       totalThoughts: 2,
       nextThoughtNeeded: true
     });
 
-    const result = await sequentialThinking.think({
+    const result = sequentialThinking.think({
       thought: "Thought 2",
       thoughtNumber: 2,
       totalThoughts: 2,
