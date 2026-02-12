@@ -1,10 +1,15 @@
 #!/usr/bin/env bun
 
-import { createServer as createMcpServer, runServer } from "./server.js";
+import { createServer, runServer } from "./mcp/server.js";
+import { TransactionManager } from "./codemode/index.js";
 
-// Export the createServer function for testing
-export { createMcpServer as createServer };
-export default createMcpServer;
+// Export Code Mode API
+export { TransactionManager };
+export * from "./core/types.js";
+
+// Export MCP Server factory
+export { createServer };
+export default createServer;
 
 // Run the server if this is the main module
 if (import.meta.main) {
