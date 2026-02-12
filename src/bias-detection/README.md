@@ -45,6 +45,18 @@ These words often signal overgeneralization or unsupported claims that may indic
   - Returns empty array if no bias indicators are found
   - Case-insensitive matching against predefined word list
 
+## Code Mode Usage
+
+You can use the bias detection logic programmatically in your application:
+
+```typescript
+import { BiasDetectionClient } from "@wemake.cx/bias-detection";
+
+const client = new BiasDetectionClient();
+const result = await client.detectBias({ text: "This is obviously biased" });
+console.log(result.biases); // ["obviously"]
+```
+
 ## Setup
 
 ### bunx
