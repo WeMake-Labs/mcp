@@ -13,7 +13,7 @@ export class AnalogicalReasoningMcpServer {
     this.server = new Server(
       {
         name: "analogical-reasoning-server",
-        version: "0.3.5"
+        version: "0.4.0"
       },
       {
         capabilities: {
