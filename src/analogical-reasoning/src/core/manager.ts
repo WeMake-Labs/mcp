@@ -7,6 +7,23 @@ import {
   isValidElementType
 } from "./types.js";
 
+/**
+ * AI Tool Designation: Analogical Reasoning Manager
+ *
+ * Purpose:
+ * Manages the state, validation, and visualization of analogical reasoning processes.
+ * It facilitates the mapping of concepts between source and target domains, inference generation,
+ * and structural alignment evaluation.
+ *
+ * Limitations:
+ * - State Management: Uses in-memory storage for analogy history and domain registry. State is lost upon server restart.
+ * - ID Generation: Uses a simple sequential integer counter for element IDs, which is not persistent.
+ *
+ * Operational Workflow:
+ * 1. Input Validation: Validates raw input against the AnalogicalReasoningData schema using the `validate` method.
+ * 2. State Updates: Updates the internal analogy history and domain registry with the `update` method.
+ * 3. Visualization: Generates human-readable, color-coded ANSI output for the analogy using the `visualize` method.
+ */
 export class AnalogicalReasoningManager {
   private analogyHistory: Record<string, AnalogicalReasoningData[]> = {};
   private domainRegistry: Record<
@@ -18,6 +35,27 @@ export class AnalogicalReasoningManager {
   > = {};
   private nextElementId = 1;
 
+  /**
+   * Validates raw input data against the AnalogicalReasoningData schema.
+   *
+   * Purpose:
+   * Ensures that the input object conforms to the required structure, types, and constraints
+   * for analogical reasoning data processing. It performs deep validation of domains, elements,
+   * mappings, and metadata.
+   *
+   * @param input - The raw input data to validate. Can be any unknown type.
+   *
+   * @returns {AnalogicalReasoningData} The validated and strictly typed AnalogicalReasoningData object.
+   *
+   * @throws {Error} If `analogyId` is missing or not a string.
+   * @throws {Error} If `purpose` is invalid or not one of the allowed values.
+   * @throws {Error} If `confidence` is not a number between 0 and 1.
+   * @throws {Error} If `iteration` is not a non-negative number.
+   * @throws {Error} If `sourceDomain` or `targetDomain` structure is invalid.
+   * @throws {Error} If any element has an invalid name, type, or description.
+   * @throws {Error} If any mapping references non-existent elements or has invalid strength.
+   * @throws {Error} If inference confidence is out of range.
+   */
   public validate(input: unknown): AnalogicalReasoningData {
     const data = input as Record<string, unknown>;
 
@@ -299,6 +337,21 @@ export class AnalogicalReasoningManager {
     this.updateDomainRegistry(data.targetDomain);
   }
 
+  /**
+   * Generates a visualization string for the analogical reasoning data.
+   *
+   * Purpose:
+   * Creates a formatted, ANSI-colored string representation of the analogy for terminal output.
+   * It highlights structural mappings, strength indicators, unmapped elements, and inferences
+   * using the `chalk` library to improve readability and user understanding.
+   *
+   * @param data - The AnalogicalReasoningData object to visualize.
+   *
+   * @returns {string} A string containing the formatted visualization with ANSI escape codes.
+   *
+   * @sideEffects
+   * - None (this method returns a string and does not log to console directly, though the result is intended for console output).
+   */
   public visualize(data: AnalogicalReasoningData): string {
     const { sourceDomain, targetDomain, mappings } = data;
 
