@@ -104,11 +104,11 @@ describe("Edge Cases and Performance", () => {
     expect(goals[0].goal).toBe(longGoal);
   });
 
-   it("handles whitespace-only goal string as valid", () => {  
-    tracker.addGoal("   ");  
-    expect(tracker.getGoals()).toHaveLength(1);  
-    expect(tracker.getGoals()[0].goal).toBe("   ");  
-  }); 
+  it("should reject whitespace-only goal string", () => {  
+    expect(() => {  
+      tracker.addGoal("   ");  
+    }).toThrow("Goal cannot be empty");  
+  });  
 
   it("handles special characters and Unicode in goal", () => {
     const specialGoal = "Learn 日本語 & Emoji 🎉 with quotes \"'`";
