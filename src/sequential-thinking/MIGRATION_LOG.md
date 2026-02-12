@@ -49,7 +49,7 @@ previous implementation consisted of a single `src/index.ts` file.
 
 ### MCP Server (Standard)
 
-```bash
+```sh
 bun start
 ```
 

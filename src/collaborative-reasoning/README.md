@@ -72,7 +72,7 @@ This server supports the MCP Code Mode architecture, allowing direct programmati
 
 #### Installation
 
-```bash
+```sh
 npm install @wemake.cx/collaborative-reasoning
 ```
 

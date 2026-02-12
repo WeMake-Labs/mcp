@@ -1,3 +1,7 @@
+---
+alwaysApply: true
+---
+
 # MCP Code Mode Migration Guide
 
 ## Introduction
@@ -21,20 +25,20 @@ strongly-typed TypeScript API that LLMs can program against directly, rather tha
 
 The Code Mode architecture separates concerns into three distinct layers:
 
-1.  **Core Layer (`src/core/`)**
-    - Contains pure business logic and domain models.
-    - No dependencies on MCP SDK or transport layers.
-    - Defines shared types and interfaces.
+1. **Core Layer (`src/core/`)**
+   - Contains pure business logic and domain models.
+   - No dependencies on MCP SDK or transport layers.
+   - Defines shared types and interfaces.
 
-2.  **Code Mode Layer (`src/codemode/`)**
-    - The public TypeScript API exposed to LLMs.
-    - Wraps the Core layer.
-    - Provides a clean, strictly-typed class-based interface.
+2. **Code Mode Layer (`src/codemode/`)**
+   - The public TypeScript API exposed to LLMs.
+   - Wraps the Core layer.
+   - Provides a clean, strictly-typed class-based interface.
 
-3.  **MCP Layer (`src/mcp/`)**
-    - Adapts the Code Mode API to the standard MCP protocol.
-    - Ensures backward compatibility for clients expecting standard MCP tools.
-    - Handles JSON-RPC request/response mapping.
+3. **MCP Layer (`src/mcp/`)**
+   - Adapts the Code Mode API to the standard MCP protocol.
+   - Ensures backward compatibility for clients expecting standard MCP tools.
+   - Handles JSON-RPC request/response mapping.
 
 ### Directory Structure
 
@@ -57,54 +61,55 @@ src/
 
 ### Phase 1: Preparation
 
-1.  **Identify the Server:** Select a legacy server from `src/` (e.g., `memory`, `scientific-method`).
-2.  **Create Directories:**
-    ```bash
-    mkdir -p src/core src/codemode src/mcp
-    ```
+1. **Identify the Server:** Select a legacy server from `src/` (e.g., `memory`, `scientific-method`).
+2. **Create Directories:**
+
+   ```sh
+   mkdir -p src/core src/codemode src/mcp
+   ```
 
 ### Phase 2: Core Extraction
 
-1.  **Extract Types:** Move all interface definitions to `src/core/types.ts`.
-2.  **Extract Logic:** Move the main logic class (e.g., `KnowledgeGraphManager`) to `src/core/manager.ts`.
-    - Ensure it returns typed objects, not MCP `CallToolResult` structures.
-    - Remove MCP-specific code (like `CallToolRequestSchema`).
+1. **Extract Types:** Move all interface definitions to `src/core/types.ts`.
+2. **Extract Logic:** Move the main logic class (e.g., `KnowledgeGraphManager`) to `src/core/manager.ts`.
+   - Ensure it returns typed objects, not MCP `CallToolResult` structures.
+   - Remove MCP-specific code (like `CallToolRequestSchema`).
 
 ### Phase 3: Code Mode Implementation
 
-1.  **Create API Class:** In `src/codemode/index.ts`, create a class that wraps the Core logic.
+1. **Create API Class:** In `src/codemode/index.ts`, create a class that wraps the Core logic.
 
-    ```typescript
-    import { Manager } from "../core/manager.js";
-    import { InputType, OutputType } from "../core/types.js";
+   ```typescript
+   import { Manager } from "../core/manager.js";
+   import { InputType, OutputType } from "../core/types.js";
 
-    export class ServiceName {
-      private manager: Manager;
+   export class ServiceName {
+     private manager: Manager;
 
-      constructor() {
-        this.manager = new Manager();
-      }
+     constructor() {
+       this.manager = new Manager();
+     }
 
-      public doSomething(input: InputType): OutputType {
-        return this.manager.execute(input);
-      }
-    }
-    ```
+     public doSomething(input: InputType): OutputType {
+       return this.manager.execute(input);
+     }
+   }
+   ```
 
 ### Phase 4: MCP Adapter
 
-1.  **Define Tools:** In `src/mcp/tools.ts`, define the tool schemas using the standard MCP SDK.
-2.  **Implement Server:** In `src/mcp/server.ts`:
-    - Instantiate the Code Mode API class.
-    - Map `callTool` requests to API method calls.
-    - Format API results into MCP `CallToolResult` objects.
+1. **Define Tools:** In `src/mcp/tools.ts`, define the tool schemas using the standard MCP SDK.
+2. **Implement Server:** In `src/mcp/server.ts`:
+   - Instantiate the Code Mode API class.
+   - Map `callTool` requests to API method calls.
+   - Format API results into MCP `CallToolResult` objects.
 
 ### Phase 5: Entry Point & Cleanup
 
-1.  **Update `index.ts`:**
-    - Re-export the Code Mode API.
-    - Run the MCP server if executed directly.
-2.  **Migrate Tests:** Move tests to `tests/core`, `tests/codemode`, and `tests/mcp` to match the new structure.
+1. **Update `index.ts`:**
+   - Re-export the Code Mode API.
+   - Run the MCP server if executed directly.
+2. **Migrate Tests:** Move tests to `tests/core`, `tests/codemode`, and `tests/mcp` to match the new structure.
 
 ---
 
@@ -128,7 +133,7 @@ src/
 
 - [x] `collaborative-reasoning`
 - [ ] `focus-group`
-- [ ] `visual-reasoning`
+- [x] `visual-reasoning`
 - [ ] `multimodal-synthesizer`
 
 ---
@@ -185,9 +190,9 @@ const memory = new Memory();
 
 ## Testing Procedures
 
-1.  **Core Tests:** Unit test the business logic in isolation.
-2.  **Code Mode Tests:** Test the API class to ensure it correctly delegates to Core and handles inputs/outputs.
-3.  **MCP Tests:** Test the server to ensure tool names and arguments are correctly mapped to the API.
+1. **Core Tests:** Unit test the business logic in isolation.
+2. **Code Mode Tests:** Test the API class to ensure it correctly delegates to Core and handles inputs/outputs.
+3. **MCP Tests:** Test the server to ensure tool names and arguments are correctly mapped to the API.
 
 ## Performance & Optimization
 

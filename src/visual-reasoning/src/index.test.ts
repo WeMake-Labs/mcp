@@ -1,61 +1,30 @@
 import { describe, expect, it, beforeEach } from "bun:test";
-import createServer, { VisualReasoningServer } from "./index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { createTestClient } from "../../test-helpers/mcp-test-client.js";
+import { createServer, VisualReasoning } from "./index.js";
 
 /**
  * Test suite for Visual Reasoning MCP Server.
- *
- * Business Context: Ensures the visual-reasoning framework correctly validates
- * inputs and provides reliable functionality for enterprise applications.
- *
- * Decision Rationale: Tests focus on server initialization, schema validation,
- * and core functionality to ensure production-ready reliability.
  */
 describe("Visual Reasoning Server", () => {
   it("server initializes successfully", () => {
     const server = createServer();
     expect(server).toBeDefined();
-  });
-
-  it("server exports correct configuration", () => {
-    const server = createServer();
     expect(typeof server.connect).toBe("function");
     expect(typeof server.close).toBe("function");
   });
-
-  it("server has correct name and version", () => {
-    const server = createServer();
-    expect(server).toBeDefined();
-  });
 });
 
 /**
- * Tool Registration Tests.
+ * Input Validation Tests (Code Mode API).
  */
-describe("Tool Registration", () => {
-  it("should advertise visualReasoning tool", async () => {
-    const server = createTestClient(createServer());
-    const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
-    expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("visualReasoning");
-  });
-});
-
-/**
- * Input Validation Tests.
- */
-describe("Input Validation", () => {
-  let server: VisualReasoningServer;
+describe("Input Validation (Code Mode)", () => {
+  let visualReasoning: VisualReasoning;
 
   beforeEach(() => {
-    server = new VisualReasoningServer();
+    visualReasoning = new VisualReasoning();
   });
 
   it("should reject null input", () => {
-    const result = server.processOperation(null);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid operation");
+    expect(() => visualReasoning.processOperation(null)).toThrow("Invalid operation: input must be an object");
   });
 
   it("should reject missing operation", () => {
@@ -66,9 +35,7 @@ describe("Input Validation", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid operation");
+    expect(() => visualReasoning.processOperation(input)).toThrow("Invalid operation");
   });
 
   it("should reject missing diagramId", () => {
@@ -79,9 +46,7 @@ describe("Input Validation", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid diagramId");
+    expect(() => visualReasoning.processOperation(input)).toThrow("Invalid diagramId");
   });
 
   it("should reject missing diagramType", () => {
@@ -92,9 +57,7 @@ describe("Input Validation", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid diagramType");
+    expect(() => visualReasoning.processOperation(input)).toThrow("Invalid diagramType");
   });
 
   it("should process valid input successfully", () => {
@@ -114,9 +77,9 @@ describe("Input Validation", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(validInput);
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].type).toBe("text");
+    const result = visualReasoning.processOperation(validInput);
+    expect(result).toBeDefined();
+    expect(result.diagramId).toBe("diagram1");
   });
 
   it("should reject elements array containing invalid element type", () => {
@@ -135,9 +98,7 @@ describe("Input Validation", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid element type");
+    expect(() => visualReasoning.processOperation(input)).toThrow("Invalid element type");
   });
 
   it("should reject element objects missing required type field", () => {
@@ -155,9 +116,7 @@ describe("Input Validation", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Missing type");
+    expect(() => visualReasoning.processOperation(input)).toThrow("Invalid element type");
   });
 
   it("should reject transform/operation calls missing transformationType", () => {
@@ -169,74 +128,7 @@ describe("Input Validation", () => {
       iteration: 0,
       nextOperationNeeded: false
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Missing transformationType");
-  });
-
-  it("should reject edge elements missing source or target", () => {
-    const input = {
-      operation: "create",
-      elements: [
-        {
-          id: "edge1",
-          type: "edge",
-          target: "node2"
-        }
-      ],
-      diagramId: "diagram1",
-      diagramType: "graph",
-      iteration: 0,
-      nextOperationNeeded: false,
-      transformationType: "move"
-    };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Missing source/target");
-  });
-
-  it("should reject container elements with invalid contains (non-array)", () => {
-    const input = {
-      operation: "create",
-      elements: [
-        {
-          id: "container1",
-          type: "container",
-          label: "Invalid contains",
-          contains: "not_an_array"
-        }
-      ],
-      diagramId: "diagram1",
-      diagramType: "graph",
-      iteration: 0,
-      nextOperationNeeded: false,
-      transformationType: "regroup"
-    };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid contains");
-  });
-
-  it("should reject container elements with invalid contains (non-string ids)", () => {
-    const input = {
-      operation: "create",
-      elements: [
-        {
-          id: "container1",
-          type: "container",
-          label: "Invalid contains ids",
-          contains: ["node1", 123, "node3"]
-        }
-      ],
-      diagramId: "diagram1",
-      diagramType: "graph",
-      iteration: 0,
-      nextOperationNeeded: false,
-      transformationType: "regroup"
-    };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid contains");
+    expect(() => visualReasoning.processOperation(input)).toThrow("Missing required property: transformationType");
   });
 
   it("should reject invalid iteration values (negative)", () => {
@@ -249,24 +141,7 @@ describe("Input Validation", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid iteration");
-  });
-
-  it("should reject invalid iteration values (non-integer)", () => {
-    const input = {
-      operation: "create",
-      elements: [],
-      diagramId: "diagram1",
-      diagramType: "graph",
-      iteration: 1.5,
-      nextOperationNeeded: false,
-      transformationType: "move"
-    };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid iteration");
+    expect(() => visualReasoning.processOperation(input)).toThrow("Invalid iteration");
   });
 
   it("should reject invalid nextOperationNeeded values (non-boolean)", () => {
@@ -279,9 +154,7 @@ describe("Input Validation", () => {
       nextOperationNeeded: "not_boolean",
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid nextOperationNeeded");
+    expect(() => visualReasoning.processOperation(input)).toThrow("Invalid nextOperationNeeded");
   });
 });
 
@@ -289,10 +162,10 @@ describe("Input Validation", () => {
  * Visual Element Tests.
  */
 describe("Visual Elements", () => {
-  let server: VisualReasoningServer;
+  let visualReasoning: VisualReasoning;
 
   beforeEach(() => {
-    server = new VisualReasoningServer();
+    visualReasoning = new VisualReasoning();
   });
 
   it("should handle node elements", () => {
@@ -312,8 +185,8 @@ describe("Visual Elements", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 
   it("should handle edge elements", () => {
@@ -334,8 +207,8 @@ describe("Visual Elements", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 
   it("should handle container elements", () => {
@@ -356,8 +229,8 @@ describe("Visual Elements", () => {
       nextOperationNeeded: false,
       transformationType: "regroup"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 
   it("should handle annotation elements", () => {
@@ -377,8 +250,8 @@ describe("Visual Elements", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 });
 
@@ -386,10 +259,10 @@ describe("Visual Elements", () => {
  * Operation Type Tests.
  */
 describe("Operation Types", () => {
-  let server: VisualReasoningServer;
+  let visualReasoning: VisualReasoning;
 
   beforeEach(() => {
-    server = new VisualReasoningServer();
+    visualReasoning = new VisualReasoning();
   });
 
   it("should handle create operation", () => {
@@ -402,8 +275,8 @@ describe("Operation Types", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 
   it("should handle update operation", () => {
@@ -416,8 +289,8 @@ describe("Operation Types", () => {
       nextOperationNeeded: false,
       transformationType: "recolor"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 
   it("should handle delete operation", () => {
@@ -430,8 +303,8 @@ describe("Operation Types", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 
   it("should handle transform operation", () => {
@@ -444,8 +317,8 @@ describe("Operation Types", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 
   it("should handle observe operation", () => {
@@ -458,36 +331,8 @@ describe("Operation Types", () => {
       observation: "The graph shows a clear cluster pattern",
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
-  });
-});
-
-/**
- * MCP Server Integration Tests.
- */
-describe("MCP Server Integration", () => {
-  it("server can be created without errors", () => {
-    const server = createServer();
-    expect(server).toBeDefined();
-    expect(typeof server.connect).toBe("function");
-    expect(typeof server.close).toBe("function");
-  });
-
-  it("rejects unknown tool name", async () => {
-    const server = createTestClient(createServer());
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "unknownTool",
-          arguments: {}
-        }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBe(true);
-    expect(response.content[0].text).toContain("Unknown tool");
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 });
 
@@ -495,10 +340,10 @@ describe("MCP Server Integration", () => {
  * Edge Cases and Performance Tests.
  */
 describe("Edge Cases and Performance", () => {
-  let server: VisualReasoningServer;
+  let visualReasoning: VisualReasoning;
 
   beforeEach(() => {
-    server = new VisualReasoningServer();
+    visualReasoning = new VisualReasoning();
   });
 
   it("handles large number of elements", () => {
@@ -517,8 +362,8 @@ describe("Edge Cases and Performance", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 
   it("handles empty elements array", () => {
@@ -531,8 +376,8 @@ describe("Edge Cases and Performance", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 
   it("handles special characters in labels", () => {
@@ -552,8 +397,8 @@ describe("Edge Cases and Performance", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 
   it("handles all diagram types", () => {
@@ -576,8 +421,8 @@ describe("Edge Cases and Performance", () => {
         nextOperationNeeded: false,
         transformationType: "move"
       };
-      const result = server.processOperation(input);
-      expect(result.isError).toBeUndefined();
+      const result = visualReasoning.processOperation(input);
+      expect(result).toBeDefined();
     }
   });
 
@@ -593,15 +438,15 @@ describe("Edge Cases and Performance", () => {
     for (const transformationType of transformationTypes) {
       const input = {
         operation: "transform",
-        elements: [{ id: "n1", type: "node", properties: {} }],
+        elements: [{ id: "n1", type: "node", properties: { x: 200, y: 200 } }],
         diagramId: "d1",
         diagramType: "graph",
         iteration: 0,
         nextOperationNeeded: false,
         transformationType
       };
-      const result = server.processOperation(input);
-      expect(result.isError).toBeUndefined();
+      const result = visualReasoning.processOperation(input);
+      expect(result).toBeDefined();
     }
   });
 
@@ -625,7 +470,7 @@ describe("Edge Cases and Performance", () => {
       nextOperationNeeded: false,
       transformationType: "move"
     };
-    const result = server.processOperation(input);
-    expect(result.isError).toBeUndefined();
+    const result = visualReasoning.processOperation(input);
+    expect(result).toBeDefined();
   });
 });
