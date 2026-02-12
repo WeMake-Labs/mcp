@@ -116,6 +116,28 @@ Example:
   - Supports iterative refinement of self-awareness and calibration
   - Tracks knowledge boundaries and reasoning quality over time
 
+### Code Mode Usage
+
+This server supports **Code Mode**, allowing LLMs to import and use the functionality directly as a TypeScript API.
+
+```typescript
+import { metacognitive } from "@wemake.cx/metacognitive-monitoring";
+
+// Direct API usage
+const result = await metacognitive.monitor({
+  task: "Analyze complex system",
+  stage: "planning",
+  overallConfidence: 0.8,
+  uncertaintyAreas: ["Edge cases"],
+  recommendedApproach: "Systematic decomposition",
+  monitoringId: "mon-1",
+  iteration: 1,
+  nextAssessmentNeeded: true
+});
+
+console.log(result.task); // "Analyze complex system"
+```
+
 ## Setup
 
 ### Cursor
