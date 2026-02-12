@@ -1,7 +1,16 @@
 # Knowledge Graph Memory Server
 
-A basic implementation of persistent memory using a local knowledge graph. This lets the assistant remember information
-about the user across chats.
+A robust implementation of persistent memory using a local knowledge graph, now featuring a **Code Mode API** for
+programmatic access. This server allows AI agents to store and retrieve structured information about users and concepts
+across sessions.
+
+## Architecture
+
+This server follows the **Code Mode Architecture** (3-layer design):
+
+1. **Core (`src/core/`)**: Pure business logic and domain models (`KnowledgeGraphManager`).
+2. **Code Mode (`src/codemode/`)**: Strictly-typed TypeScript API (`MemoryGraph`) for direct programmatic usage.
+3. **MCP Adapter (`src/mcp/`)**: Protocol adapter exposing the API as MCP tools.
 
 ## Core Concepts
 
@@ -13,143 +22,19 @@ Entities are the primary nodes in the knowledge graph. Each entity has:
 - An entity type (e.g., "person", "organization", "event")
 - A list of observations
 
-Example:
-
-```json
-{
-  "name": "John_Smith",
-  "entityType": "person",
-  "observations": ["Speaks fluent Spanish"]
-}
-```
-
 ### Relations
 
-Relations define directed connections between entities. They are always stored in active voice and describe how entities
-interact or relate to each other.
-
-Example:
-
-```json
-{
-  "from": "John_Smith",
-  "to": "Anthropic",
-  "relationType": "works_at"
-}
-```
+Relations define directed connections between entities. They are always stored in active voice.
 
 ### Observations
 
-Observations are discrete pieces of information about an entity. They are:
+Discrete pieces of information attached to specific entities.
 
-- Stored as strings
-- Attached to specific entities
-- Can be added or removed independently
-- Should be atomic (one fact per observation)
+## Usage
 
-Example:
+### 1. As an MCP Server (Standard)
 
-```json
-{
-  "entityName": "John_Smith",
-  "observations": ["Speaks fluent Spanish", "Graduated in 2019", "Prefers morning meetings"]
-}
-```
-
-## API
-
-### Tools
-
-- **create_entities**
-  - Create multiple new entities in the knowledge graph
-  - Input: `entities` (array of objects)
-    - Each object contains:
-      - `name` (string): Entity identifier
-      - `entityType` (string): Type classification
-      - `observations` (string[]): Associated observations
-  - Ignores entities with existing names
-
-- **create_relations**
-  - Create multiple new relations between entities
-  - Input: `relations` (array of objects)
-    - Each object contains:
-      - `from` (string): Source entity name
-      - `to` (string): Target entity name
-      - `relationType` (string): Relationship type in active voice
-  - Skips duplicate relations
-
-- **add_observations**
-  - Add new observations to existing entities
-  - Input: `observations` (array of objects)
-    - Each object contains:
-      - `entityName` (string): Target entity
-      - `contents` (string[]): New observations to add
-  - Returns added observations per entity
-  - Fails if entity doesn't exist
-
-- **delete_entities**
-  - Remove entities and their relations
-  - Input: `entityNames` (string[])
-  - Cascading deletion of associated relations
-  - Silent operation if entity doesn't exist
-
-- **delete_observations**
-  - Remove specific observations from entities
-  - Input: `deletions` (array of objects)
-    - Each object contains:
-      - `entityName` (string): Target entity
-      - `observations` (string[]): Observations to remove
-  - Silent operation if observation doesn't exist
-
-- **delete_relations**
-  - Remove specific relations from the graph
-  - Input: `relations` (array of objects)
-    - Each object contains:
-      - `from` (string): Source entity name
-      - `to` (string): Target entity name
-      - `relationType` (string): Relationship type
-  - Silent operation if relation doesn't exist
-
-- **read_graph**
-  - Read the entire knowledge graph
-  - No input required
-  - Returns complete graph structure with all entities and relations
-
-- **search_nodes**
-  - Search for nodes based on query
-  - Input: `query` (string)
-  - Searches across:
-    - Entity names
-    - Entity types
-    - Observation content
-  - Returns matching entities and their relations
-
-- **open_nodes**
-  - Retrieve specific nodes by name
-  - Input: `names` (string[])
-  - Returns:
-    - Requested entities
-    - Relations between requested entities
-  - Silently skips non-existent nodes
-
-## Setup
-
-### bunx
-
-```json
-{
-  "mcpServers": {
-    "Memory": {
-      "command": "bunx",
-      "args": ["@wemake.cx/memory@latest"]
-    }
-  }
-}
-```
-
-#### bunx with custom settings
-
-The server can be configured using the following environment variables:
+Configure your MCP client (e.g., Claude Desktop, Trae) to use this server:
 
 ```json
 {
@@ -165,33 +50,64 @@ The server can be configured using the following environment variables:
 }
 ```
 
-- `MEMORY_FILE_PATH`: Path to the memory storage JSON file (default: `memory.jsonl` in the server directory)
+**Tools Available:**
 
-## System Prompt
+- `create_entities`: Create new entities.
+- `create_relations`: Create relationships between entities.
+- `add_observations`: Add facts to existing entities.
+- `delete_entities`: Remove entities and their relations.
+- `delete_observations`: Remove specific facts.
+- `delete_relations`: Remove specific relationships.
+- `read_graph`: Read the entire graph.
+- `search_nodes`: Search for entities/relations by query.
+- `open_nodes`: Retrieve specific entities by name.
 
-The prompt for utilizing memory depends on the use case. Changing the prompt will help the model determine the frequency
-and types of memories created.
+### 2. Programmatic API (Code Mode)
 
-```markdown
-Follow these steps for each interaction:
+You can import and use the `MemoryGraph` class directly in your TypeScript applications or other MCP servers.
 
-1. User Identification:
-   - You should assume that you are interacting with default_user
-   - If you have not identified default_user, proactively try to do so.
+```typescript
+import { MemoryGraph } from "@wemake.cx/memory";
 
-2. Memory Retrieval:
-   - Always begin your chat by saying only "Remembering..." and retrieve all relevant information from your knowledge
-     graph
-   - Always refer to your knowledge graph as your "memory"
+// Initialize with path to memory file
+const memory = new MemoryGraph("./memory.jsonl");
 
-3. Memory
-   - While conversing with the user, be attentive to any new information that falls into these categories: a) Basic
-     Identity (age, gender, location, job title, education level, etc.) b) Behaviors (interests, habits, etc.) c)
-     Preferences (communication style, preferred language, etc.) d) Goals (goals, targets, aspirations, etc.) e)
-     Relationships (personal and professional relationships up to 3 degrees of separation)
+// Create entities
+await memory.createEntities([
+  {
+    name: "John Doe",
+    entityType: "person",
+    observations: ["Software Engineer", "Likes coffee"]
+  }
+]);
 
-4. Memory Update:
-   - If any new information was gathered during the interaction, update your memory as follows: a) Create entities for
-     recurring organizations, people, and significant events b) Connect them to the current entities using relations c)
-     Store facts about them as observations
+// Add observations
+await memory.addObservations([
+  {
+    entityName: "John Doe",
+    contents: ["Started working on MCP migration"]
+  }
+]);
+
+// Search
+const results = await memory.searchNodes("John");
+console.log(results);
+```
+
+## Configuration
+
+- `MEMORY_FILE_PATH`: Path to the memory storage JSON file (default: `memory.jsonl` in the server directory).
+
+## Development
+
+### Build
+
+```bash
+bun run build
+```
+
+### Test
+
+```bash
+bun test
 ```
