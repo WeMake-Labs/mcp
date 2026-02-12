@@ -194,7 +194,7 @@ const ETHICAL_REASONING_TOOL: Tool = {
 /**
  * Factory function that creates and configures an ethical reasoning MCP server instance.
  *
- * This function initializes a Server with the name "ethical-reasoning-server" and version "0.3.0",
+ * This function initializes a Server with the name "ethical-reasoning-server" and version "0.4.0",
  * registers the ETHICAL_REASONING_TOOL, and sets up request handlers for listing available tools
  * and processing ethical reasoning requests. The CallTool handler calls EthicalReasoningServer.process
  * when req.params.name === "ethicalReasoning" and returns an error response for unknown tool names.
@@ -213,7 +213,7 @@ const ETHICAL_REASONING_TOOL: Tool = {
  * ```
  */
 export default function createServer(): Server {
-  const server = new Server({ name: "ethical-reasoning-server", version: "0.3.0" }, { capabilities: { tools: {} } });
+  const server = new Server({ name: "ethical-reasoning-server", version: "0.4.0" }, { capabilities: { tools: {} } });
   const ethicalServer = new EthicalReasoningServer();
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [ETHICAL_REASONING_TOOL] }));
