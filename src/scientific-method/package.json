@@ -34,7 +34,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' && tsc",
+    "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' && tsc -p tsconfig.build.json",
     "start": "bun run ./dist/index.js",
     "test": "bun test",
     "publish": "bun publish"
