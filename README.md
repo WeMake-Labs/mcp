@@ -59,6 +59,17 @@ Our ecosystem includes specialized MCP servers organized into key cognitive and 
 - **Cloudflare Workers Compatible**: Deploy via Worker-compatible bundles free of Bun-only APIs
 - **Monorepo Architecture**: Unified workspace with automated testing and CI/CD
 
+### 🚀 Code Mode Migration
+
+We are currently migrating our MCP servers to a **Code Mode** architecture. This new pattern exposes tools as a
+programmable TypeScript API, allowing LLMs to write code that interacts directly with our services rather than relying
+solely on JSON-RPC tool calls.
+
+- **Status:** 🚧 In Progress
+- **Migrated Servers:** `sequential-thinking`, `metacognitive-monitoring`
+- **Documentation:** See the detailed [MCP Code Mode Migration Guide](docs/MCP_CODE_MODE_MIGRATION.md) for architecture
+  specs, step-by-step instructions, and performance benefits.
+
 ### 🚀 Quick Start
 
 ```sh
