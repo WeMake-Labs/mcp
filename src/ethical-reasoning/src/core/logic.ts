@@ -7,11 +7,11 @@ import { EthicalRequestData, FrameworkType, frameworks, EthicalAnalysisResult } 
 export class EthicalAnalyzer {
   private history: EthicalRequestData[] = [];
 
-  public validateData(input: unknown): EthicalRequestData {  
-    if (input === null || input === undefined) {  
-      throw new Error("null is not an object");  
-    }  
-    const data = input as Record<string, unknown>;  
+  public validateData(input: unknown): EthicalRequestData {
+    if (input === null || input === undefined) {
+      throw new Error("null is not an object");
+    }
+    const data = input as Record<string, unknown>;
 
     if (!data.scenario || typeof data.scenario !== "string") {
       throw new Error("Invalid scenario: must be a string");
@@ -73,7 +73,7 @@ export class EthicalAnalyzer {
   public async analyze(input: unknown): Promise<EthicalAnalysisResult> {
     const data = this.validateData(input);
     this.history.push(data);
-    
+
     const verbose = process.env.MCP_VERBOSE === "1";
     if (verbose) {
       console.error(chalk.bold("Scenario:") + " " + data.scenario);
@@ -88,10 +88,12 @@ export class EthicalAnalyzer {
     for (const f of data.frameworks) {
       const guidance = this.frameworkGuidance(f, data.scenario, data.action);
       guidanceByFramework[f] = guidance;
-      if (verbose) {
-        const header = chalk.cyan(`[${f}]`);
-        console.error(header + " " + guidance);
-      }
+
+      // RESTORED: Unconditional logging of framework guidance
+      // This ensures that guidance is always visible in stderr for debugging/monitoring
+      // regardless of the MCP_VERBOSE setting.
+      const header = chalk.cyan(`[${f}]`);
+      console.error(header + " " + guidance);
     }
     if (verbose) console.error("");
 

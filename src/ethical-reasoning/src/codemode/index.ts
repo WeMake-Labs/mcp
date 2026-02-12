@@ -15,7 +15,7 @@ export class EthicalReasoningAPI {
 
   /**
    * Analyze an ethical scenario using the configured frameworks.
-   * 
+   *
    * @param input - The input object containing scenario, action, and frameworks.
    * @returns A promise resolving to the ethical analysis result.
    */

@@ -1,4 +1,3 @@
-
 // Supported frameworks
 export const frameworks = Object.freeze(["utilitarianism", "deontology", "virtue", "care", "social-contract"] as const);
 

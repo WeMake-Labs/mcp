@@ -57,29 +57,34 @@ The server encourages analysis through multiple ethical frameworks to:
 
 #### Limitations
 
-This tool is designed as a **decision-support aid**, not an automated moral decision-maker. It has the following limitations:
+This tool is designed as a **decision-support aid**, not an automated moral decision-maker. It has the following
+limitations:
 
-1.  **Non-Deterministic Guidance**: The tool provides ethical *perspectives* and *considerations*, not definitive "right" or "wrong" answers.
-2.  **Context Sensitivity**: The quality of the analysis depends heavily on the detail and nuance provided in the `scenario` description.
-3.  **No Moral Agency**: The tool does not hold moral responsibility; it merely reflects established ethical frameworks onto the provided input.
-4.  **Framework Bias**: Each framework has inherent biases (e.g., Utilitarianism favors the majority, Deontology favors rules). The tool does not reconcile these differences but presents them for human synthesis.
+1.  **Non-Deterministic Guidance**: The tool provides ethical _perspectives_ and _considerations_, not definitive
+    "right" or "wrong" answers.
+2.  **Context Sensitivity**: The quality of the analysis depends heavily on the detail and nuance provided in the
+    `scenario` description.
+3.  **No Moral Agency**: The tool does not hold moral responsibility; it merely reflects established ethical frameworks
+    onto the provided input.
+4.  **Framework Bias**: Each framework has inherent biases (e.g., Utilitarianism favors the majority, Deontology favors
+    rules). The tool does not reconcile these differences but presents them for human synthesis.
 
 #### Operational Workflow
 
 The tool operates through a strict, linear workflow to ensure consistent analysis:
 
 1.  **Input Validation**:
-    -   Validates presence of `scenario` and `action`.
-    -   Verifies selected `frameworks` are supported.
-    -   Checks confidence scores are within 0.0-1.0 range.
+    - Validates presence of `scenario` and `action`.
+    - Verifies selected `frameworks` are supported.
+    - Checks confidence scores are within 0.0-1.0 range.
 2.  **Framework Analysis** (Parallel):
-    -   The tool processes the input against each selected framework independently.
-    -   Generates framework-specific guidance based on the unique principles of that theory.
+    - The tool processes the input against each selected framework independently.
+    - Generates framework-specific guidance based on the unique principles of that theory.
 3.  **Result Aggregation**:
-    -   Compiles all framework analyses into a structured result object.
-    -   Calculates metadata (request number, confidence pass-through).
+    - Compiles all framework analyses into a structured result object.
+    - Calculates metadata (request number, confidence pass-through).
 4.  **Output Generation**:
-    -   Returns the structured `EthicalAnalysisResult` containing specific guidance for each framework.
+    - Returns the structured `EthicalAnalysisResult` containing specific guidance for each framework.
 
 ### TypeScript API (Code Mode)
 
