@@ -1,6 +1,12 @@
 import { NarrativeInput, NarrativeOutline } from "./types.js";
 
-export function validateNarrativeInput(input: unknown): NarrativeInput {
+/**  
+ * AI Tool: Narrative Input Validator  
+ * Purpose: Validates and sanitizes user input for narrative planning requests.  
+ * Limitations: Assumes English text; does not validate semantic coherence of inputs.  
+ * Workflow: 1. Validate object structure 2. Validate premise field 3. Validate characters array 4. Validate arcs array  
+ */  
+export function validateNarrativeInput(input: unknown): NarrativeInput { 
   if (!input || typeof input !== "object") {
     throw new Error("Invalid input: must be an object");
   }
@@ -32,6 +38,12 @@ export function validateNarrativeInput(input: unknown): NarrativeInput {
   return data as NarrativeInput;
 }
 
+/**  
+ * AI Tool: Narrative Planner  
+ * Purpose: Generates a simple three-act story outline from validated narrative inputs.  
+ * Limitations: Creates basic template-based outlines; does not use AI for creative generation.  
+ * Workflow: 1. Format characters into comma-separated list 2. Extract setup from premise 3. Map arcs to conflicts 4. Generate resolution text  
+ */  
 export function planNarrative(data: NarrativeInput): NarrativeOutline {
   const chars = data.characters
     .map((c) => c.trim())
