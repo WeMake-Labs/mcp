@@ -97,7 +97,7 @@ export class ConstraintSolverServer {
 /**
  * Factory function that creates and configures a constraint solver MCP server instance.
  *
- * This function initializes a Server with the name "constraint-solver-server" and version "0.3.0",
+ * This function initializes a Server with the name "constraint-solver-server" and version "0.4.0",
  * registers the CONSTRAINT_SOLVER_TOOL, and sets up request handlers for listing available tools
  * and processing constraint solving requests. The CallTool handler calls ConstraintSolverServer.process
  * when req.params.name === "constraintSolver" and returns an error response for unknown tool names.
@@ -117,7 +117,7 @@ export class ConstraintSolverServer {
  * ```
  */
 export default function createServer(): Server {
-  const server = new Server({ name: "constraint-solver-server", version: "0.3.0" }, { capabilities: { tools: {} } });
+  const server = new Server({ name: "constraint-solver-server", version: "0.4.0" }, { capabilities: { tools: {} } });
   const constraintServer = new ConstraintSolverServer();
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [CONSTRAINT_SOLVER_TOOL] }));
