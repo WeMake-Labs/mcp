@@ -3,10 +3,10 @@
   "author": "WeMake (https://wemake.cx)",
   "repository": {
     "type": "git",
-    "url": "git+https://WeMake-Labs/mcp.git"
+    "url": "git+https://github.com/WeMake-Labs/mcp.git"
   },
   "bugs": {
-    "url": "https://WeMake-Labs/mcp/issues"
+    "url": "https://github.com/WeMake-Labs/mcp/issues"
   },
   "description": "WeMake Model Context Protocol (MCP) servers",
   "homepage": "https://wemake.cx",

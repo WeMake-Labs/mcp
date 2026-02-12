@@ -17,13 +17,11 @@ export class MetacognitiveCodeMode {
   /**
    * Performs a metacognitive monitoring assessment.
    *
-   * @param input - The monitoring data input
+   * @param input - The monitoring data input. Must be a complete object satisfying the MetacognitiveMonitoringData interface.
    * @returns The monitoring result
    */
-  public async monitor(input: Partial<MetacognitiveMonitoringData>): Promise<MonitoringResult> {
-    // We treat the input as potentially partial but the analyzer validates it.
-    // In a real Code Mode scenario, we might want to relax validation or fill defaults,
-    // but for now we pass it through.
+  public async monitor(input: MetacognitiveMonitoringData): Promise<MonitoringResult> {
+    // Pass strictly typed input to the analyzer
     const { result } = this.analyzer.process(input);
     return result;
   }
