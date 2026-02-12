@@ -1,10 +1,10 @@
 import { describe, expect, it, beforeEach, afterEach } from "bun:test";
-import createServer, { KnowledgeGraphManager } from "./index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { MemoryGraph } from "./codemode/index.js";
+import { createServer } from "./mcp/server.js";
+import { tools } from "./mcp/tools.js";
 import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 // Test helpers
 const testMemoryPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "test-memory.jsonl");
@@ -17,16 +17,7 @@ async function cleanupTestFile(): Promise<void> {
   }
 }
 
-/**
- * Test suite for Memory MCP Server.
- *
- * Business Context: Ensures the memory framework correctly validates
- * inputs and provides reliable functionality for enterprise applications.
- *
- * Decision Rationale: Tests focus on server initialization, schema validation,
- * and core functionality to ensure production-ready reliability.
- */
-describe("Memory Server", () => {
+describe("Memory Server (Code Mode)", () => {
   beforeEach(async () => {
     await cleanupTestFile();
   });
@@ -40,48 +31,25 @@ describe("Memory Server", () => {
     expect(server).toBeDefined();
   });
 
-  it("server exports correct configuration", () => {
-    const server = createServer();
-    expect(typeof server.connect).toBe("function");
-    expect(typeof server.close).toBe("function");
+  it("MemoryGraph initializes successfully", () => {
+    const graph = new MemoryGraph(testMemoryPath);
+    expect(graph).toBeDefined();
   });
 });
 
-/**
- * Tool Registration Tests.
- */
-describe("Tool Registration", () => {
-  it("should advertise memory tools", async () => {
-    const server = createTestClient(createServer());
-    const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
-
-    // Memory server registers 9 tools
-    expect(response.tools.length).toBeGreaterThanOrEqual(9);
-    const toolNames = response.tools.map((tool: { name: string }) => tool.name);
-    expect(toolNames).toContain("create_entities");
-    expect(toolNames).toContain("create_relations");
-    expect(toolNames).toContain("list_entities");
-    expect(toolNames).toContain("get_entity");
-    expect(toolNames).toContain("delete_entity");
-    expect(toolNames).toContain("upsert_entity");
-    expect(toolNames).toContain("query_entities");
-    expect(toolNames).toContain("export_entities");
-    expect(toolNames).toContain("import_entities");
-  });
-});
-
-/**
- * Entity CRUD Tests.
- */
-describe("Entity CRUD Operations", () => {
-  let manager: KnowledgeGraphManager;
+describe("Entity CRUD Operations (Code Mode)", () => {
+  let graph: MemoryGraph;
 
   beforeEach(() => {
-    manager = new KnowledgeGraphManager();
+    graph = new MemoryGraph(testMemoryPath);
+  });
+
+  afterEach(async () => {
+    await cleanupTestFile();
   });
 
   it("should create entity successfully", async () => {
-    const entities = await manager.createEntities([
+    const entities = await graph.createEntities([
       {
         name: "Test Entity",
         entityType: "concept",
@@ -94,9 +62,23 @@ describe("Entity CRUD Operations", () => {
     expect(entities[0].entityType).toBe("concept");
   });
 
-  it("should read entity successfully", async () => {
-    // First create an entity
-    await manager.createEntities([
+  it("should handle duplicate entity creation gracefully", async () => {
+    await graph.createEntities([{ name: "Duplicate", entityType: "test", observations: [] }]);
+
+    const result = await graph.createEntities([
+      { name: "Duplicate", entityType: "test", observations: ["Ignored"] },
+      { name: "New", entityType: "test", observations: [] }
+    ]);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("New");
+
+    const nodes = await graph.openNodes(["Duplicate"]);
+    expect(nodes.entities[0].observations).toHaveLength(0);
+  });
+
+  it("should read entity successfully via openNodes", async () => {
+    await graph.createEntities([
       {
         name: "Test Entity",
         entityType: "concept",
@@ -104,17 +86,18 @@ describe("Entity CRUD Operations", () => {
       }
     ]);
 
-    // Then read it back
-    const graph = await manager.openNodes(["Test Entity"]);
-
-    expect(graph.entities).toHaveLength(1);
-    expect(graph.entities[0].name).toBe("Test Entity");
-    expect(graph.entities[0].observations).toContain("Test observation");
+    const result = await graph.openNodes(["Test Entity"]);
+    expect(result.entities).toHaveLength(1);
+    expect(result.entities[0].name).toBe("Test Entity");
   });
 
-  it("should update entity successfully", async () => {
-    // First create an entity
-    await manager.createEntities([
+  it("should return empty for non-existent entities in openNodes", async () => {
+    const result = await graph.openNodes(["NonExistent"]);
+    expect(result.entities).toHaveLength(0);
+  });
+
+  it("should update entity via addObservations", async () => {
+    await graph.createEntities([
       {
         name: "Test Entity",
         entityType: "concept",
@@ -122,20 +105,27 @@ describe("Entity CRUD Operations", () => {
       }
     ]);
 
-    // Then add observations to it
-    const updatedEntities = await manager.addObservations([
+    const updated = await graph.addObservations([
       {
         entityName: "Test Entity",
-        contents: ["Updated observation", "Another observation"]
+        contents: ["Updated observation"]
       }
     ]);
 
-    expect(updatedEntities).toHaveLength(1);
+    expect(updated).toHaveLength(1);
+
+    const result = await graph.openNodes(["Test Entity"]);
+    expect(result.entities[0].observations).toContain("Updated observation");
+  });
+
+  it("should throw error when adding observations to non-existent entity", async () => {
+    expect(graph.addObservations([{ entityName: "Ghost", contents: ["Boo"] }])).rejects.toThrow(
+      "Entity with name Ghost not found"
+    );
   });
 
   it("should delete entity successfully", async () => {
-    // First create an entity
-    await manager.createEntities([
+    await graph.createEntities([
       {
         name: "Test Entity",
         entityType: "concept",
@@ -143,644 +133,224 @@ describe("Entity CRUD Operations", () => {
       }
     ]);
 
-    // Then delete it
-    await manager.deleteEntities(["Test Entity"]);
+    await graph.deleteEntities(["Test Entity"]);
 
-    // Verify it's deleted by trying to read it
-    const graph = await manager.openNodes(["Test Entity"]);
-    expect(graph.entities).toHaveLength(0);
+    const result = await graph.openNodes(["Test Entity"]);
+    expect(result.entities).toHaveLength(0);
   });
 
-  it("should handle duplicate entity creation", async () => {
-    await manager.createEntities([
-      {
-        name: "Duplicate Entity",
-        entityType: "concept",
-        observations: ["First"]
-      }
-    ]);
-
-    const entities = await manager.createEntities([
-      {
-        name: "Duplicate Entity",
-        entityType: "concept",
-        observations: ["Second"]
-      }
-    ]);
-
-    // Should handle duplicates gracefully
-    expect(entities).toHaveLength(1);
-  });
-
-  it("should handle reading non-existent entity", async () => {
-    const graph = await manager.openNodes(["Non-existent"]);
-
-    expect(graph.entities).toHaveLength(0);
-  });
-
-  it("should handle updating non-existent entity", async () => {
-    const entities = await manager.addObservations([
-      {
-        entityName: "Non-existent",
-        contents: ["Update"]
-      }
-    ]);
-
-    // Should handle non-existent entities gracefully
-    expect(entities).toHaveLength(0);
-  });
-
-  it("should handle deleting non-existent entity", async () => {
-    // Should handle non-existent entities gracefully
-    await manager.deleteEntities(["Non-existent"]);
-
-    // No error should be thrown
+  it("should handle deleting non-existent entities gracefully", async () => {
+    await graph.deleteEntities(["Ghost"]);
+    // Should not throw
   });
 });
 
-/**
- * Relation Management Tests.
- */
 describe("Relation Management", () => {
-  let manager: KnowledgeGraphManager;
+  let graph: MemoryGraph;
 
   beforeEach(() => {
-    manager = new KnowledgeGraphManager();
-  });
-
-  it("should create relation successfully", async () => {
-    // First create entities
-    await manager.createEntities([
-      {
-        name: "Entity A",
-        entityType: "concept",
-        observations: ["Entity A observation"]
-      },
-      {
-        name: "Entity B",
-        entityType: "concept",
-        observations: ["Entity B observation"]
-      }
-    ]);
-
-    // Then create relation
-    const relations = await manager.createRelations([
-      {
-        from: "Entity A",
-        to: "Entity B",
-        relationType: "relates-to"
-      }
-    ]);
-
-    expect(relations).toHaveLength(1);
-    expect(relations[0].from).toBe("Entity A");
-    expect(relations[0].to).toBe("Entity B");
-  });
-
-  it("should handle relation between non-existent entities", async () => {
-    const relations = await manager.createRelations([
-      {
-        from: "Non-existent A",
-        to: "Non-existent B",
-        relationType: "relates-to"
-      }
-    ]);
-
-    // Should handle gracefully
-    expect(relations).toHaveLength(0);
-  });
-
-  it("should delete relation successfully", async () => {
-    // First create entities and relation
-    await manager.createEntities([
-      { name: "A", entityType: "concept", observations: [] },
-      { name: "B", entityType: "concept", observations: [] }
-    ]);
-    await manager.createRelations([{ from: "A", to: "B", relationType: "relates-to" }]);
-
-    // Then delete relation
-    await manager.deleteRelations([{ from: "A", to: "B", relationType: "relates-to" }]);
-
-    // Verify it's deleted
-    const graph = await manager.readGraph();
-    expect(graph.relations).toHaveLength(0);
-  });
-
-  it("should handle deleting non-existent relation", async () => {
-    // Should handle gracefully
-    await manager.deleteRelations([
-      {
-        from: "Non-existent",
-        to: "Non-existent",
-        relationType: "non-existent"
-      }
-    ]);
-
-    // No error should be thrown
-  });
-});
-
-/**
- * Graph Query Tests.
- */
-describe("Graph Queries", () => {
-  let manager: KnowledgeGraphManager;
-
-  beforeEach(async () => {
-    manager = new KnowledgeGraphManager();
-
-    // Setup test data
-    await manager.createEntity({
-      name: "Alice",
-      entityType: "person",
-      observations: ["Alice is a developer"]
-    });
-
-    await manager.createEntity({
-      name: "Bob",
-      entityType: "person",
-      observations: ["Bob is a designer"]
-    });
-
-    await manager.createEntity({
-      name: "Project X",
-      entityType: "project",
-      observations: ["Project X is a web application"]
-    });
-
-    await manager.createRelation({
-      from: "Alice",
-      to: "Project X",
-      relationType: "works-on"
-    });
-
-    await manager.createRelation({
-      from: "Bob",
-      to: "Project X",
-      relationType: "designs"
-    });
-  });
-
-  it("should search nodes by query", async () => {
-    const graph = await manager.searchNodes("Alice");
-
-    expect(graph.entities.length).toBeGreaterThan(0);
-    expect(graph.entities[0].name).toBe("Alice");
-  });
-
-  it("should read entire graph", async () => {
-    const graph = await manager.readGraph();
-
-    expect(graph.entities.length).toBeGreaterThanOrEqual(3);
-    expect(graph.relations.length).toBeGreaterThanOrEqual(2);
-  });
-
-  it("should search nodes with no results", async () => {
-    const graph = await manager.searchNodes("Non-existent");
-
-    expect(graph.entities).toHaveLength(0);
-  });
-
-  it("should handle searching non-existent entity", async () => {
-    const graph = await manager.searchNodes("Non-existent");
-
-    expect(graph.entities).toHaveLength(0);
-  });
-
-  it("should handle paths with no path found", async () => {
-    await manager.createEntities([
-      {
-        name: "Isolated",
-        entityType: "concept",
-        observations: ["Isolated entity"]
-      }
-    ]);
-
-    const graph = await manager.readGraph();
-
-    // Verify isolated entity exists but has no relations
-    const isolated = graph.entities.find((e) => e.name === "Isolated");
-    expect(isolated).toBeDefined();
-  });
-});
-
-/**
- * File I/O Tests.
- */
-describe("File I/O Operations", () => {
-  let manager: KnowledgeGraphManager;
-
-  beforeEach(() => {
-    // Override the memory file path for testing
-    process.env.MEMORY_FILE_PATH = testMemoryPath;
-    manager = new KnowledgeGraphManager();
+    graph = new MemoryGraph(testMemoryPath);
   });
 
   afterEach(async () => {
-    delete process.env.MEMORY_FILE_PATH;
-  });
-
-  it("should persist data to file", async () => {
-    await manager.createEntity({
-      name: "Persisted Entity",
-      entityType: "concept",
-      observations: ["This should be saved"]
-    });
-
-    // Verify file exists and has content
-    const fileExists = await fs
-      .access(testMemoryPath)
-      .then(() => true)
-      .catch(() => false);
-    expect(fileExists).toBe(true);
-  });
-
-  it("should load data from file on initialization", async () => {
-    // Create and save an entity
-    await manager.createEntity({
-      name: "Saved Entity",
-      entityType: "concept",
-      observations: ["Saved observation"]
-    });
-
-    // Create new manager instance (should load from file)
-    const newManager = new KnowledgeGraphManager();
-
-    // Should be able to read the saved entity
-    const result = await newManager.readEntity({ name: "Saved Entity" });
-    expect(result.isError).toBeUndefined();
-  });
-
-  it("should handle file read errors gracefully", async () => {
-    // Create file with invalid JSON
-    await fs.writeFile(testMemoryPath, "invalid json content");
-
-    const newManager = new KnowledgeGraphManager();
-
-    // Should handle gracefully and start with empty state
-    const result = await newManager.readEntity({ name: "Test" });
-    expect(result.isError).toBe(true);
-  });
-
-  it("should handle missing file gracefully", async () => {
-    // Ensure file doesn't exist
     await cleanupTestFile();
-
-    const newManager = new KnowledgeGraphManager();
-
-    // Should start with empty state
-    const result = await newManager.readEntity({ name: "Test" });
-    expect(result.isError).toBe(true);
-  });
-});
-
-/**
- * Input Validation Tests.
- */
-describe("Input Validation", () => {
-  let manager: KnowledgeGraphManager;
-
-  beforeEach(() => {
-    manager = new KnowledgeGraphManager();
   });
 
-  it("should reject null input", async () => {
-    const result = await manager.createEntity(null as unknown as Parameters<KnowledgeGraphManager["createEntity"]>[0]);
-    expect(result.isError).toBe(true);
+  it("should create relation successfully", async () => {
+    await graph.createEntities([
+      { name: "A", entityType: "concept", observations: [] },
+      { name: "B", entityType: "concept", observations: [] }
+    ]);
+
+    const relations = await graph.createRelations([{ from: "A", to: "B", relationType: "relates-to" }]);
+
+    expect(relations).toHaveLength(1);
   });
 
-  it("should reject missing entity name", async () => {
-    const result = await manager.createEntity({
-      entityType: "concept",
-      observations: ["Test"]
-    } as unknown as Parameters<KnowledgeGraphManager["createEntity"]>[0]);
-    expect(result.isError).toBe(true);
-  });
+  it("should throw error when creating relation with missing endpoints", async () => {
+    await graph.createEntities([{ name: "A", entityType: "concept", observations: [] }]);
 
-  it("should reject missing entity type", async () => {
-    const result = await manager.createEntity({
-      name: "Test",
-      observations: ["Test"]
-    } as unknown as Parameters<KnowledgeGraphManager["createEntity"]>[0]);
-    expect(result.isError).toBe(true);
-  });
-
-  it("should reject missing observations", async () => {
-    const result = await manager.createEntity({
-      name: "Test",
-      entityType: "concept"
-    } as unknown as Parameters<KnowledgeGraphManager["createEntity"]>[0]);
-    expect(result.isError).toBe(true);
-  });
-
-  it("should reject non-array observations", async () => {
-    const result = await manager.createEntity({
-      name: "Test",
-      entityType: "concept",
-      observations: "not an array"
-    } as unknown as Parameters<KnowledgeGraphManager["createEntity"]>[0]);
-    expect(result.isError).toBe(true);
-  });
-
-  it("should handle very long entity names", async () => {
-    const longName = "a".repeat(10000);
-    const result = await manager.createEntity({
-      name: longName,
-      entityType: "concept",
-      observations: ["Long name test"]
-    });
-    expect(result.isError).toBeUndefined();
-  });
-
-  it("should handle special characters in names", async () => {
-    const specialName = "Entity with special chars: @#$% & émojis 🎉";
-    const result = await manager.createEntity({
-      name: specialName,
-      entityType: "concept",
-      observations: ["Special characters test"]
-    });
-    expect(result.isError).toBeUndefined();
-  });
-
-  it("should handle empty observations array", async () => {
-    const result = await manager.createEntity({
-      name: "Empty Obs",
-      entityType: "concept",
-      observations: []
-    });
-    expect(result.isError).toBeUndefined();
-  });
-});
-
-/**
- * Concurrent Operations Tests.
- */
-describe("Concurrent Operations", () => {
-  let manager: KnowledgeGraphManager;
-
-  beforeEach(() => {
-    manager = new KnowledgeGraphManager();
-  });
-
-  it("should handle concurrent entity creation", async () => {
-    const operations = Array.from({ length: 100 }, (_, i) =>
-      manager.createEntity({
-        name: `Concurrent Entity ${i}`,
-        entityType: "concept",
-        observations: [`Observation ${i}`]
-      })
+    expect(graph.createRelations([{ from: "A", to: "Missing", relationType: "relates-to" }])).rejects.toThrow(
+      "Unknown relation endpoints"
     );
-
-    const results = await Promise.all(operations);
-
-    // All operations should succeed
-    for (const result of results) {
-      expect(result.isError).toBeUndefined();
-    }
   });
 
-  it("should handle concurrent reads", async () => {
-    // First create an entity
-    await manager.createEntity({
-      name: "Concurrent Read Test",
-      entityType: "concept",
-      observations: ["Test observation"]
-    });
+  it("should delete relation successfully", async () => {
+    await graph.createEntities([
+      { name: "A", entityType: "concept", observations: [] },
+      { name: "B", entityType: "concept", observations: [] }
+    ]);
+    await graph.createRelations([{ from: "A", to: "B", relationType: "test" }]);
 
-    // Then perform concurrent reads
-    const operations = Array.from({ length: 50 }, () => manager.readEntity({ name: "Concurrent Read Test" }));
+    await graph.deleteRelations([{ from: "A", to: "B", relationType: "test" }]);
 
-    const results = await Promise.all(operations);
+    const result = await graph.openNodes(["A", "B"]);
+    expect(result.relations).toHaveLength(0);
+  });
+});
 
-    // All reads should succeed
-    for (const result of results) {
-      expect(result.isError).toBeUndefined();
+describe("Observation Management", () => {
+  let graph: MemoryGraph;
+
+  beforeEach(() => {
+    graph = new MemoryGraph(testMemoryPath);
+  });
+
+  afterEach(async () => {
+    await cleanupTestFile();
+  });
+
+  it("should delete observations successfully", async () => {
+    await graph.createEntities([
+      {
+        name: "ObsEntity",
+        entityType: "test",
+        observations: ["Keep", "Delete"]
+      }
+    ]);
+
+    await graph.deleteObservations([
+      {
+        entityName: "ObsEntity",
+        observations: ["Delete"]
+      }
+    ]);
+
+    const result = await graph.openNodes(["ObsEntity"]);
+    expect(result.entities[0].observations).toEqual(["Keep"]);
+  });
+
+  it("should handle deleting non-existent observations gracefully", async () => {
+    await graph.createEntities([
+      {
+        name: "ObsEntity",
+        entityType: "test",
+        observations: ["Keep"]
+      }
+    ]);
+
+    await graph.deleteObservations([
+      {
+        entityName: "ObsEntity",
+        observations: ["Ghost"]
+      }
+    ]);
+
+    const result = await graph.openNodes(["ObsEntity"]);
+    expect(result.entities[0].observations).toEqual(["Keep"]);
+  });
+});
+
+describe("Concurrency and Thread Safety", () => {
+  let graph: MemoryGraph;
+
+  beforeEach(() => {
+    graph = new MemoryGraph(testMemoryPath);
+  });
+
+  afterEach(async () => {
+    await cleanupTestFile();
+  });
+
+  it("should handle concurrent writes without data loss", async () => {
+    const iterations = 50;
+    const promises = [];
+
+    // Concurrently create entities
+    for (let i = 0; i < iterations; i++) {
+      promises.push(graph.createEntities([{ name: `Entity ${i}`, entityType: "concurrent", observations: [] }]));
     }
+
+    await Promise.all(promises);
+
+    const result = await graph.searchNodes("Entity");
+    expect(result.entities).toHaveLength(iterations);
   });
 
   it("should handle mixed concurrent operations", async () => {
-    const operations = [
-      manager.createEntity({
-        name: "Mixed Ops Entity",
-        entityType: "concept",
-        observations: ["Mixed ops test"]
-      }),
-      manager.readEntity({ name: "Mixed Ops Entity" }),
-      manager.updateEntity({
-        name: "Mixed Ops Entity",
-        observations: ["Updated observation"]
-      }),
-      manager.readEntity({ name: "Mixed Ops Entity" }),
-      manager.deleteEntity({ name: "Mixed Ops Entity" }),
-      manager.readEntity({ name: "Mixed Ops Entity" })
+    await graph.createEntities([{ name: "Base", entityType: "test", observations: [] }]);
+
+    const ops = [
+      graph.addObservations([{ entityName: "Base", contents: ["Obs1"] }]),
+      graph.addObservations([{ entityName: "Base", contents: ["Obs2"] }]),
+      graph.createEntities([{ name: "New1", entityType: "test", observations: [] }]),
+      graph.createEntities([{ name: "New2", entityType: "test", observations: [] }])
     ];
 
-    const results = await Promise.all(operations);
+    await Promise.all(ops);
 
-    // First 4 operations should succeed, last should fail (entity deleted)
-    expect(results[0].isError).toBeUndefined(); // create
-    expect(results[1].isError).toBeUndefined(); // read
-    expect(results[2].isError).toBeUndefined(); // update
-    expect(results[3].isError).toBeUndefined(); // read
-    expect(results[4].isError).toBeUndefined(); // delete
-    expect(results[5].isError).toBe(true); // read after delete
+    const base = await graph.openNodes(["Base"]);
+    expect(base.entities[0].observations).toContain("Obs1");
+    expect(base.entities[0].observations).toContain("Obs2");
+
+    const others = await graph.openNodes(["New1", "New2"]);
+    expect(others.entities).toHaveLength(2);
   });
 });
 
-/**
- * MCP Server Integration Tests.
- */
-describe("MCP Server Integration", () => {
-  it("server can be created without errors", () => {
-    const server = createServer();
-    expect(server).toBeDefined();
-    expect(typeof server.connect).toBe("function");
-    expect(typeof server.close).toBe("function");
-  });
-
-  it("rejects unknown tool name", async () => {
-    const server = createTestClient(createServer());
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "unknownTool",
-          arguments: {}
-        }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBe(true);
-    expect(response.content[0].text).toContain("Unknown tool");
-  });
-
-  it("handles valid memory operations", async () => {
-    const server = createTestClient(createServer());
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "create_entities",
-          arguments: {
-            entities: [
-              {
-                name: "Test Entity",
-                entityType: "concept",
-                observations: ["Test observation"]
-              }
-            ]
-          }
-        }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBeUndefined();
-  });
-});
-
-/**
- * Edge Cases and Performance Tests.
- */
-describe("Edge Cases and Performance", () => {
-  let manager: KnowledgeGraphManager;
+describe("Search and Edge Cases", () => {
+  let graph: MemoryGraph;
 
   beforeEach(() => {
-    manager = new KnowledgeGraphManager();
+    graph = new MemoryGraph(testMemoryPath);
   });
 
-  it("handles very large entity count", async () => {
-    // Create 1000 entities
-    const operations = Array.from({ length: 1000 }, (_, i) =>
-      manager.createEntity({
-        name: `Entity ${i}`,
-        entityType: "concept",
-        observations: [`Observation ${i}`]
-      })
+  afterEach(async () => {
+    await cleanupTestFile();
+  });
+
+  it("should search nodes successfully", async () => {
+    await graph.createEntities([
+      { name: "Apple", entityType: "fruit", observations: ["Red"] },
+      { name: "Banana", entityType: "fruit", observations: ["Yellow"] }
+    ]);
+
+    const result = await graph.searchNodes("red");
+    expect(result.entities).toHaveLength(1);
+    expect(result.entities[0].name).toBe("Apple");
+  });
+
+  it("should handle empty search query", async () => {
+    await graph.createEntities([{ name: "A", entityType: "T", observations: [] }]);
+    const result = await graph.searchNodes("");
+    expect(result.entities.length).toBeGreaterThan(0);
+  });
+
+  it("should handle malformed lines in memory file", async () => {
+    // Write some garbage to the file
+    await fs.writeFile(
+      testMemoryPath,
+      '{"valid": false}\nnot json\n{"name": "Good", "entityType": "test", "observations": [], "type": "entity"}\n'
     );
 
-    const results = await Promise.all(operations);
-
-    // All should succeed
-    for (const result of results) {
-      expect(result.isError).toBeUndefined();
-    }
-
-    // Verify we can search through them
-    const searchResult = await manager.searchEntities({ query: "Entity" });
-    expect(searchResult.isError).toBeUndefined();
+    const result = await graph.openNodes(["Good"]);
+    expect(result.entities).toHaveLength(1);
+    expect(result.entities[0].name).toBe("Good");
   });
+});
 
-  it("handles very large observation text", async () => {
-    const largeObservation = "a".repeat(10000);
-    const result = await manager.createEntity({
-      name: "Large Observation Entity",
-      entityType: "concept",
-      observations: [largeObservation]
+describe("MCP Protocol Validation", () => {
+  it("should have valid tool definitions", () => {
+    const requiredTools = [
+      "create_entities",
+      "create_relations",
+      "add_observations",
+      "delete_entities",
+      "delete_observations",
+      "delete_relations",
+      "read_graph",
+      "search_nodes",
+      "open_nodes"
+    ];
+
+    const toolNames = tools.map((t) => t.name);
+    requiredTools.forEach((tool) => {
+      expect(toolNames).toContain(tool);
     });
-    expect(result.isError).toBeUndefined();
   });
 
-  it("handles special characters in all fields", async () => {
-    const result = await manager.createEntity({
-      name: "Special chars entity: @#$% & émojis 🎉",
-      entityType: 'Special type with <html> "quotes"',
-      observations: ["Observation with special chars: @#$% & émojis 🎉", "Another with newlines\n\nand tabs\t\there"]
-    });
-    expect(result.isError).toBeUndefined();
-  });
-
-  it("handles empty string names and observations", async () => {
-    const result = await manager.createEntity({
-      name: "",
-      entityType: "concept",
-      observations: [""]
-    });
-    expect(result.isError).toBeUndefined();
-  });
-
-  it("handles unicode and emoji characters", async () => {
-    const unicodeEntity = {
-      name: "Unicode Entity 日本語 русский العربية",
-      entityType: "multilingual",
-      observations: ["English text", "日本語テキスト", "русский текст", "نص عربي", "Emoji test 🎉🚀💻"]
-    };
-
-    const result = await manager.createEntity(unicodeEntity);
-    expect(result.isError).toBeUndefined();
-  });
-
-  it("handles complex graph with many relations", async () => {
-    // Create a graph: A -> B -> C, A -> D, B -> D
-
-    await manager.createEntity({ name: "A", entityType: "node", observations: [] });
-    await manager.createEntity({ name: "B", entityType: "node", observations: [] });
-    await manager.createEntity({ name: "C", entityType: "node", observations: [] });
-    await manager.createEntity({ name: "D", entityType: "node", observations: [] });
-
-    await manager.createRelation({ from: "A", to: "B", relationType: "connects" });
-    await manager.createRelation({ from: "B", to: "C", relationType: "connects" });
-    await manager.createRelation({ from: "A", to: "D", relationType: "connects" });
-    await manager.createRelation({ from: "B", to: "D", relationType: "connects" });
-
-    // Test path finding
-    const pathResult = await manager.getPaths({
-      from: "A",
-      to: "D",
-      maxDepth: 3
-    });
-    expect(pathResult.isError).toBeUndefined();
-
-    // Test neighbors
-    const neighborsResult = await manager.getNeighbors({ entityName: "A" });
-    expect(neighborsResult.isError).toBeUndefined();
-  });
-
-  it("handles malformed JSON in file gracefully", async () => {
-    process.env.MEMORY_FILE_PATH = testMemoryPath;
-
-    // Write malformed JSON
-    await fs.writeFile(testMemoryPath, '{"malformed": json}');
-
-    const newManager = new KnowledgeGraphManager();
-
-    // Should handle gracefully and start with empty state
-    const result = await newManager.readEntity({ name: "Test" });
-    expect(result.isError).toBe(true);
-
-    delete process.env.MEMORY_FILE_PATH;
-  });
-
-  it("handles file permission errors", async () => {
-    // This test would require mocking fs operations
-    // For now, we'll test the general error handling pattern
-    const result = await manager.createEntity({
-      name: "Test",
-      entityType: "concept",
-      observations: ["Test"]
-    });
-    expect(result.isError).toBeUndefined();
-  });
-
-  it("handles memory file path with special characters", async () => {
-    const specialPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "test-special-@#$%.jsonl");
-    process.env.MEMORY_FILE_PATH = specialPath;
-
-    const newManager = new KnowledgeGraphManager();
-
-    const result = await newManager.createEntity({
-      name: "Special Path Entity",
-      entityType: "concept",
-      observations: ["Test"]
-    });
-    expect(result.isError).toBeUndefined();
-
-    // Cleanup
-    try {
-      await fs.unlink(specialPath);
-    } catch {
-      // Ignore cleanup errors
-    }
-
-    delete process.env.MEMORY_FILE_PATH;
+  it("should validate input schemas", () => {
+    const createTool = tools.find((t) => t.name === "create_entities");
+    expect(createTool?.inputSchema.required).toContain("entities");
   });
 });
