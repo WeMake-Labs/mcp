@@ -128,7 +128,7 @@ src/
 
 - [x] `collaborative-reasoning`
 - [ ] `focus-group`
-- [ ] `visual-reasoning`
+- [x] `visual-reasoning`
 - [ ] `multimodal-synthesizer`
 
 ---
