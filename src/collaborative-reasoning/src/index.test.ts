@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach } from "bun:test";
-import createServer, { CollaborativeReasoningServer } from "./index.js";
+import createServer from "./mcp/server.js";
+import { CollaborativeReasoning } from "./codemode/index.js";
 
 /**
  * Test suite for Collaborative Reasoning MCP Server.
@@ -52,19 +53,26 @@ describe("Tool Registration", () => {
  * to ensure clear error messages and proper input sanitization.
  */
 describe("Input Validation", () => {
-  let serverInstance: CollaborativeReasoningServer;
+  let collaborativeReasoning: CollaborativeReasoning;
 
   beforeEach(() => {
-    serverInstance = new CollaborativeReasoningServer();
+    collaborativeReasoning = new CollaborativeReasoning();
   });
 
-  it("should reject null input", () => {
-    const result = serverInstance.processCollaborativeReasoning(null);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("null is not an object");
+  it("should reject null input", async () => {
+    // expect(collaborativeReasoning.collaborate(null)).rejects.toThrow();
+    // Bun test might not have rejects.toThrow shorthand or it might be different.
+    // Using try-catch block for safety.
+    let error;
+    try {
+      await collaborativeReasoning.collaborate(null);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeDefined();
   });
 
-  it("should reject input missing topic", () => {
+  it("should reject input missing topic", async () => {
     const invalidInput = {
       personas: [],
       contributions: [],
@@ -74,12 +82,17 @@ describe("Input Validation", () => {
       iteration: 1,
       nextContributionNeeded: false
     };
-    const result = serverInstance.processCollaborativeReasoning(invalidInput);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid topic");
+    let error;
+    try {
+      await collaborativeReasoning.collaborate(invalidInput);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeDefined();
+    expect(String(error)).toContain("Invalid topic");
   });
 
-  it("should reject input missing personas", () => {
+  it("should reject input missing personas", async () => {
     const invalidInput = {
       topic: "Test Topic",
       contributions: [],
@@ -89,12 +102,17 @@ describe("Input Validation", () => {
       iteration: 1,
       nextContributionNeeded: false
     };
-    const result = serverInstance.processCollaborativeReasoning(invalidInput);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid personas");
+    let error;
+    try {
+      await collaborativeReasoning.collaborate(invalidInput);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeDefined();
+    expect(String(error)).toContain("Invalid personas");
   });
 
-  it("should reject input missing contributions", () => {
+  it("should reject input missing contributions", async () => {
     const invalidInput = {
       topic: "Test Topic",
       personas: [],
@@ -104,12 +122,17 @@ describe("Input Validation", () => {
       iteration: 1,
       nextContributionNeeded: false
     };
-    const result = serverInstance.processCollaborativeReasoning(invalidInput);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid contributions");
+    let error;
+    try {
+      await collaborativeReasoning.collaborate(invalidInput);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeDefined();
+    expect(String(error)).toContain("Invalid contributions");
   });
 
-  it("should process valid input successfully", () => {
+  it("should process valid input successfully", async () => {
     const validInput = {
       topic: "Should we adopt AI in our workflow?",
       personas: [
@@ -140,9 +163,9 @@ describe("Input Validation", () => {
       iteration: 1,
       nextContributionNeeded: false
     };
-    const result = serverInstance.processCollaborativeReasoning(validInput);
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].type).toBe("text");
+    const result = await collaborativeReasoning.collaborate(validInput);
+    expect(result).toBeDefined();
+    expect(result.topic).toBe(validInput.topic);
   });
 });
 
@@ -150,13 +173,13 @@ describe("Input Validation", () => {
  * Persona Management Tests.
  */
 describe("Persona Management", () => {
-  let serverInstance: CollaborativeReasoningServer;
+  let collaborativeReasoning: CollaborativeReasoning;
 
   beforeEach(() => {
-    serverInstance = new CollaborativeReasoningServer();
+    collaborativeReasoning = new CollaborativeReasoning();
   });
 
-  it("should handle multiple personas correctly", () => {
+  it("should handle multiple personas correctly", async () => {
     const input = {
       topic: "Technology Decision",
       personas: [
@@ -186,11 +209,11 @@ describe("Persona Management", () => {
       iteration: 1,
       nextContributionNeeded: true
     };
-    const result = serverInstance.processCollaborativeReasoning(input);
-    expect(result.isError).toBeUndefined();
+    const result = await collaborativeReasoning.collaborate(input);
+    expect(result).toBeDefined();
   });
 
-  it("should rotate personas when nextPersonaId not specified", () => {
+  it("should rotate personas when nextPersonaId not specified", async () => {
     const input = {
       topic: "Decision Topic",
       personas: [
@@ -220,10 +243,8 @@ describe("Persona Management", () => {
       iteration: 1,
       nextContributionNeeded: true
     };
-    const result = serverInstance.processCollaborativeReasoning(input);
-    expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
-    expect(parsed.nextPersonaId).toBe("p2");
+    const result = await collaborativeReasoning.collaborate(input);
+    expect(result.nextPersonaId).toBe("p2");
   });
 });
 
@@ -263,13 +284,13 @@ describe("MCP Server Integration", () => {
  * production reliability.
  */
 describe("Edge Cases and Performance", () => {
-  let serverInstance: CollaborativeReasoningServer;
+  let collaborativeReasoning: CollaborativeReasoning;
 
   beforeEach(() => {
-    serverInstance = new CollaborativeReasoningServer();
+    collaborativeReasoning = new CollaborativeReasoning();
   });
 
-  it("handles large number of contributions", () => {
+  it("handles large number of contributions", async () => {
     const contributions = Array.from({ length: 100 }, (_, i) => ({
       personaId: "persona1",
       content: `Contribution ${i}`,
@@ -297,11 +318,12 @@ describe("Edge Cases and Performance", () => {
       iteration: 1,
       nextContributionNeeded: false
     };
-    const result = serverInstance.processCollaborativeReasoning(input);
-    expect(result.isError).toBeUndefined();
+    const result = await collaborativeReasoning.collaborate(input);
+    expect(result).toBeDefined();
+    expect(result.contributions.length).toBe(100);
   });
 
-  it("handles empty contributions array gracefully", () => {
+  it("handles empty contributions array gracefully", async () => {
     const input = {
       topic: "Empty Discussion",
       personas: [
@@ -322,11 +344,12 @@ describe("Edge Cases and Performance", () => {
       iteration: 1,
       nextContributionNeeded: true
     };
-    const result = serverInstance.processCollaborativeReasoning(input);
-    expect(result.isError).toBeUndefined();
+    const result = await collaborativeReasoning.collaborate(input);
+    expect(result).toBeDefined();
+    expect(result.contributions.length).toBe(0);
   });
 
-  it("handles special characters in inputs", () => {
+  it("handles special characters in inputs", async () => {
     const input = {
       topic: "Special chars: @#$% & émojis 🎉",
       personas: [
@@ -354,7 +377,8 @@ describe("Edge Cases and Performance", () => {
       iteration: 1,
       nextContributionNeeded: false
     };
-    const result = serverInstance.processCollaborativeReasoning(input);
-    expect(result.isError).toBeUndefined();
+    const result = await collaborativeReasoning.collaborate(input);
+    expect(result).toBeDefined();
+    expect(result.topic).toContain("émojis");
   });
 });
