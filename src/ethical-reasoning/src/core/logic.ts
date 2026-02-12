@@ -7,8 +7,11 @@ import { EthicalRequestData, FrameworkType, frameworks, EthicalAnalysisResult } 
 export class EthicalAnalyzer {
   private history: EthicalRequestData[] = [];
 
-  public validateData(input: unknown): EthicalRequestData {
-    const data = input as Record<string, unknown>;
+  public validateData(input: unknown): EthicalRequestData {  
+    if (input === null || input === undefined) {  
+      throw new Error("null is not an object");  
+    }  
+    const data = input as Record<string, unknown>;  
 
     if (!data.scenario || typeof data.scenario !== "string") {
       throw new Error("Invalid scenario: must be a string");
@@ -67,7 +70,7 @@ export class EthicalAnalyzer {
     }
   }
 
-  public analyze(input: unknown): EthicalAnalysisResult {
+  public async analyze(input: unknown): Promise<EthicalAnalysisResult> {
     const data = this.validateData(input);
     this.history.push(data);
     
@@ -77,6 +80,9 @@ export class EthicalAnalyzer {
       console.error(chalk.bold("Action:") + " " + data.action);
       console.error("");
     }
+
+    // Simulate async processing (e.g. for future external API calls)
+    await Promise.resolve();
 
     const guidanceByFramework: Record<FrameworkType, string> = {} as Record<FrameworkType, string>;
     for (const f of data.frameworks) {
