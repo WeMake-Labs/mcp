@@ -102,12 +102,12 @@ console.log(results);
 
 ### Build
 
-```bash
+```sh
 bun run build
 ```
 
 ### Test
 
-```bash
+```sh
 bun test
 ```
