@@ -61,7 +61,7 @@ export class MultimodalSynthServer {
 /**
  * Factory function that creates and configures a multimodal synthesizer MCP server instance.
  *
- * This function initializes a Server with the name "multimodal-synthesizer-server" and version "0.3.0",
+ * This function initializes a Server with the name "multimodal-synthesizer-server" and version "0.4.0",
  * registers the MULTIMODAL_SYNTH_TOOL, and sets up request handlers for listing available tools
  * and processing multimodal synthesis requests. The CallTool handler calls MultimodalSynthServer.process
  * when req.params.name === "multimodalSynth".
@@ -83,7 +83,7 @@ export class MultimodalSynthServer {
  */
 export default function createServer(): Server {
   const server = new Server(
-    { name: "multimodal-synthesizer-server", version: "0.3.0" },
+    { name: "multimodal-synthesizer-server", version: "0.4.0" },
     { capabilities: { tools: {} } }
   );
   const synthServer = new MultimodalSynthServer();
