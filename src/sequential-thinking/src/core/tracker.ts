@@ -46,9 +46,13 @@ export class SequentialThinkingTracker {
     try {
       const validatedInput = this.validateThoughtData(input);
 
-      if (validatedInput.thoughtNumber > validatedInput.totalThoughts) {
-        validatedInput.totalThoughts = validatedInput.thoughtNumber;
-      }
+      const adjustedTotalThoughts =
+        validatedInput.thoughtNumber > validatedInput.totalThoughts
+          ? validatedInput.thoughtNumber
+          : validatedInput.totalThoughts;
+
+      const thoughtData = { ...validatedInput, totalThoughts: adjustedTotalThoughts };
+      this.thoughtHistory.push(thoughtData);
 
       this.thoughtHistory.push(validatedInput);
 
