@@ -46,6 +46,23 @@ Example output:
 }
 ```
 
+## Code Mode Usage
+
+This server can be used directly as a TypeScript library:
+
+```typescript
+import { MultimodalSynthesizer } from "@wemake.cx/multimodal-synthesizer";
+
+const synthesizer = new MultimodalSynthesizer();
+
+const result = await synthesizer.synthesize({
+  text: ["Hello world"],
+  images: ["image.jpg"]
+});
+
+console.log(result.summary);
+```
+
 ## API
 
 ### Tools

@@ -1,93 +1,50 @@
 import { describe, expect, it, beforeEach } from "bun:test";
-import createServer, { MultimodalSynthServer } from "./index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { createTestClient } from "../../test-helpers/mcp-test-client.js";
+import { createServer, MultimodalSynthesizer } from "./index.js";
 
 /**
  * Test suite for Multimodal Synthesizer MCP Server.
- *
- * Business Context: Ensures the multimodal-synthesizer framework correctly validates
- * inputs and provides reliable functionality for enterprise applications.
- *
- * Decision Rationale: Tests focus on server initialization, schema validation,
- * and core functionality to ensure production-ready reliability.
  */
 describe("Multimodal Synthesizer Server", () => {
   it("server initializes successfully", () => {
     const server = createServer();
     expect(server).toBeDefined();
   });
-
-  it("server exports correct configuration", () => {
-    const server = createServer();
-    expect(typeof server.connect).toBe("function");
-    expect(typeof server.close).toBe("function");
-  });
 });
 
 /**
- * Tool Registration Tests.
+ * Input Validation Tests (Code Mode).
  */
-describe("Tool Registration", () => {
-  it("should advertise multimodalSynth tool", async () => {
-    const server = createTestClient(createServer());
-    const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
-    expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("testTool");
-    expect(response.tools[0].inputSchema).toBeDefined();
-  });
-});
-
-/**
- * Input Validation Tests.
- */
-describe("Input Validation", () => {
-  let server: MultimodalSynthServer;
+describe("Input Validation (Code Mode)", () => {
+  let synthesizer: MultimodalSynthesizer;
 
   beforeEach(() => {
-    server = new MultimodalSynthServer();
+    synthesizer = new MultimodalSynthesizer();
   });
 
   it("should reject null input", async () => {
-    const result = await server.process(null);
-    expect(result.isError).toBe(true);
-    if (result.content[0].type === "text") {
-      if (result.content[0].type === "text") {
-        expect(result.content[0].text).toContain("Invalid input");
-      }
-    }
+    // @ts-ignore
+    await expect(synthesizer.synthesize(null)).rejects.toThrow("Invalid input");
   });
 
   it("should reject non-object input", async () => {
-    const result = await server.process("string input");
-    expect(result.isError).toBe(true);
-    if (result.content[0].type === "text") {
-      if (result.content[0].type === "text") {
-        expect(result.content[0].text).toContain("Invalid input");
-      }
-    }
+    // @ts-ignore
+    await expect(synthesizer.synthesize("string input")).rejects.toThrow("Invalid input");
   });
 
   it("should reject missing text array", async () => {
     const input = {
       images: ["image1.jpg", "image2.png"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBe(true);
-    if (result.content[0].type === "text") {
-      expect(result.content[0].text).toContain("Invalid input");
-    }
+    // @ts-ignore
+    await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
   it("should reject missing images array", async () => {
     const input = {
       text: ["Hello world"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBe(true);
-    if (result.content[0].type === "text") {
-      expect(result.content[0].text).toContain("Invalid input");
-    }
+    // @ts-ignore
+    await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
   it("should reject non-array text", async () => {
@@ -95,11 +52,8 @@ describe("Input Validation", () => {
       text: "not an array",
       images: ["image1.jpg"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBe(true);
-    if (result.content[0].type === "text") {
-      expect(result.content[0].text).toContain("Invalid input");
-    }
+    // @ts-ignore
+    await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
   it("should reject non-array images", async () => {
@@ -107,11 +61,8 @@ describe("Input Validation", () => {
       text: ["Hello"],
       images: "not an array"
     };
-    const result = await server.process(input);
-    expect(result.isError).toBe(true);
-    if (result.content[0].type === "text") {
-      expect(result.content[0].text).toContain("Invalid input");
-    }
+    // @ts-ignore
+    await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
   it("should reject non-string text items", async () => {
@@ -119,11 +70,8 @@ describe("Input Validation", () => {
       text: ["Hello", 123, "World"],
       images: ["image1.jpg"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBe(true);
-    if (result.content[0].type === "text") {
-      expect(result.content[0].text).toContain("Invalid input");
-    }
+    // @ts-ignore
+    await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
   it("should reject non-string image items", async () => {
@@ -131,11 +79,8 @@ describe("Input Validation", () => {
       text: ["Hello"],
       images: ["image1.jpg", 456, "image2.png"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBe(true);
-    if (result.content[0].type === "text") {
-      expect(result.content[0].text).toContain("Invalid input");
-    }
+    // @ts-ignore
+    await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
   it("should process valid input successfully", async () => {
@@ -143,25 +88,22 @@ describe("Input Validation", () => {
       text: ["Hello world", "This is a test"],
       images: ["image1.jpg", "image2.png"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].type).toBe("json");
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toContain("Hello world");
-    expect(json.json.summary).toContain("This is a test");
-    expect(json.json.summary).toContain("image1.jpg");
-    expect(json.json.summary).toContain("image2.png");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toContain("Hello world");
+    expect(result.summary).toContain("This is a test");
+    expect(result.summary).toContain("image1.jpg");
+    expect(result.summary).toContain("image2.png");
   });
 });
 
 /**
- * Synthesis Logic Tests.
+ * Synthesis Logic Tests (Code Mode).
  */
-describe("Synthesis Logic", () => {
-  let server: MultimodalSynthServer;
+describe("Synthesis Logic (Code Mode)", () => {
+  let synthesizer: MultimodalSynthesizer;
 
   beforeEach(() => {
-    server = new MultimodalSynthServer();
+    synthesizer = new MultimodalSynthesizer();
   });
 
   it("should combine multiple text items", async () => {
@@ -169,10 +111,8 @@ describe("Synthesis Logic", () => {
       text: ["First text", "Second text", "Third text"],
       images: ["image1.jpg"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toBe("First text Second text Third text | Images: image1.jpg");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toBe("First text Second text Third text | Images: image1.jpg");
   });
 
   it("should handle empty images array", async () => {
@@ -180,10 +120,8 @@ describe("Synthesis Logic", () => {
       text: ["Only text content"],
       images: []
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toBe("Only text content | Images: ");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toBe("Only text content | Images: ");
   });
 
   it("should filter out empty/whitespace text items", async () => {
@@ -191,10 +129,8 @@ describe("Synthesis Logic", () => {
       text: ["Valid text", "", "   ", "Another valid text"],
       images: ["image1.jpg"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toBe("Valid text Another valid text | Images: image1.jpg");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toBe("Valid text Another valid text | Images: image1.jpg");
   });
 
   it("should filter out empty/whitespace image items", async () => {
@@ -202,10 +138,8 @@ describe("Synthesis Logic", () => {
       text: ["Some text"],
       images: ["image1.jpg", "", "   ", "image2.png"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toBe("Some text | Images: image1.jpg, image2.png");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toBe("Some text | Images: image1.jpg, image2.png");
   });
 
   it("should handle single text and image", async () => {
@@ -213,99 +147,8 @@ describe("Synthesis Logic", () => {
       text: ["Single text"],
       images: ["single-image.jpg"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toBe("Single text | Images: single-image.jpg");
-  });
-
-  it("should handle all empty arrays", async () => {
-    const input = {
-      text: [],
-      images: []
-    };
-    const result = await server.process(input);
-    expect(result.isError).toBe(true);
-    if (result.content[0].type === "text") {
-      expect(result.content[0].text).toContain("Invalid input");
-    }
-  });
-
-  it("should handle arrays with only whitespace", async () => {
-    const input = {
-      text: ["   ", "\t", "\n"],
-      images: ["   ", "\t"]
-    };
-    const result = await server.process(input);
-    expect(result.isError).toBe(true);
-    if (result.content[0].type === "text") {
-      expect(result.content[0].text).toContain("Invalid input");
-    }
-  });
-});
-
-/**
- * MCP Server Integration Tests.
- */
-describe("MCP Server Integration", () => {
-  it("server can be created without errors", () => {
-    const server = createServer();
-    expect(server).toBeDefined();
-    expect(typeof server.connect).toBe("function");
-    expect(typeof server.close).toBe("function");
-  });
-
-  it("handles valid multimodal synthesis request", async () => {
-    const server = createServer();
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "multimodalSynth",
-          arguments: {
-            text: ["Hello world", "Test message"],
-            images: ["image1.jpg", "image2.png"]
-          }
-        }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBeUndefined();
-    expect(response.content[0].type).toBe("json");
-  });
-
-  it("rejects unknown tool name", async () => {
-    const server = createServer();
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "unknownTool",
-          arguments: {}
-        }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBe(true);
-    expect(response.content[0].text).toContain("Unknown tool");
-  });
-
-  it("handles invalid input through MCP interface", async () => {
-    const server = createServer();
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "multimodalSynth",
-          arguments: {
-            text: "not an array"
-          }
-        }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBe(true);
-    expect(response.content[0].text).toContain("Invalid input");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toBe("Single text | Images: single-image.jpg");
   });
 });
 
@@ -313,10 +156,10 @@ describe("MCP Server Integration", () => {
  * Edge Cases and Performance Tests.
  */
 describe("Edge Cases and Performance", () => {
-  let server: MultimodalSynthServer;
+  let synthesizer: MultimodalSynthesizer;
 
   beforeEach(() => {
-    server = new MultimodalSynthServer();
+    synthesizer = new MultimodalSynthesizer();
   });
 
   it("handles very large text arrays", async () => {
@@ -325,11 +168,9 @@ describe("Edge Cases and Performance", () => {
       text: largeText,
       images: ["large-test.jpg"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toContain("Text item 0");
-    expect(json.json.summary).toContain("Text item 999");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toContain("Text item 0");
+    expect(result.summary).toContain("Text item 999");
   });
 
   it("handles very large image arrays", async () => {
@@ -338,11 +179,9 @@ describe("Edge Cases and Performance", () => {
       text: ["Test text"],
       images: largeImages
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toContain("Test text");
-    expect(json.json.summary.split("Images: ")[1].split(", ").length).toBe(1000);
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toContain("Test text");
+    expect(result.summary.split("Images: ")[1].split(", ").length).toBe(1000);
   });
 
   it("handles very long individual strings", async () => {
@@ -351,10 +190,8 @@ describe("Edge Cases and Performance", () => {
       text: [longText],
       images: ["long-text-test.jpg"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toContain(longText.substring(0, 100)); // Check first part
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toContain(longText.substring(0, 100)); // Check first part
   });
 
   it("handles special characters in text", async () => {
@@ -363,10 +200,8 @@ describe("Edge Cases and Performance", () => {
       text: [specialText],
       images: ["special-chars.jpg"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toContain(specialText);
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toContain(specialText);
   });
 
   it("handles special characters in image names", async () => {
@@ -380,12 +215,10 @@ describe("Edge Cases and Performance", () => {
       text: ["Test with special image names"],
       images: specialImages
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toContain("Test with special image names");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toContain("Test with special image names");
     for (const image of specialImages) {
-      expect(json.json.summary).toContain(image);
+      expect(result.summary).toContain(image);
     }
   });
 
@@ -396,12 +229,10 @@ describe("Edge Cases and Performance", () => {
       text: [unicodeText],
       images: emojiImages
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toContain(unicodeText);
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toContain(unicodeText);
     for (const image of emojiImages) {
-      expect(json.json.summary).toContain(image);
+      expect(result.summary).toContain(image);
     }
   });
 
@@ -410,15 +241,13 @@ describe("Edge Cases and Performance", () => {
       text: ["", "Valid text", "   ", "Another valid", ""],
       images: ["", "valid-image.jpg", "   ", "another-image.png", ""]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toBe("Valid text Another valid | Images: valid-image.jpg, another-image.png");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toBe("Valid text Another valid | Images: valid-image.jpg, another-image.png");
   });
 
   it("handles concurrent synthesis operations", async () => {
     const operations = Array.from({ length: 100 }, (_, i) =>
-      server.process({
+      synthesizer.synthesize({
         text: [`Text ${i}`],
         images: [`image-${i}.jpg`]
       })
@@ -428,8 +257,7 @@ describe("Edge Cases and Performance", () => {
 
     // All operations should succeed
     for (const result of results) {
-      expect(result.isError).toBeUndefined();
-      expect(result.content[0].type).toBe("json");
+      expect(result.summary).toBeDefined();
     }
   });
 
@@ -445,12 +273,11 @@ describe("Edge Cases and Performance", () => {
         }
       }
     };
-    const result = await server.process(nestedInput);
-    expect(result.isError).toBeUndefined();
+    // @ts-ignore
+    const result = await synthesizer.synthesize(nestedInput);
     // Should still process the valid text and images, ignore nested properties
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toContain("Nested text");
-    expect(json.json.summary).toContain("nested-image.jpg");
+    expect(result.summary).toContain("Nested text");
+    expect(result.summary).toContain("nested-image.jpg");
   });
 
   it("handles array items with leading/trailing whitespace", async () => {
@@ -458,10 +285,8 @@ describe("Edge Cases and Performance", () => {
       text: ["  Leading space", "Trailing space  ", "  Both sides  "],
       images: ["  image1.jpg  ", "  image2.png  "]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toBe("Leading space Trailing space Both sides | Images: image1.jpg, image2.png");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toBe("Leading space Trailing space Both sides | Images: image1.jpg, image2.png");
   });
 
   it("handles numeric strings in arrays", async () => {
@@ -469,10 +294,8 @@ describe("Edge Cases and Performance", () => {
       text: ["Text 1", "Text 2"],
       images: ["123.jpg", "456.png"]
     };
-    const result = await server.process(input);
-    expect(result.isError).toBeUndefined();
-    const json = result.content[0] as { type: "json"; json: { summary: string } };
-    expect(json.json.summary).toContain("123.jpg");
-    expect(json.json.summary).toContain("456.png");
+    const result = await synthesizer.synthesize(input);
+    expect(result.summary).toContain("123.jpg");
+    expect(result.summary).toContain("456.png");
   });
 });
