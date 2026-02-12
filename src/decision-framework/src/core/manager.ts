@@ -1,5 +1,23 @@
 import { DecisionAnalysisData, Option, Criterion, CriterionEvaluation, Outcome, InformationGap } from "./types.js";
 
+/**  
+ * DecisionManager - Core decision analysis engine  
+ * 
+ * Purpose: Validates decision analysis data, manages decision history, and performs 
+ * calculations for expected utility and multi-criteria analysis.  
+ * 
+ * Limitations: 
+ * - Assumes probability values sum to 1.0 (normalizes if not)  
+ * - Assumes criterion weights sum to 1.0 (normalizes if not)  
+ * - Does not persist decision history across process restarts  
+ * 
+ * Workflow:  
+ * 1. Validate input data structure and types  
+ * 2. Auto-generate missing IDs for options, criteria, and outcomes  
+ * 3. Update decision history and registries  
+ * 4. Calculate expected values (for expected-utility analysis)  
+ * 5. Calculate multi-criteria scores (for multi-criteria analysis)  
+ */  
 export class DecisionManager {
   private decisionHistory: Record<string, DecisionAnalysisData[]> = {};
   private optionRegistry: Record<string, Record<string, Option>> = {};
