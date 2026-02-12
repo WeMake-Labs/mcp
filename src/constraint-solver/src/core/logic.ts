@@ -1,4 +1,10 @@
-import { Parser } from "expr-eval";
+/**  
+ * Core constraint evaluation logic.  
+ * Purpose: Evaluates mathematical/logical constraints against variable assignments.  
+ * Limitations: Max 1000 variables, 5000 constraints. Invalid expressions return false.  
+ * Workflow: Parse constraints with expr-eval, evaluate against provided variables.  
+ */  
+import { Parser } from "expr-eval";  
 import { ConstraintProblem, ConstraintResult } from "./types.js";
 
 export function evaluateConstraint(expr: string, vars: Record<string, number>): boolean {
