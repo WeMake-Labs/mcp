@@ -54,8 +54,6 @@ export class SequentialThinkingTracker {
       const thoughtData = { ...validatedInput, totalThoughts: adjustedTotalThoughts };
       this.thoughtHistory.push(thoughtData);
 
-      this.thoughtHistory.push(validatedInput);
-
       if (validatedInput.branchFromThought && validatedInput.branchId) {
         if (!this.branches[validatedInput.branchId]) {
           this.branches[validatedInput.branchId] = [];
@@ -64,7 +62,7 @@ export class SequentialThinkingTracker {
       }
 
       if (!this.disableThoughtLogging) {
-        const formattedThought = formatThought(validatedInput);
+        const formattedThought = formatThought(thoughtData);
         console.error(formattedThought);
       }
 
@@ -74,16 +72,16 @@ export class SequentialThinkingTracker {
             type: "text",
             text: JSON.stringify(
               {
-                thoughtNumber: validatedInput.thoughtNumber,
-                totalThoughts: validatedInput.totalThoughts,
-                nextThoughtNeeded: validatedInput.nextThoughtNeeded,
-                isRevision: validatedInput.isRevision,
-                revisesThought: validatedInput.revisesThought,
-                branchFromThought: validatedInput.branchFromThought,
-                branchId: validatedInput.branchId,
+                thoughtNumber: thoughtData.thoughtNumber,
+                totalThoughts: thoughtData.totalThoughts,
+                nextThoughtNeeded: thoughtData.nextThoughtNeeded,
+                isRevision: thoughtData.isRevision,
+                revisesThought: thoughtData.revisesThought,
+                branchFromThought: thoughtData.branchFromThought,
+                branchId: thoughtData.branchId,
                 branches: Object.keys(this.branches),
                 thoughtHistoryLength: this.thoughtHistory.length,
-                needsMoreThoughts: validatedInput.needsMoreThoughts
+                needsMoreThoughts: thoughtData.needsMoreThoughts
               },
               null,
               2
