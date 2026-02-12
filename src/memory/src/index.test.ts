@@ -241,6 +241,53 @@ describe("Observation Management", () => {
   });
 });
 
+describe("Concurrency and Thread Safety", () => {
+  let graph: MemoryGraph;
+
+  beforeEach(() => {
+    graph = new MemoryGraph(testMemoryPath);
+  });
+
+  afterEach(async () => {
+    await cleanupTestFile();
+  });
+
+  it("should handle concurrent writes without data loss", async () => {
+    const iterations = 50;
+    const promises = [];
+
+    // Concurrently create entities
+    for (let i = 0; i < iterations; i++) {
+      promises.push(graph.createEntities([{ name: `Entity ${i}`, entityType: "concurrent", observations: [] }]));
+    }
+
+    await Promise.all(promises);
+
+    const result = await graph.searchNodes("Entity");
+    expect(result.entities).toHaveLength(iterations);
+  });
+
+  it("should handle mixed concurrent operations", async () => {
+    await graph.createEntities([{ name: "Base", entityType: "test", observations: [] }]);
+
+    const ops = [
+      graph.addObservations([{ entityName: "Base", contents: ["Obs1"] }]),
+      graph.addObservations([{ entityName: "Base", contents: ["Obs2"] }]),
+      graph.createEntities([{ name: "New1", entityType: "test", observations: [] }]),
+      graph.createEntities([{ name: "New2", entityType: "test", observations: [] }])
+    ];
+
+    await Promise.all(ops);
+
+    const base = await graph.openNodes(["Base"]);
+    expect(base.entities[0].observations).toContain("Obs1");
+    expect(base.entities[0].observations).toContain("Obs2");
+
+    const others = await graph.openNodes(["New1", "New2"]);
+    expect(others.entities).toHaveLength(2);
+  });
+});
+
 describe("Search and Edge Cases", () => {
   let graph: MemoryGraph;
 
