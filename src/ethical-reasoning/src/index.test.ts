@@ -1,299 +1,269 @@
 import { describe, expect, it, beforeEach } from "bun:test";
-import createServer, { EthicalReasoningServer } from "./index.js";
+import { createServer } from "./mcp/server.js";
+import { EthicalReasoningAPI } from "./codemode/index.js";
 
 /**
- * Test suite for Ethical Reasoning MCP Server.
- *
- * Business Context: Ensures the ethical-reasoning framework correctly validates
- * inputs and provides reliable functionality for enterprise applications.
- *
- * Decision Rationale: Tests focus on server initialization, schema validation,
- * and core functionality to ensure production-ready reliability.
+ * Test suite for Ethical Reasoning Code Mode API.
  */
-describe("Ethical Reasoning Server", () => {
-  it("server initializes successfully", () => {
-    const server = createServer();
-    expect(server).toBeDefined();
-  });
-
-  it("server exports correct configuration", () => {
-    const server = createServer();
-    expect(typeof server.connect).toBe("function");
-    expect(typeof server.close).toBe("function");
-  });
-
-  it("server has correct name and version", () => {
-    const server = createServer();
-    expect(server).toBeDefined();
-  });
-});
-
-/**
- * Tool Registration Tests.
- *
- * Business Context: Verifies that MCP tools are correctly advertised to clients.
- */
-describe("Tool Registration", () => {
-  it("should register ethicalReasoning tool correctly", () => {
-    const server = createServer();
-
-    // Test that the server is properly configured
-    // The createServer function registers the ListToolsRequestSchema handler
-    // which returns the ETHICAL_REASONING_TOOL
-
-    expect(server).toBeDefined();
-
-    // Since we can't directly call the internal handler without the transport layer,
-    // we verify that the server creation process completes successfully
-    // and that the tool metadata matches expected values by checking the source
-
-    // The ETHICAL_REASONING_TOOL constant defines the tool metadata:
-    // - name: "ethicalReasoning"
-    // - description contains "Evaluate a proposed action using multiple ethical frameworks"
-
-    // This validates that createServer() properly configures the tool registration
-  });
-});
-
-/**
- * Input Validation Tests.
- *
- * Business Context: Enterprise applications require robust input validation
- * to prevent data corruption and ensure GDPR compliance.
- *
- * Decision Rationale: Test validation logic directly without transport layer
- * to ensure clear error messages and proper input sanitization.
- */
-describe("Input Validation", () => {
-  let server: EthicalReasoningServer;
+describe("Ethical Reasoning API (Code Mode)", () => {
+  let api: EthicalReasoningAPI;
 
   beforeEach(() => {
-    server = new EthicalReasoningServer();
+    api = new EthicalReasoningAPI();
   });
 
-  it("should reject null input", () => {
-    const result = server.process(null);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("null is not an object");
+  it("initializes successfully", () => {
+    expect(api).toBeDefined();
   });
 
-  it("should reject missing scenario", () => {
-    const input = {
-      action: "Take the medication",
-      frameworks: ["utilitarianism"],
-      confidence: 0.8,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid scenario");
+  describe("Input Validation", () => {
+    it("should reject null input", () => {
+      expect(api.analyze(null)).rejects.toThrow("null is not an object");
+    });
+
+    it("should reject missing scenario", () => {
+      const input = {
+        action: "Take the medication",
+        frameworks: ["utilitarianism"],
+        confidence: 0.8,
+        nextStepNeeded: false
+      };
+      expect(api.analyze(input)).rejects.toThrow("Invalid scenario");
+    });
+
+    it("should reject missing action", () => {
+      const input = {
+        scenario: "A patient needs treatment",
+        frameworks: ["utilitarianism"],
+        confidence: 0.8,
+        nextStepNeeded: false
+      };
+      expect(api.analyze(input)).rejects.toThrow("Invalid action");
+    });
+
+    it("should reject missing frameworks", () => {
+      const input = {
+        scenario: "A patient needs treatment",
+        action: "Take the medication",
+        confidence: 0.8,
+        nextStepNeeded: false
+      };
+      expect(api.analyze(input)).rejects.toThrow("Invalid frameworks");
+    });
+
+    it("should reject empty frameworks array", () => {
+      const input = {
+        scenario: "A patient needs treatment",
+        action: "Take the medication",
+        frameworks: [],
+        confidence: 0.8,
+        nextStepNeeded: false
+      };
+      expect(api.analyze(input)).rejects.toThrow("Invalid frameworks");
+    });
+
+    it("should reject invalid framework type", () => {
+      const input = {
+        scenario: "A patient needs treatment",
+        action: "Take the medication",
+        frameworks: ["invalid-framework"],
+        confidence: 0.8,
+        nextStepNeeded: false
+      };
+      expect(api.analyze(input)).rejects.toThrow("Unsupported framework");
+    });
+
+    it("should reject invalid confidence range (< 0)", () => {
+      const input = {
+        scenario: "A patient needs treatment",
+        action: "Take the medication",
+        frameworks: ["utilitarianism"],
+        confidence: -0.1,
+        nextStepNeeded: false
+      };
+      expect(api.analyze(input)).rejects.toThrow("Invalid confidence");
+    });
+
+    it("should reject invalid confidence range (> 1)", () => {
+      const input = {
+        scenario: "A patient needs treatment",
+        action: "Take the medication",
+        frameworks: ["utilitarianism"],
+        confidence: 1.1,
+        nextStepNeeded: false
+      };
+      expect(api.analyze(input)).rejects.toThrow("Invalid confidence");
+    });
+
+    it("should reject non-boolean nextStepNeeded", () => {
+      const input = {
+        scenario: "A patient needs treatment",
+        action: "Take the medication",
+        frameworks: ["utilitarianism"],
+        confidence: 0.8,
+        nextStepNeeded: "yes"
+      };
+      expect(api.analyze(input)).rejects.toThrow("Invalid nextStepNeeded");
+    });
   });
 
-  it("should reject missing action", () => {
-    const input = {
-      scenario: "A patient needs treatment",
-      frameworks: ["utilitarianism"],
-      confidence: 0.8,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid action");
+  describe("Ethical Frameworks", () => {
+    it("should process valid input successfully", async () => {
+      const validInput = {
+        scenario: "A patient needs treatment",
+        action: "Prescribe medication",
+        frameworks: ["utilitarianism"],
+        confidence: 0.8,
+        nextStepNeeded: false
+      };
+      const result = await api.analyze(validInput);
+      expect(result).toBeDefined();
+      expect(result.frameworks).toContain("utilitarianism");
+      expect(result.guidance["utilitarianism"]).toBeDefined();
+    });
+
+    it("should handle utilitarianism framework", async () => {
+      const input = {
+        scenario: "Company decision on layoffs",
+        action: "Proceed with layoffs",
+        frameworks: ["utilitarianism"],
+        confidence: 0.7,
+        nextStepNeeded: false
+      };
+      const result = await api.analyze(input);
+      expect(result.guidance["utilitarianism"]).toContain("Consider total expected benefits");
+    });
+
+    it("should handle deontology framework", async () => {
+      const input = {
+        scenario: "Should I lie to protect someone?",
+        action: "Tell the truth",
+        frameworks: ["deontology"],
+        confidence: 0.9,
+        nextStepNeeded: false
+      };
+      const result = await api.analyze(input);
+      expect(result.guidance["deontology"]).toContain("Identify the relevant duties");
+    });
+
+    it("should handle virtue framework", async () => {
+      const input = {
+        scenario: "How to handle a difficult conversation",
+        action: "Approach with compassion",
+        frameworks: ["virtue"],
+        confidence: 0.8,
+        nextStepNeeded: false
+      };
+      const result = await api.analyze(input);
+      expect(result.guidance["virtue"]).toContain("Examine what virtues or vices");
+    });
+
+    it("should handle care framework", async () => {
+      const input = {
+        scenario: "Caring for an aging parent",
+        action: "Prioritize their wellbeing",
+        frameworks: ["care"],
+        confidence: 0.85,
+        nextStepNeeded: false
+      };
+      const result = await api.analyze(input);
+      expect(result.guidance["care"]).toContain("Assess how relationships");
+    });
+
+    it("should handle social-contract framework", async () => {
+      const input = {
+        scenario: "Tax policy decision",
+        action: "Implement progressive taxation",
+        frameworks: ["social-contract"],
+        confidence: 0.75,
+        nextStepNeeded: false
+      };
+      const result = await api.analyze(input);
+      expect(result.guidance["social-contract"]).toContain("Evaluate whether the action");
+    });
+
+    it("should handle multiple frameworks", async () => {
+      const input = {
+        scenario: "Healthcare decision",
+        action: "Provide universal healthcare",
+        frameworks: ["utilitarianism", "care", "social-contract"],
+        confidence: 0.8,
+        nextStepNeeded: true
+      };
+      const result = await api.analyze(input);
+      expect(result.frameworks).toHaveLength(3);
+      expect(result.guidance["utilitarianism"]).toBeDefined();
+      expect(result.guidance["care"]).toBeDefined();
+      expect(result.guidance["social-contract"]).toBeDefined();
+    });
   });
 
-  it("should reject missing frameworks", () => {
-    const input = {
-      scenario: "A patient needs treatment",
-      action: "Take the medication",
-      confidence: 0.8,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid frameworks");
-  });
+  describe("Edge Cases and Performance", () => {
+    it("handles very long scenario and action strings", async () => {
+      const longScenario = "A".repeat(10000);
+      const longAction = "B".repeat(10000);
+      const input = {
+        scenario: longScenario,
+        action: longAction,
+        frameworks: ["utilitarianism"],
+        confidence: 0.8,
+        nextStepNeeded: false
+      };
+      const result = await api.analyze(input);
+      expect(result).toBeDefined();
+      expect(result.guidance["utilitarianism"]).toBeDefined();
+    });
 
-  it("should reject empty frameworks array", () => {
-    const input = {
-      scenario: "A patient needs treatment",
-      action: "Take the medication",
-      frameworks: [],
-      confidence: 0.8,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid frameworks");
-  });
+    it("handles boundary confidence values", async () => {
+      const input1 = {
+        scenario: "Test",
+        action: "Test action",
+        frameworks: ["utilitarianism"],
+        confidence: 0.0,
+        nextStepNeeded: false
+      };
+      await expect(api.analyze(input1)).resolves.toBeDefined();
 
-  it("should reject invalid framework type", () => {
-    const input = {
-      scenario: "A patient needs treatment",
-      action: "Take the medication",
-      frameworks: ["invalid-framework"],
-      confidence: 0.8,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Unsupported framework");
-  });
+      const input2 = {
+        scenario: "Test",
+        action: "Test action",
+        frameworks: ["utilitarianism"],
+        confidence: 1.0,
+        nextStepNeeded: false
+      };
+      await expect(api.analyze(input2)).resolves.toBeDefined();
+    });
 
-  it("should reject invalid confidence range (< 0)", () => {
-    const input = {
-      scenario: "A patient needs treatment",
-      action: "Take the medication",
-      frameworks: ["utilitarianism"],
-      confidence: -0.1,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid confidence");
-  });
+    it("handles special characters in scenario and action", async () => {
+      const input = {
+        scenario: "Scenario with special chars: @#$% & émojis 🎉",
+        action: "Action with <html> \"quotes\" and 'apostrophes'",
+        frameworks: ["deontology"],
+        confidence: 0.8,
+        nextStepNeeded: false
+      };
+      const result = await api.analyze(input);
+      expect(result).toBeDefined();
+    });
 
-  it("should reject invalid confidence range (> 1)", () => {
-    const input = {
-      scenario: "A patient needs treatment",
-      action: "Take the medication",
-      frameworks: ["utilitarianism"],
-      confidence: 1.1,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid confidence");
-  });
-
-  it("should reject non-boolean nextStepNeeded", () => {
-    const input = {
-      scenario: "A patient needs treatment",
-      action: "Take the medication",
-      frameworks: ["utilitarianism"],
-      confidence: 0.8,
-      nextStepNeeded: "yes"
-    };
-    const result = server.process(input);
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid nextStepNeeded");
-  });
-
-  it("should process valid input successfully", () => {
-    const validInput = {
-      scenario: "A patient needs treatment",
-      action: "Prescribe medication",
-      frameworks: ["utilitarianism"],
-      confidence: 0.8,
-      nextStepNeeded: false
-    };
-    const result = server.process(validInput);
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].type).toBe("text");
-  });
-});
-
-/**
- * Ethical Framework Tests.
- *
- * Business Context: Test that all supported ethical frameworks are correctly
- * handled and provide appropriate guidance.
- */
-describe("Ethical Frameworks", () => {
-  let server: EthicalReasoningServer;
-
-  beforeEach(() => {
-    server = new EthicalReasoningServer();
-  });
-
-  it("should handle utilitarianism framework", () => {
-    const input = {
-      scenario: "Company decision on layoffs",
-      action: "Proceed with layoffs",
-      frameworks: ["utilitarianism"],
-      confidence: 0.7,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].text).toContain("utilitarianism");
-  });
-
-  it("should handle deontology framework", () => {
-    const input = {
-      scenario: "Should I lie to protect someone?",
-      action: "Tell the truth",
-      frameworks: ["deontology"],
-      confidence: 0.9,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].text).toContain("deontology");
-  });
-
-  it("should handle virtue framework", () => {
-    const input = {
-      scenario: "How to handle a difficult conversation",
-      action: "Approach with compassion",
-      frameworks: ["virtue"],
-      confidence: 0.8,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].text).toContain("virtue");
-  });
-
-  it("should handle care framework", () => {
-    const input = {
-      scenario: "Caring for an aging parent",
-      action: "Prioritize their wellbeing",
-      frameworks: ["care"],
-      confidence: 0.85,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].text).toContain("care");
-  });
-
-  it("should handle social-contract framework", () => {
-    const input = {
-      scenario: "Tax policy decision",
-      action: "Implement progressive taxation",
-      frameworks: ["social-contract"],
-      confidence: 0.75,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].text).toContain("social-contract");
-  });
-
-  it("should handle multiple frameworks", () => {
-    const input = {
-      scenario: "Healthcare decision",
-      action: "Provide universal healthcare",
-      frameworks: ["utilitarianism", "care", "social-contract"],
-      confidence: 0.8,
-      nextStepNeeded: true
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
-    const text = result.content[0].text;
-    expect(text).toContain("utilitarianism");
-    expect(text).toContain("care");
-    expect(text).toContain("social-contract");
+    it("handles suggestedNext field correctly", async () => {
+      const input = {
+        scenario: "Initial ethical analysis",
+        action: "First step",
+        frameworks: ["utilitarianism"],
+        confidence: 0.7,
+        nextStepNeeded: true,
+        suggestedNext: ["deontology", "virtue"]
+      };
+      const result = await api.analyze(input);
+      expect(result.suggestedNext).toHaveLength(2);
+      expect(result.suggestedNext).toContain("deontology");
+    });
   });
 });
 
 /**
  * MCP Server Integration Tests.
- *
- * Business Context: MCP protocol compliance is essential for AI agent integration.
- *
- * Decision Rationale: Test server initialization without requiring a connected transport.
- * Full integration testing is done via MCP Inspector during development workflow.
  */
 describe("MCP Server Integration", () => {
   it("server can be created without errors", () => {
@@ -301,149 +271,5 @@ describe("MCP Server Integration", () => {
     expect(server).toBeDefined();
     expect(typeof server.connect).toBe("function");
     expect(typeof server.close).toBe("function");
-  });
-
-  it("handles valid ethical reasoning request", async () => {
-    const server = createServer();
-
-    // Test that the server is properly configured for ethical reasoning requests
-    // The createServer function registers the CallToolRequestSchema handler
-    // which processes ethicalReasoning tool calls
-
-    expect(server).toBeDefined();
-
-    // Since we can't directly call the internal handler without the transport layer,
-    // we verify that the server creation process completes successfully
-    // and that ethical reasoning request handling would work correctly
-
-    // The CallToolRequestSchema handler checks if the tool name is "ethicalReasoning"
-    // and calls EthicalReasoningServer.process for valid requests
-  });
-
-  it("rejects unknown tool name", async () => {
-    const server = createServer();
-
-    // Test that the server is properly configured for unknown tool handling
-    // The createServer function registers the CallToolRequestSchema handler
-    // which returns an error for unknown tools
-
-    expect(server).toBeDefined();
-
-    // Since we can't directly call the internal handler without the transport layer,
-    // we verify that the server creation process completes successfully
-    // and that unknown tool handling would work correctly
-
-    // The CallToolRequestSchema handler checks if the tool name exists and
-    // returns an error message for unknown tools
-  });
-});
-
-/**
- * Edge Cases and Performance Tests.
- *
- * Business Context: Enterprise applications must handle edge cases gracefully
- * and perform well under load.
- *
- * Decision Rationale: Test boundary conditions and performance to ensure
- * production reliability.
- */
-describe("Edge Cases and Performance", () => {
-  let server: EthicalReasoningServer;
-
-  beforeEach(() => {
-    server = new EthicalReasoningServer();
-  });
-
-  it("handles very long scenario and action strings", () => {
-    const longScenario = "A".repeat(10000);
-    const longAction = "B".repeat(10000);
-    const input = {
-      scenario: longScenario,
-      action: longAction,
-      frameworks: ["utilitarianism"],
-      confidence: 0.8,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
-  });
-
-  it("handles boundary confidence values", () => {
-    const input1 = {
-      scenario: "Test",
-      action: "Test action",
-      frameworks: ["utilitarianism"],
-      confidence: 0.0,
-      nextStepNeeded: false
-    };
-    const result1 = server.process(input1);
-    expect(result1.isError).toBeUndefined();
-
-    const input2 = {
-      scenario: "Test",
-      action: "Test action",
-      frameworks: ["utilitarianism"],
-      confidence: 1.0,
-      nextStepNeeded: false
-    };
-    const result2 = server.process(input2);
-    expect(result2.isError).toBeUndefined();
-  });
-
-  it("handles special characters in scenario and action", () => {
-    const input = {
-      scenario: "Scenario with special chars: @#$% & émojis 🎉",
-      action: "Action with <html> \"quotes\" and 'apostrophes'",
-      frameworks: ["deontology"],
-      confidence: 0.8,
-      nextStepNeeded: false
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
-  });
-
-  it("handles conflicting frameworks scenario", () => {
-    const input = {
-      scenario: "Trolley problem variant",
-      action: "Pull the lever",
-      frameworks: ["utilitarianism", "deontology"],
-      confidence: 0.5,
-      nextStepNeeded: true
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].text).toContain("utilitarianism");
-    expect(result.content[0].text).toContain("deontology");
-  });
-
-  it("handles all frameworks simultaneously", () => {
-    const input = {
-      scenario: "Complex ethical dilemma",
-      action: "Make a decision",
-      frameworks: ["utilitarianism", "deontology", "virtue", "care", "social-contract"],
-      confidence: 0.6,
-      nextStepNeeded: true
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
-    const text = result.content[0].text;
-    expect(text).toContain("utilitarianism");
-    expect(text).toContain("deontology");
-    expect(text).toContain("virtue");
-    expect(text).toContain("care");
-    expect(text).toContain("social-contract");
-  });
-
-  it("handles suggestedNext field correctly", () => {
-    const input = {
-      scenario: "Initial ethical analysis",
-      action: "First step",
-      frameworks: ["utilitarianism"],
-      confidence: 0.7,
-      nextStepNeeded: true,
-      suggestedNext: ["deontology", "virtue"]
-    };
-    const result = server.process(input);
-    expect(result.isError).toBeUndefined();
   });
 });

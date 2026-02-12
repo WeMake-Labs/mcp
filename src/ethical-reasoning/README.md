@@ -53,6 +53,27 @@ The server encourages analysis through multiple ethical frameworks to:
   - Returns comprehensive ethical analysis with framework-specific evaluations
   - Supports iterative refinement through multiple analysis rounds
 
+### TypeScript API (Code Mode)
+
+The server exposes a strongly-typed TypeScript API for programmatic usage:
+
+```typescript
+import { EthicalReasoningAPI } from "@wemake.cx/ethical-reasoning";
+
+const api = new EthicalReasoningAPI();
+
+const result = await api.analyze({
+  scenario: "Company decision on layoffs",
+  action: "Proceed with layoffs",
+  frameworks: ["utilitarianism", "deontology"],
+  confidence: 0.8,
+  nextStepNeeded: false
+});
+
+console.log(result.guidance.utilitarianism);
+// Output: "Consider total expected benefits..."
+```
+
 ### Framework-Specific Analysis
 
 Each framework provides distinct analytical perspectives:
