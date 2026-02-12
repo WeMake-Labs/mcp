@@ -15,7 +15,9 @@ class Mutex {
     // Catch errors so the queue doesn't get stuck
     this._queue = result.then(
       () => {},
-      () => {}
+      (err) => {
+        console.error("Mutex operation failed:", err);
+      }
     );
     return result;
   }
