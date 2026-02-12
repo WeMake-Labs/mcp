@@ -1069,7 +1069,7 @@ Key features:
 /**
  * Factory function that creates and configures a scientific method MCP server instance.
  *
- * This function initializes a Server with the name "scientific-method-server" and version "0.3.0",
+ * This function initializes a Server with the name "scientific-method-server" and version "0.4.0",
  * registers the SCIENTIFIC_METHOD_TOOL, and sets up request handlers for listing available tools
  * and processing scientific method inquiries. The CallTool handler calls ScientificMethodServer.processScientificInquiry
  * when req.params.name === "scientificMethod".
@@ -1094,7 +1094,7 @@ export default function createServer(): Server {
   const server = new Server(
     {
       name: "scientific-method-server",
-      version: "0.3.0"
+      version: "0.4.0"
     },
     {
       capabilities: {
