@@ -1069,7 +1069,7 @@ export default function createServer(): Server {
   const server = new Server(
     {
       name: "decision-framework-server",
-      version: "0.3.0"
+      version: "0.4.0"
     },
     {
       capabilities: {
