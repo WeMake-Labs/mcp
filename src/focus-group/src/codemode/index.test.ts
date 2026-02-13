@@ -1,6 +1,5 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import { FocusGroupServer } from "./index.js";
-import { FocusGroupData } from "../core/types.js";
 
 /**
  * Test suite for Focus Group Code Mode API.

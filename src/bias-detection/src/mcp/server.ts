@@ -1,11 +1,6 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  ListToolsRequestSchema,
-  CallToolRequestSchema,
-  CallToolRequest,
-  Tool
-} from "@modelcontextprotocol/sdk/types.js";
+import { ListToolsRequestSchema, CallToolRequestSchema, CallToolRequest } from "@modelcontextprotocol/sdk/types.js";
 import { BiasDetectionClient } from "../codemode/index.js";
 import { BIAS_DETECTION_TOOL } from "./tools.js";
 import { BiasDetectionInput } from "../core/types.js";
@@ -44,7 +39,12 @@ export function createServer(): Server {
 }
 
 function isValidBiasDetectionInput(args: unknown): args is BiasDetectionInput {
-  return typeof args === "object" && args !== null && "text" in args && typeof (args as any).text === "string";
+  return (
+    typeof args === "object" &&
+    args !== null &&
+    "text" in args &&
+    typeof (args as Record<string, unknown>).text === "string"
+  );
 }
 
 export async function runServer() {

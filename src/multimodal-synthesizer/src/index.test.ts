@@ -22,12 +22,12 @@ describe("Input Validation (Code Mode)", () => {
   });
 
   it("should reject null input", async () => {
-    // @ts-ignore
+    // @ts-expect-error - Testing invalid input
     await expect(synthesizer.synthesize(null)).rejects.toThrow("Invalid input");
   });
 
   it("should reject non-object input", async () => {
-    // @ts-ignore
+    // @ts-expect-error - Testing invalid input
     await expect(synthesizer.synthesize("string input")).rejects.toThrow("Invalid input");
   });
 
@@ -35,7 +35,7 @@ describe("Input Validation (Code Mode)", () => {
     const input = {
       images: ["image1.jpg", "image2.png"]
     };
-    // @ts-ignore
+    // @ts-expect-error - Testing invalid input
     await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
@@ -43,7 +43,7 @@ describe("Input Validation (Code Mode)", () => {
     const input = {
       text: ["Hello world"]
     };
-    // @ts-ignore
+    // @ts-expect-error - Testing invalid input
     await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
@@ -52,7 +52,7 @@ describe("Input Validation (Code Mode)", () => {
       text: "not an array",
       images: ["image1.jpg"]
     };
-    // @ts-ignore
+    // @ts-expect-error - Testing invalid input
     await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
@@ -61,7 +61,7 @@ describe("Input Validation (Code Mode)", () => {
       text: ["Hello"],
       images: "not an array"
     };
-    // @ts-ignore
+    // @ts-expect-error - Testing invalid input
     await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
@@ -70,7 +70,7 @@ describe("Input Validation (Code Mode)", () => {
       text: ["Hello", 123, "World"],
       images: ["image1.jpg"]
     };
-    // @ts-ignore
+    // @ts-expect-error - Testing invalid input
     await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
@@ -79,7 +79,7 @@ describe("Input Validation (Code Mode)", () => {
       text: ["Hello"],
       images: ["image1.jpg", 456, "image2.png"]
     };
-    // @ts-ignore
+    // @ts-expect-error - Testing invalid input
     await expect(synthesizer.synthesize(input)).rejects.toThrow("Invalid input");
   });
 
@@ -273,7 +273,6 @@ describe("Edge Cases and Performance", () => {
         }
       }
     };
-    // @ts-ignore
     const result = await synthesizer.synthesize(nestedInput);
     // Should still process the valid text and images, ignore nested properties
     expect(result.summary).toContain("Nested text");

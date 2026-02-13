@@ -1,13 +1,6 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import { StructuredArgumentation } from "./codemode/index.js";
 import { createServer } from "./mcp/index.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-  ListToolsResult,
-  CallToolResult
-} from "@modelcontextprotocol/sdk/types.js";
-import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 describe("Structured Argumentation (Code Mode)", () => {
   let argumentation: StructuredArgumentation;

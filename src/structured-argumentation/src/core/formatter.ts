@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { ArgumentData, RelationshipGraph, ArgumentType } from "./types.js";
+import { ArgumentData, RelationshipGraph } from "./types.js";
 
 export function formatArgument(argument: ArgumentData): string {
   const { argumentId, argumentType, claim, premises, conclusion, confidence, strengths, weaknesses } = argument;

@@ -1,12 +1,7 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer from "./index.js";
 import { ConstraintMcpServer } from "./mcp/server.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-  JSONRPCMessage,
-  TextContent
-} from "@modelcontextprotocol/sdk/types.js";
+import { JSONRPCMessage, TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 
 /**
@@ -39,7 +34,7 @@ class MockTransport implements Transport {
       const originalSend = this.send.bind(this);
       this.send = async (msg) => {
         await originalSend(msg);
-        if ("id" in msg && (msg as any).id === (request as any).id) {
+        if ("id" in msg && (msg as { id?: unknown }).id === (request as { id?: unknown }).id) {
           resolve(msg);
         }
       };
@@ -84,7 +79,7 @@ describe("Tool Registration", () => {
       jsonrpc: "2.0",
       id: 1,
       method: "tools/list"
-    })) as any;
+    })) as { result: { tools: Array<{ name: string; description: string }> } };
 
     expect(response.result.tools).toHaveLength(1);
     expect(response.result.tools[0].name).toBe("constraintSolver");
@@ -285,7 +280,7 @@ describe("MCP Server Integration", () => {
           constraints: ["x < y"]
         }
       }
-    })) as any;
+    })) as { error?: unknown; result: { content: Array<{ text: string }> } };
 
     expect(response.error).toBeUndefined();
     expect(response.result.content[0].text).toBeDefined();
@@ -306,7 +301,7 @@ describe("MCP Server Integration", () => {
         name: "unknownTool",
         arguments: {}
       }
-    })) as any;
+    })) as { result?: { isError?: boolean; content: Array<{ text: string }> }; error?: unknown };
 
     // Expect either a JSON-RPC error or a result with isError: true
     if (response.result) {

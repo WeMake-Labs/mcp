@@ -40,9 +40,9 @@ describe("FocusGroupLogic Validation", () => {
   });
 
   it("should throw on missing persona fields", () => {
-    const invalidPersona = { ...validPersona } as any;
+    const invalidPersona = { ...validPersona } as Partial<FocusGroupPersona>;
     delete invalidPersona.name;
-    const data = { ...validData, personas: [invalidPersona] };
+    const data = { ...validData, personas: [invalidPersona as FocusGroupPersona] };
     expect(() => logic.validateFocusGroupData(data)).toThrow("missing or invalid 'name'");
   });
 
@@ -50,7 +50,7 @@ describe("FocusGroupLogic Validation", () => {
     const feedback: Feedback = {
       personaId: "p1",
       content: "test",
-      type: "invalid_type" as any,
+      type: "invalid_type" as "praise",
       severity: 0.5
     };
     const data = { ...validData, feedback: [feedback] };
@@ -80,7 +80,7 @@ describe("FocusGroupLogic Validation", () => {
   });
 
   it("should throw on invalid stage", () => {
-    const data = { ...validData, stage: "invalid_stage" as any };
+    const data = { ...validData, stage: "invalid_stage" as "introduction" };
     expect(() => logic.validateFocusGroupData(data)).toThrow("Invalid stage");
   });
 
