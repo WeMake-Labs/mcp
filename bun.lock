@@ -41,7 +41,7 @@
     },
     "src/analogical-reasoning": {
       "name": "@wemake.cx/analogical-reasoning",
-      "version": "0.3.5",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-analogical-reasoning": "dist/index.js",
       },
@@ -58,7 +58,7 @@
     },
     "src/bias-detection": {
       "name": "@wemake.cx/bias-detection",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-bias-detection": "dist/index.js",
       },
@@ -87,7 +87,7 @@
     },
     "src/constraint-solver": {
       "name": "@wemake.cx/constraint-solver",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-constraint-solver": "dist/index.js",
       },
@@ -102,7 +102,7 @@
     },
     "src/decision-framework": {
       "name": "@wemake.cx/decision-framework",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-decision-framework": "dist/index.js",
       },
@@ -117,7 +117,7 @@
     },
     "src/ethical-reasoning": {
       "name": "@wemake.cx/ethical-reasoning",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-ethical-reasoning": "dist/index.js",
       },
@@ -132,7 +132,7 @@
     },
     "src/focus-group": {
       "name": "@wemake.cx/focus-group",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-focus-group": "dist/index.js",
       },
@@ -147,7 +147,7 @@
     },
     "src/goal-tracker": {
       "name": "@wemake.cx/goal-tracker",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-goal-tracker": "dist/index.js",
       },
@@ -161,7 +161,7 @@
     },
     "src/memory": {
       "name": "@wemake.cx/memory",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-memory": "dist/index.js",
       },
@@ -190,7 +190,7 @@
     },
     "src/multimodal-synthesizer": {
       "name": "@wemake.cx/multimodal-synthesizer",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-multimodal-synthesizer": "dist/index.js",
       },
@@ -204,7 +204,7 @@
     },
     "src/narrative-planner": {
       "name": "@wemake.cx/narrative-planner",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-narrative-planner": "dist/index.js",
       },
@@ -218,7 +218,7 @@
     },
     "src/scientific-method": {
       "name": "@wemake.cx/scientific-method",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-scientific-method": "dist/index.js",
       },
@@ -248,7 +248,7 @@
     },
     "src/structured-argumentation": {
       "name": "@wemake.cx/structured-argumentation",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-structured-argumentation": "dist/index.js",
       },
@@ -263,7 +263,7 @@
     },
     "src/transaction-manager": {
       "name": "@wemake.cx/transaction-manager",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-transaction-manager": "dist/index.js",
       },
@@ -281,7 +281,7 @@
     },
     "src/visual-reasoning": {
       "name": "@wemake.cx/visual-reasoning",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "bin": {
         "mcp-server-visual-reasoning": "dist/index.js",
       },
