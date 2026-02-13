@@ -22,16 +22,16 @@ export class GoalTrackerCore {
 
   constructor() {}
 
-   addGoal(goal: string): void {  
-    const trimmedGoal = goal?.trim();  
-    if (!trimmedGoal) {  
-      throw new Error("Goal cannot be empty");  
-    }  
-    // idempotent: prevent duplicate goals  
-    if (!this.goals.some((g) => g.goal === trimmedGoal)) {  
-      this.goals.push({ goal: trimmedGoal, completed: false });  
-    }  
-  }  
+  addGoal(goal: string): void {
+    const trimmedGoal = goal?.trim();
+    if (!trimmedGoal) {
+      throw new Error("Goal cannot be empty");
+    }
+    // idempotent: prevent duplicate goals
+    if (!this.goals.some((g) => g.goal === trimmedGoal)) {
+      this.goals.push({ goal: trimmedGoal, completed: false });
+    }
+  }
 
   completeGoal(goal: string): void {
     const trimmedGoal = goal?.trim();

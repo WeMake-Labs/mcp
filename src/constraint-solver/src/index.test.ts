@@ -1,8 +1,12 @@
-
 import { describe, expect, it, beforeEach } from "bun:test";
 import createServer from "./index.js";
 import { ConstraintMcpServer } from "./mcp/server.js";
-import { CallToolRequestSchema, ListToolsRequestSchema, JSONRPCMessage, TextContent } from "@modelcontextprotocol/sdk/types.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+  JSONRPCMessage,
+  TextContent
+} from "@modelcontextprotocol/sdk/types.js";
 import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 
 /**
@@ -12,35 +16,35 @@ class MockTransport implements Transport {
   onclose?: () => void;
   onerror?: (error: Error) => void;
   onmessage?: (message: JSONRPCMessage) => void;
-  
+
   private _messages: JSONRPCMessage[] = [];
-  
+
   async start(): Promise<void> {}
-  
+
   async send(message: JSONRPCMessage): Promise<void> {
     this._messages.push(message);
   }
-  
+
   async close(): Promise<void> {
     this.onclose?.();
   }
-  
+
   get messages() {
     return this._messages;
   }
-  
+
   // Helper to simulate incoming message and wait for response
   async sendRequest(request: JSONRPCMessage): Promise<JSONRPCMessage> {
     const p = new Promise<JSONRPCMessage>((resolve) => {
       const originalSend = this.send.bind(this);
       this.send = async (msg) => {
         await originalSend(msg);
-        if ('id' in msg && (msg as any).id === (request as any).id) {
+        if ("id" in msg && (msg as any).id === (request as any).id) {
           resolve(msg);
         }
       };
     });
-    
+
     this.onmessage?.(request);
     return p;
   }
@@ -75,13 +79,13 @@ describe("Tool Registration", () => {
     const server = createServer();
     const transport = new MockTransport();
     await server.connect(transport);
-    
-    const response = await transport.sendRequest({
+
+    const response = (await transport.sendRequest({
       jsonrpc: "2.0",
       id: 1,
       method: "tools/list"
-    }) as any;
-    
+    })) as any;
+
     expect(response.result.tools).toHaveLength(1);
     expect(response.result.tools[0].name).toBe("constraintSolver");
     expect(response.result.tools[0].description).toContain("Checks if a set of variables satisfies all constraints");
@@ -270,7 +274,7 @@ describe("MCP Server Integration", () => {
     const transport = new MockTransport();
     await server.connect(transport);
 
-    const response = await transport.sendRequest({
+    const response = (await transport.sendRequest({
       jsonrpc: "2.0",
       id: 2,
       method: "tools/call",
@@ -281,7 +285,7 @@ describe("MCP Server Integration", () => {
           constraints: ["x < y"]
         }
       }
-    }) as any;
+    })) as any;
 
     expect(response.error).toBeUndefined();
     expect(response.result.content[0].text).toBeDefined();
@@ -294,7 +298,7 @@ describe("MCP Server Integration", () => {
     const transport = new MockTransport();
     await server.connect(transport);
 
-    const response = await transport.sendRequest({
+    const response = (await transport.sendRequest({
       jsonrpc: "2.0",
       id: 3,
       method: "tools/call",
@@ -302,14 +306,14 @@ describe("MCP Server Integration", () => {
         name: "unknownTool",
         arguments: {}
       }
-    }) as any;
+    })) as any;
 
     // Expect either a JSON-RPC error or a result with isError: true
     if (response.result) {
-        expect(response.result.isError).toBe(true);
-        expect(response.result.content[0].text).toContain("Unknown tool");
+      expect(response.result.isError).toBe(true);
+      expect(response.result.content[0].text).toContain("Unknown tool");
     } else {
-        expect(response.error).toBeDefined();
+      expect(response.error).toBeDefined();
     }
   });
 });

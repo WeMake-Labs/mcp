@@ -24,7 +24,7 @@ export function createServer(): Server {
           case "add":
             if (!goal) {
               return {
-                content: [{ type: "text", text: "Missing parameter: 'goal' required for action 'add'." }], 
+                content: [{ type: "text", text: "Missing parameter: 'goal' required for action 'add'." }],
                 isError: true
               };
             }
@@ -32,8 +32,8 @@ export function createServer(): Server {
             break;
           case "complete":
             if (!goal) {
-               return {
-               content: [{ type: "text", text: "Missing parameter: 'goal' required for action 'complete'." }],
+              return {
+                content: [{ type: "text", text: "Missing parameter: 'goal' required for action 'complete'." }],
                 isError: true
               };
             }

@@ -180,7 +180,6 @@ export class FocusGroupVisualizer {
       // Use the nextPersonaId determined by the logic layer
       const nextPersonaId = data.nextPersonaId;
 
-
       const nextPersona = data.personas.find((p) => p.id === nextPersonaId);
 
       if (nextPersona) {

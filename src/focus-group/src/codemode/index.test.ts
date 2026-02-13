@@ -367,15 +367,8 @@ describe("Focus Group Server (Code Mode)", () => {
     });
 
     it("handles all feedback types", () => {
-      const feedbackTypes: Array<"praise" | "confusion" | "suggestion" | "usability" | "feature" | "bug" | "summary"> = [
-        "praise",
-        "confusion",
-        "suggestion",
-        "usability",
-        "feature",
-        "bug",
-        "summary"
-      ];
+      const feedbackTypes: Array<"praise" | "confusion" | "suggestion" | "usability" | "feature" | "bug" | "summary"> =
+        ["praise", "confusion", "suggestion", "usability", "feature", "bug", "summary"];
 
       const feedback = feedbackTypes.map((type) => ({
         personaId: "persona1",

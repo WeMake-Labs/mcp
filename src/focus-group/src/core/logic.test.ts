@@ -1,11 +1,10 @@
-
 import { describe, expect, it } from "bun:test";
 import { FocusGroupLogic } from "./logic.js";
 import { FocusGroupData, FocusGroupPersona, Feedback } from "./types.js";
 
 describe("FocusGroupLogic Validation", () => {
   const logic = new FocusGroupLogic();
-  
+
   const validPersona: FocusGroupPersona = {
     id: "p1",
     name: "Persona 1",

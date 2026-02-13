@@ -29,7 +29,7 @@ export function createServer(): Server {
     if (request.params.name === "focusGroup") {
       try {
         const result = focusGroupServer.processFocusGroup(request.params.arguments);
-        
+
         // Construct the summary object for the LLM
         const summary = {
           sessionId: result.sessionId,

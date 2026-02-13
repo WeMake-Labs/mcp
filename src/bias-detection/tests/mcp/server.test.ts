@@ -13,7 +13,7 @@ describe("Bias Detection MCP Server", () => {
   beforeEach(async () => {
     server = createServer();
     client = new Client({ name: "test-client", version: "1.0.0" }, { capabilities: {} });
-    
+
     [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
 
     await server.connect(serverTransport);
@@ -36,19 +36,19 @@ describe("Bias Detection MCP Server", () => {
   });
 
   test("handles valid bias detection request", async () => {
-    const result = await client.callTool({
+    const result = (await client.callTool({
       name: "biasDetection",
       arguments: { text: "This is obviously biased" }
-    }) as CallToolResult;
+    })) as CallToolResult;
 
     expect(result.isError).toBeFalsy();
     expect(result.content).toBeDefined();
-    
+
     const item = result.content[0];
     if (item.type !== "text") {
       throw new Error("Expected text content");
     }
-    
+
     const content = JSON.parse(item.text);
     expect(content.biases).toContain("obviously");
   });

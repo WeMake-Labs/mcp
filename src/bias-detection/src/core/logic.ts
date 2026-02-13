@@ -14,6 +14,6 @@ export function detectBias(input: BiasDetectionInput): BiasDetectionResult {
   const regex = new RegExp(`\\b(${escaped.join("|")})\\b`, "gi");
   const matches = text.match(regex) ?? [];
   const uniqueBiases = [...new Set(matches.map((m) => m.toLowerCase()))];
-  
+
   return { biases: uniqueBiases };
 }

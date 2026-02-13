@@ -3,7 +3,7 @@ import { detectBias } from "../core/logic.js";
 
 /**
  * Client for the Bias Detection API.
- * 
+ *
  * Provides methods to analyze text for potentially biased language patterns.
  */
 export class BiasDetectionClient {

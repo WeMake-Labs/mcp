@@ -1,6 +1,7 @@
 # Constraint Solver MCP Server
 
-A specialized MCP server for validating variable assignments against mathematical and logical constraints, enabling systematic constraint satisfaction checking.
+A specialized MCP server for validating variable assignments against mathematical and logical constraints, enabling
+systematic constraint satisfaction checking.
 
 ## Architecture
 
@@ -24,11 +25,7 @@ const result = await solver.check({
     x: 10,
     y: 5
   },
-  constraints: [
-    "x > 0",
-    "y <= x",
-    "x + y < 20"
-  ]
+  constraints: ["x > 0", "y <= x", "x + y < 20"]
 });
 
 if (result.satisfied) {
@@ -166,7 +163,7 @@ Follow these steps for constraint solving:
    - Consider edge cases and boundary conditions
 
 2. Constraint Formulation:
-   - Use mathematical operators: +, -, *, /, %, **
+   - Use mathematical operators: +, -, \*, /, %, \*\*
    - Use comparison operators: >, <, >=, <=, ===, !==
    - Use logical operators: &&, ||, !
    - Reference variables by their exact names

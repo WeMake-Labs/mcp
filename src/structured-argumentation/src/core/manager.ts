@@ -38,7 +38,7 @@ export class ArgumentationManager {
       claim: data.claim as string,
       premises: data.premises as string[],
       conclusion: data.conclusion as string,
-      argumentId: (data.argumentId as string) || `arg-${this.nextArgumentId++}`,  
+      argumentId: (data.argumentId as string) || `arg-${this.nextArgumentId++}`,
       argumentType: data.argumentType as ArgumentType,
       confidence: data.confidence as number,
       nextArgumentNeeded: typeof data.nextArgumentNeeded === "boolean" ? data.nextArgumentNeeded : true

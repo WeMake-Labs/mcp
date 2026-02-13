@@ -1,13 +1,13 @@
 import { NarrativeInput, NarrativeOutline } from "../core/types.js";
 import { planNarrative, validateNarrativeInput } from "../core/logic.js";
 
-/**  
- * AI Tool: Narrative Planner Code Mode API  
- * Purpose: Provides programmatic access to narrative planning functionality for integration into applications.  
- * Limitations: Generates template-based outlines; requires valid inputs; does not persist state.  
- * Workflow: 1. Instantiate class 2. Call planNarrative() with input 3. Receive structured outline  
- */  
-export class NarrativePlanner {  
+/**
+ * AI Tool: Narrative Planner Code Mode API
+ * Purpose: Provides programmatic access to narrative planning functionality for integration into applications.
+ * Limitations: Generates template-based outlines; requires valid inputs; does not persist state.
+ * Workflow: 1. Instantiate class 2. Call planNarrative() with input 3. Receive structured outline
+ */
+export class NarrativePlanner {
   /**
    * Generates a simple three-act story outline based on the input.
    * @param input The narrative parameters (premise, characters, arcs).

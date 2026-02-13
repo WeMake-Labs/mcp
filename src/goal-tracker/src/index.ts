@@ -18,7 +18,7 @@ if (import.meta.main) {
     console.error("Fatal error running server:", err);
     process.exit(1);
   });
-  
+
   // Graceful Shutdown
   process.on("SIGINT", () => process.exit(0));
   process.on("SIGTERM", () => process.exit(0));

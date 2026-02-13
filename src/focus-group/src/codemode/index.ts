@@ -14,7 +14,7 @@ export class FocusGroupServer {
   /**
    * Process a focus group session.
    * Validates input, updates history, selects next persona, and visualizes the result.
-   * 
+   *
    * @param input The raw input data (usually from LLM tool call)
    * @returns The updated FocusGroupData object
    */

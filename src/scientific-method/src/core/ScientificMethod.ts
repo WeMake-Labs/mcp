@@ -1,11 +1,5 @@
 import chalk from "chalk";
-import {
-  ExperimentData,
-  HypothesisData,
-  Prediction,
-  ScientificInquiryData,
-  Variable
-} from "./types.js";
+import { ExperimentData, HypothesisData, Prediction, ScientificInquiryData, Variable } from "./types.js";
 
 /**
  * Core implementation of the Scientific Method workflow.

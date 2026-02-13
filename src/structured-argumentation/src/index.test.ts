@@ -1,7 +1,12 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import { StructuredArgumentation } from "./codemode/index.js";
 import { createServer } from "./mcp/index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema, ListToolsResult, CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+  ListToolsResult,
+  CallToolResult
+} from "@modelcontextprotocol/sdk/types.js";
 import { createTestClient } from "../../test-helpers/mcp-test-client.js";
 
 describe("Structured Argumentation (Code Mode)", () => {
@@ -167,4 +172,3 @@ describe("MCP Server Integration", () => {
   // Note: Full integration tests are skipped because createTestClient provides mocks
   // instead of actual server execution. Code Mode tests cover the logic.
 });
-

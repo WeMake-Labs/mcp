@@ -83,7 +83,11 @@ export class FocusGroupLogic {
       if (!persona.usageScenario || typeof persona.usageScenario !== "string") {
         throw new Error(`Invalid persona '${persona.id}': missing or invalid 'usageScenario'`);
       }
-      if (!persona.communication || typeof persona.communication.style !== "string" || typeof persona.communication.tone !== "string") {
+      if (
+        !persona.communication ||
+        typeof persona.communication.style !== "string" ||
+        typeof persona.communication.tone !== "string"
+      ) {
         throw new Error(`Invalid persona '${persona.id}': missing or invalid 'communication'`);
       }
     }
@@ -129,9 +133,16 @@ export class FocusGroupLogic {
     }
 
     // Validate Stage
-    const validStages = ["introduction", "initial-impressions", "deep-dive", "synthesis", "recommendations", "prioritization"];
+    const validStages = [
+      "introduction",
+      "initial-impressions",
+      "deep-dive",
+      "synthesis",
+      "recommendations",
+      "prioritization"
+    ];
     if (!validStages.includes(data.stage)) {
-       throw new Error(`Invalid stage: '${data.stage}'. Must be one of: ${validStages.join(", ")}`);
+      throw new Error(`Invalid stage: '${data.stage}'. Must be one of: ${validStages.join(", ")}`);
     }
 
     // Ensure activePersonaId exists

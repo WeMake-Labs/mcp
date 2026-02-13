@@ -78,7 +78,7 @@ describe("GoalTracker Code Mode API", () => {
     const goals = tracker.getGoals();
     expect(goals).toHaveLength(2);
   });
-  
+
   it("should add multiple goals via batch method", () => {
     tracker.addGoals(["Goal 1", "Goal 2"]);
     const goals = tracker.getGoals();
@@ -104,11 +104,11 @@ describe("Edge Cases and Performance", () => {
     expect(goals[0].goal).toBe(longGoal);
   });
 
-  it("should reject whitespace-only goal string", () => {  
-    expect(() => {  
-      tracker.addGoal("   ");  
-    }).toThrow("Goal cannot be empty");  
-  });  
+  it("should reject whitespace-only goal string", () => {
+    expect(() => {
+      tracker.addGoal("   ");
+    }).toThrow("Goal cannot be empty");
+  });
 
   it("handles special characters and Unicode in goal", () => {
     const specialGoal = "Learn 日本語 & Emoji 🎉 with quotes \"'`";

@@ -1,6 +1,7 @@
 # Goal Tracker MCP Server
 
-A simple but effective tool for tracking and completing goals. This server helps models maintain goal-oriented workflows through basic goal creation, status reporting, and completion marking.
+A simple but effective tool for tracking and completing goals. This server helps models maintain goal-oriented workflows
+through basic goal creation, status reporting, and completion marking.
 
 ## Architecture
 
@@ -69,11 +70,13 @@ Adds goals, marks completion, and reports status.
 **Examples:**
 
 1.  **Add a goal:**
+
     ```json
     { "action": "add", "goal": "Fix bugs" }
     ```
 
 2.  **Complete a goal:**
+
     ```json
     { "action": "complete", "goal": "Fix bugs" }
     ```

@@ -36,6 +36,7 @@ tracking logical relationships, and facilitating structured debate progression.
 ## Architecture
 
 This server follows the "Code Mode" architecture, separating concerns into:
+
 - **Core (`src/core`)**: Pure business logic and domain models.
 - **Code Mode (`src/codemode`)**: Public TypeScript API for programmatic usage.
 - **MCP Adapter (`src/mcp`)**: Adapter for the Model Context Protocol.

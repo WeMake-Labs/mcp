@@ -1,18 +1,18 @@
 import chalk from "chalk";
 import { DecisionAnalysisData, CriterionEvaluation, Outcome } from "./types.js";
 
-/**  
- * DecisionVisualizer - Formats decision analysis data for terminal display  
- * 
- * Purpose: Generates formatted, colorized text output for decision analysis results  
- * 
- * Limitations: 
- * - Output is optimized for terminal display with ANSI color codes  
- * - Not suitable for non-terminal environments without color support  
- * 
- * Workflow: Converts DecisionAnalysisData to formatted string with sections for  
- * context, options, criteria, evaluations, outcomes, gaps, and recommendations  
- */  
+/**
+ * DecisionVisualizer - Formats decision analysis data for terminal display
+ *
+ * Purpose: Generates formatted, colorized text output for decision analysis results
+ *
+ * Limitations:
+ * - Output is optimized for terminal display with ANSI color codes
+ * - Not suitable for non-terminal environments without color support
+ *
+ * Workflow: Converts DecisionAnalysisData to formatted string with sections for
+ * context, options, criteria, evaluations, outcomes, gaps, and recommendations
+ */
 export class DecisionVisualizer {
   public static visualizeDecisionAnalysis(data: DecisionAnalysisData): string {
     let output = `\n${chalk.bold(`DECISION ANALYSIS: ${data.decisionStatement}`)} (ID: ${data.decisionId})\n\n`;
