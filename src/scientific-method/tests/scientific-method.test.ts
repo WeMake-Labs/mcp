@@ -74,4 +74,28 @@ describe("Scientific Method Code Mode", () => {
     expect(visualization).toContain("SCIENTIFIC INQUIRY");
     expect(visualization).toContain("Sky is blue");
   });
+
+  it("retrieves inquiry history", async () => {
+    const api = new ScientificMethodCodeMode();
+    await api.processInquiry({
+      inquiryId: "hist-1",
+      stage: "observation",
+      observation: "Initial observation",
+      iteration: 0,
+      nextStageNeeded: true
+    });
+
+    await api.processInquiry({
+      inquiryId: "hist-1",
+      stage: "question",
+      question: "Why?",
+      iteration: 1,
+      nextStageNeeded: true
+    });
+
+    const history = await api.getInquiryHistory("hist-1");
+    expect(history).toHaveLength(2);
+    expect(history[0].stage).toBe("observation");
+    expect(history[1].stage).toBe("question");
+  });
 });

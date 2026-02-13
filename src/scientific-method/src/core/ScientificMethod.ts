@@ -7,6 +7,34 @@ import {
   Variable
 } from "./types.js";
 
+/**
+ * Core implementation of the Scientific Method workflow.
+ *
+ * **Purpose**:
+ * This class encapsulates the pure business logic for the scientific method.
+ * It handles data validation, state management for inquiries, hypotheses, and experiments,
+ * and generates visualizations. It ensures that the scientific process is followed rigorously,
+ * enforcing rules for each stage (observation, question, hypothesis, experiment, analysis, conclusion).
+ *
+ * **Limitations**:
+ * - **In-Memory Storage**: Inquiry history, hypothesis registries, and experiment registries are
+ *   stored in-memory. This state is lost when the application terminates. For persistent storage,
+ *   an external database integration would be required.
+ * - **Synchronous Validation**: Validation is performed synchronously.
+ *
+ * **Workflow Integration**:
+ * This class is designed to be wrapped by the `ScientificMethodCodeMode` class.
+ * - The Code Mode layer handles the public API surface and any async operations (if added in future).
+ * - The MCP layer handles protocol-specific communication.
+ * - This Core layer remains protocol-agnostic, focusing solely on domain logic.
+ *
+ * @example
+ * ```typescript
+ * const core = new ScientificMethodCore();
+ * const data = core.processScientificInquiry(inputData);
+ * const history = core.getInquiryHistory(data.inquiryId);
+ * ```
+ */
 export class ScientificMethodCore {
   private inquiryHistory: Record<string, ScientificInquiryData[]> = {};
   private hypothesisRegistry: Record<string, HypothesisData> = {};
