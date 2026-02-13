@@ -33,6 +33,13 @@ tracking logical relationships, and facilitating structured debate progression.
 - **Strength/weakness identification**: Systematic evaluation of argument quality
 - **Relationship mapping**: Tracking how arguments support, contradict, or build upon each other
 
+## Architecture
+
+This server follows the "Code Mode" architecture, separating concerns into:
+- **Core (`src/core`)**: Pure business logic and domain models.
+- **Code Mode (`src/codemode`)**: Public TypeScript API for programmatic usage.
+- **MCP Adapter (`src/mcp`)**: Adapter for the Model Context Protocol.
+
 ## Capabilities
 
 ### Tools
@@ -71,6 +78,27 @@ assessment, and recommendations for next argumentative steps.
 - Insufficient premise support
 - Logical fallacy identification
 - Inconsistent argument relationships
+
+### Programmatic API (Code Mode)
+
+You can use the `StructuredArgumentation` class directly in your TypeScript/JavaScript applications.
+
+```typescript
+import { StructuredArgumentation } from "@wemake.cx/structured-argumentation";
+
+const argumentation = new StructuredArgumentation();
+
+const result = await argumentation.processArgument({
+  claim: "AI will transform education",
+  premises: ["AI can personalize learning", "AI provides instant feedback"],
+  conclusion: "Therefore, education will be transformed",
+  argumentType: "thesis",
+  confidence: 0.8,
+  nextArgumentNeeded: false
+});
+
+console.log(result.argumentId);
+```
 
 ## Setup
 
@@ -115,50 +143,4 @@ Always specify the argument type that best fits your contribution:
 - Rebuttal: For responses defending against objections
 
 Ensure each argument includes clear premises, logical reasoning, and explicit conclusions.
-```
-
-## Example
-
-```typescript
-// Analyzing a policy proposal through dialectical reasoning
-const policyAnalysis = {
-  claim: "Universal Basic Income should be implemented nationwide",
-  premises: [
-    "Automation is displacing traditional jobs at an accelerating rate",
-    "Current welfare systems create poverty traps and bureaucratic inefficiency",
-    "UBI pilot programs have shown positive outcomes in reducing poverty"
-  ],
-  conclusion: "A universal basic income would provide economic security while simplifying social support systems",
-  argumentType: "thesis",
-  confidence: 0.75,
-  strengths: [
-    "Addresses technological unemployment proactively",
-    "Reduces administrative overhead compared to means-tested programs",
-    "Provides dignity and choice to recipients"
-  ],
-  weaknesses: [
-    "High fiscal cost requiring significant tax increases",
-    "Potential inflationary effects on consumer goods",
-    "May reduce work incentives for some individuals"
-  ],
-  nextArgumentNeeded: true,
-  suggestedNextTypes: ["antithesis", "objection"]
-};
-
-// Counter-argument development
-const counterArgument = {
-  claim: "Universal Basic Income implementation would be economically destabilizing",
-  premises: [
-    "The fiscal cost would require unsustainable levels of government spending",
-    "Historical evidence shows that unconditional transfers reduce work participation",
-    "Targeted assistance programs are more cost-effective than universal programs"
-  ],
-  conclusion: "UBI would create more economic problems than it solves",
-  argumentType: "antithesis",
-  respondsTo: "thesis-ubi-001",
-  contradicts: ["thesis-ubi-001"],
-  confidence: 0.68,
-  nextArgumentNeeded: true,
-  suggestedNextTypes: ["rebuttal", "synthesis"]
-};
 ```
