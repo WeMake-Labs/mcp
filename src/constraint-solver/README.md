@@ -3,9 +3,43 @@
 A specialized MCP server for validating variable assignments against mathematical and logical constraints, enabling
 systematic constraint satisfaction checking.
 
-## Core Concepts
+## Architecture
 
-### Variables
+This server follows the **MCP Code Mode** architecture, separating concerns into three layers:
+
+1.  **Core (`src/core/`)**: Pure business logic and types (no MCP dependencies).
+2.  **Code Mode (`src/codemode/`)**: Programmable TypeScript API exported for use by other applications/agents.
+3.  **MCP Adapter (`src/mcp/`)**: Protocol adapter that exposes the Code Mode API as an MCP server.
+
+## Code Mode API (Programmable Usage)
+
+You can use the Constraint Solver directly in your TypeScript applications:
+
+```typescript
+import { ConstraintSolver } from "@wemake.cx/constraint-solver";
+
+const solver = new ConstraintSolver();
+
+const result = await solver.check({
+  variables: {
+    x: 10,
+    y: 5
+  },
+  constraints: ["x > 0", "y <= x", "x + y < 20"]
+});
+
+if (result.satisfied) {
+  console.log("All constraints satisfied!");
+} else {
+  console.log("Unsatisfied constraints:", result.unsatisfied);
+}
+```
+
+## MCP Usage
+
+### Core Concepts
+
+#### Variables
 
 The server works with named variables that have numeric values:
 
@@ -24,7 +58,7 @@ Example variables:
 }
 ```
 
-### Constraints
+#### Constraints
 
 Constraints are boolean expressions that must evaluate to true:
 
@@ -45,7 +79,7 @@ Example constraints:
 ];
 ```
 
-### Constraint Satisfaction
+#### Constraint Satisfaction
 
 The system evaluates all constraints against the variable assignments:
 
@@ -54,7 +88,7 @@ The system evaluates all constraints against the variable assignments:
 - **Violation Report**: List of specific constraints that failed
 - **Validation Result**: Boolean satisfaction status with details
 
-### Safety and Security
+#### Safety and Security
 
 Constraint evaluation uses safe JavaScript evaluation:
 
@@ -63,9 +97,7 @@ Constraint evaluation uses safe JavaScript evaluation:
 - **Limited Scope**: Only provided variables are accessible
 - **No Side Effects**: Evaluation is purely functional
 
-## API
-
-### Tools
+### API Tools
 
 - **constraintSolver**
   - Validates variable assignments against constraint expressions
@@ -75,13 +107,10 @@ Constraint evaluation uses safe JavaScript evaluation:
   - Output: Constraint satisfaction result
     - `satisfied` (boolean): Whether all constraints are satisfied
     - `unsatisfied` (array): List of constraint expressions that failed
-  - Evaluates each constraint expression using provided variables
-  - Returns detailed violation report for debugging
-  - Handles invalid expressions gracefully by marking them as unsatisfied
 
-## Setup
+### Setup
 
-### bunx
+#### bunx
 
 ```json
 {

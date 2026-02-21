@@ -1,16 +1,52 @@
 import { describe, expect, it, beforeEach } from "bun:test";
-import createServer, { ConstraintSolverServer } from "./index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { createTestClient } from "../../test-helpers/mcp-test-client.js";
+import createServer from "./index.js";
+import { ConstraintMcpServer } from "./mcp/server.js";
+import { JSONRPCMessage, TextContent } from "@modelcontextprotocol/sdk/types.js";
+import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
+
+/**
+ * Mock Transport for testing MCP Server
+ */
+class MockTransport implements Transport {
+  onclose?: () => void;
+  onerror?: (error: Error) => void;
+  onmessage?: (message: JSONRPCMessage) => void;
+
+  private _messages: JSONRPCMessage[] = [];
+
+  async start(): Promise<void> {}
+
+  async send(message: JSONRPCMessage): Promise<void> {
+    this._messages.push(message);
+  }
+
+  async close(): Promise<void> {
+    this.onclose?.();
+  }
+
+  get messages() {
+    return this._messages;
+  }
+
+  // Helper to simulate incoming message and wait for response
+  async sendRequest(request: JSONRPCMessage): Promise<JSONRPCMessage> {
+    const p = new Promise<JSONRPCMessage>((resolve) => {
+      const originalSend = this.send.bind(this);
+      this.send = async (msg) => {
+        await originalSend(msg);
+        if ("id" in msg && (msg as { id?: unknown }).id === (request as { id?: unknown }).id) {
+          resolve(msg);
+        }
+      };
+    });
+
+    this.onmessage?.(request);
+    return p;
+  }
+}
 
 /**
  * Test suite for Constraint Solver MCP Server.
- *
- * Business Context: Ensures the constraint-solver framework correctly validates
- * inputs and provides reliable functionality for enterprise applications.
- *
- * Decision Rationale: Tests focus on server initialization, schema validation,
- * and core functionality to ensure production-ready reliability.
  */
 describe("Constraint Solver Server", () => {
   it("server initializes successfully", () => {
@@ -32,30 +68,33 @@ describe("Constraint Solver Server", () => {
 
 /**
  * Tool Registration Tests.
- *
- * Business Context: Verifies that MCP tools are correctly advertised to clients.
  */
 describe("Tool Registration", () => {
   it("should advertise constraintSolver tool", async () => {
-    const server = createTestClient(createServer());
-    const response = await server.request({ method: "tools/list" }, ListToolsRequestSchema);
-    expect(response.tools).toHaveLength(1);
-    expect(response.tools[0].name).toBe("constraintSolver");
-    expect(response.tools[0].description).toContain("Checks if a set of variables satisfies all constraints");
+    const server = createServer();
+    const transport = new MockTransport();
+    await server.connect(transport);
+
+    const response = (await transport.sendRequest({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "tools/list"
+    })) as { result: { tools: Array<{ name: string; description: string }> } };
+
+    expect(response.result.tools).toHaveLength(1);
+    expect(response.result.tools[0].name).toBe("constraintSolver");
+    expect(response.result.tools[0].description).toContain("Checks if a set of variables satisfies all constraints");
   });
 });
 
 /**
  * Constraint Solving Tests - Satisfied Constraints.
- *
- * Business Context: Verify that the solver correctly identifies when all
- * constraints are satisfied by the given variable assignments.
  */
 describe("Constraint Solving - Satisfied Constraints", () => {
-  let solver: ConstraintSolverServer;
+  let solver: ConstraintMcpServer;
 
   beforeEach(() => {
-    solver = new ConstraintSolverServer();
+    solver = new ConstraintMcpServer();
   });
 
   it("should solve satisfied simple constraint", async () => {
@@ -65,7 +104,7 @@ describe("Constraint Solving - Satisfied Constraints", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(true);
     expect(parsed.unsatisfied).toHaveLength(0);
   });
@@ -77,7 +116,7 @@ describe("Constraint Solving - Satisfied Constraints", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(true);
     expect(parsed.unsatisfied).toHaveLength(0);
   });
@@ -89,7 +128,7 @@ describe("Constraint Solving - Satisfied Constraints", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(true);
   });
 
@@ -100,22 +139,19 @@ describe("Constraint Solving - Satisfied Constraints", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(true);
   });
 });
 
 /**
  * Constraint Solving Tests - Unsatisfied Constraints.
- *
- * Business Context: Verify that the solver correctly identifies when
- * constraints are violated and reports which constraints failed.
  */
 describe("Constraint Solving - Unsatisfied Constraints", () => {
-  let solver: ConstraintSolverServer;
+  let solver: ConstraintMcpServer;
 
   beforeEach(() => {
-    solver = new ConstraintSolverServer();
+    solver = new ConstraintMcpServer();
   });
 
   it("should detect unsatisfied simple constraint", async () => {
@@ -125,7 +161,7 @@ describe("Constraint Solving - Unsatisfied Constraints", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(false);
     expect(parsed.unsatisfied).toHaveLength(1);
     expect(parsed.unsatisfied[0]).toBe("x < y");
@@ -138,7 +174,7 @@ describe("Constraint Solving - Unsatisfied Constraints", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(false);
     expect(parsed.unsatisfied).toHaveLength(2);
   });
@@ -150,7 +186,7 @@ describe("Constraint Solving - Unsatisfied Constraints", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(false);
     expect(parsed.unsatisfied).toHaveLength(1);
     expect(parsed.unsatisfied[0]).toBe("y < z");
@@ -159,24 +195,18 @@ describe("Constraint Solving - Unsatisfied Constraints", () => {
 
 /**
  * Input Validation Tests.
- *
- * Business Context: Enterprise applications require robust input validation
- * to prevent data corruption and ensure GDPR compliance.
- *
- * Decision Rationale: Test validation logic directly without transport layer
- * to ensure clear error messages and proper input sanitization.
  */
 describe("Input Validation", () => {
-  let solver: ConstraintSolverServer;
+  let solver: ConstraintMcpServer;
 
   beforeEach(() => {
-    solver = new ConstraintSolverServer();
+    solver = new ConstraintMcpServer();
   });
 
   it("should reject null input", async () => {
     const result = await solver.process(null);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Invalid input");
+    expect((result.content[0] as TextContent).text).toContain("Invalid input");
   });
 
   it("should reject input missing variables", async () => {
@@ -225,11 +255,6 @@ describe("Input Validation", () => {
 
 /**
  * MCP Server Integration Tests.
- *
- * Business Context: MCP protocol compliance is essential for AI agent integration.
- *
- * Decision Rationale: Test server initialization without requiring a connected transport.
- * Full integration testing is done via MCP Inspector during development workflow.
  */
 describe("MCP Server Integration", () => {
   it("server can be created without errors", () => {
@@ -241,53 +266,61 @@ describe("MCP Server Integration", () => {
 
   it("handles valid constraint solving request", async () => {
     const server = createServer();
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "constraintSolver",
-          arguments: {
-            variables: { x: 5, y: 10 },
-            constraints: ["x < y"]
-          }
+    const transport = new MockTransport();
+    await server.connect(transport);
+
+    const response = (await transport.sendRequest({
+      jsonrpc: "2.0",
+      id: 2,
+      method: "tools/call",
+      params: {
+        name: "constraintSolver",
+        arguments: {
+          variables: { x: 5, y: 10 },
+          constraints: ["x < y"]
         }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBeUndefined();
+      }
+    })) as { error?: unknown; result: { content: Array<{ text: string }> } };
+
+    expect(response.error).toBeUndefined();
+    expect(response.result.content[0].text).toBeDefined();
+    const parsed = JSON.parse(response.result.content[0].text);
+    expect(parsed.satisfied).toBe(true);
   });
 
   it("rejects unknown tool name", async () => {
     const server = createServer();
-    const response = await server.request(
-      {
-        method: "tools/call",
-        params: {
-          name: "unknownTool",
-          arguments: {}
-        }
-      },
-      CallToolRequestSchema
-    );
-    expect(response.isError).toBe(true);
-    expect(response.content[0].text).toContain("Unknown tool");
+    const transport = new MockTransport();
+    await server.connect(transport);
+
+    const response = (await transport.sendRequest({
+      jsonrpc: "2.0",
+      id: 3,
+      method: "tools/call",
+      params: {
+        name: "unknownTool",
+        arguments: {}
+      }
+    })) as { result?: { isError?: boolean; content: Array<{ text: string }> }; error?: unknown };
+
+    // Expect either a JSON-RPC error or a result with isError: true
+    if (response.result) {
+      expect(response.result.isError).toBe(true);
+      expect(response.result.content[0].text).toContain("Unknown tool");
+    } else {
+      expect(response.error).toBeDefined();
+    }
   });
 });
 
 /**
  * Edge Cases and Performance Tests.
- *
- * Business Context: Enterprise applications must handle edge cases gracefully
- * and perform well under load.
- *
- * Decision Rationale: Test boundary conditions and performance to ensure
- * production reliability.
  */
 describe("Edge Cases and Performance", () => {
-  let solver: ConstraintSolverServer;
+  let solver: ConstraintMcpServer;
 
   beforeEach(() => {
-    solver = new ConstraintSolverServer();
+    solver = new ConstraintMcpServer();
   });
 
   it("handles empty variables object", async () => {
@@ -310,7 +343,7 @@ describe("Edge Cases and Performance", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(false);
     expect(parsed.unsatisfied).toContain("Too many variables (>1000)");
   });
@@ -323,7 +356,7 @@ describe("Edge Cases and Performance", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(false);
     expect(parsed.unsatisfied).toContain("Too many constraints (>5000)");
   });
@@ -335,7 +368,7 @@ describe("Edge Cases and Performance", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(true);
   });
 
@@ -346,7 +379,7 @@ describe("Edge Cases and Performance", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(true);
   });
 
@@ -357,7 +390,7 @@ describe("Edge Cases and Performance", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(false);
   });
 
@@ -368,7 +401,7 @@ describe("Edge Cases and Performance", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(true);
   });
 
@@ -379,7 +412,7 @@ describe("Edge Cases and Performance", () => {
     };
     const result = await solver.process(input);
     expect(result.isError).toBeUndefined();
-    const parsed = JSON.parse(result.content[0].text);
+    const parsed = JSON.parse((result.content[0] as TextContent).text);
     expect(parsed.satisfied).toBe(true);
   });
 });

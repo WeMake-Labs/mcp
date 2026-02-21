@@ -1,14 +1,14 @@
 {
   "name": "@wemake.cx/analogical-reasoning",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "description": "MCP server for structured analogical reasoning and domain mapping",
   "keywords": [
     "mcp",
     "analogical-reasoning"
   ],
-  "homepage": "https://github.com/Clarity-BI/mcp/tree/main/src/analogical-reasoning",
+  "homepage": "https://github.com/WeMake-Labs/mcp/tree/main/src/analogical-reasoning",
   "bugs": {
-    "url": "https://github.com/Clarity-BI/mcp/issues"
+    "url": "https://github.com/WeMake-Labs/mcp/issues"
   },
   "license": "MIT",
   "author": "Phichayut 'Florentin' Sakwiset <florentin@wemake.cx> (https://github.com/heyFlorentin)",
@@ -23,13 +23,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Clarity-BI/mcp.git",
+    "url": "git+https://github.com/WeMake-Labs/mcp.git",
     "directory": "src/analogical-reasoning"
   },
   "scripts": {
     "build": "bun build ./src/index.ts --outdir='./dist' --target='bun' && tsc",
     "start": "bun run ./dist/index.js",
-    "test": "bun test"
+    "test": "bun test",
+    "publish": "bun publish"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
